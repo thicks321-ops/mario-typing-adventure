@@ -16,7 +16,7 @@ html,body{height:100dvh}
 #kb b.home{border-bottom:5px solid #333}#kb b.hi{opacity:1;transform:scale(1.25);outline:4px solid #fff;box-shadow:0 0 14px #ff0}
 .f0{background:#ff9aa2}.f1{background:#ffdac1}.f2{background:#e2f0cb}.f3{background:#b5ead7}.f4{background:#c7ceea}
 #top{position:absolute;top:8px;right:10px;display:flex;gap:8px}#top button{font:inherit;font-size:20px;padding:6px 12px;border-radius:12px;border:3px solid #333;background:#fff;cursor:pointer}
-#overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;text-shadow:3px 3px 0 #000}
+#overlay{position:absolute;inset:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;text-shadow:3px 3px 0 #000}
 #overlay h1{font-size:clamp(40px,7vw,90px);margin:0 0 10px;color:#ffd800}
 #overlay .big{font-size:clamp(26px,4vw,48px);animation:bob .7s infinite alternate}
 #overlay .tip{font-size:18px;margin-top:24px;max-width:700px;background:#0007;padding:8px 14px;border-radius:10px;text-shadow:none}
@@ -24,6 +24,14 @@ html,body{height:100dvh}
 #levels button{font:inherit;font-size:22px;padding:14px;border-radius:18px;border:4px solid #333;background:#fff;color:#333;cursor:pointer;text-shadow:none}
 #levels button.lock{background:#999;cursor:default}#levels button.sel{outline:6px solid #ffd800}
 .hidden{display:none!important}
+@media (max-height:500px){#overlay h1{font-size:30px;margin:0}#levels{grid-template-columns:repeat(6,1fr);width:96vw;gap:6px}#levels button{font-size:14px;padding:6px}.grade{padding:4px 12px;margin:2px}#gr{margin:6px 0 2px}}
+.grade{background:#0008;border-radius:20px;padding:10px 18px;margin:4px 0 8px;text-shadow:none;width:min(94vw,640px)}
+.glabel{font-size:min(5vw,22px);color:#ffd800}
+#gr{-webkit-appearance:none;appearance:none;width:100%;height:22px;border-radius:12px;background:linear-gradient(90deg,#7ad06a,#ffd23a,#ff9a3a,#ff5a7a);margin:14px 0 6px;touch-action:pan-y}
+#gr::-webkit-slider-thumb{-webkit-appearance:none;width:48px;height:48px;border-radius:50%;background:#e52521;border:5px solid #fff;box-shadow:0 2px 6px #0008;cursor:pointer}
+#gr::-moz-range-thumb{width:40px;height:40px;border-radius:50%;background:#e52521;border:5px solid #fff;cursor:pointer}
+.ticks{display:flex;justify-content:space-between;font-size:min(3.4vw,18px)}.tick{cursor:pointer;padding:2px 4px;border-radius:8px}.tick.on{background:#ffd800;color:#222}
+#gmsg{margin-top:6px;font-size:min(4.5vw,22px);min-height:1.3em}
 #hud{pointer-events:auto;padding-bottom:max(12px,env(safe-area-inset-bottom))}
 #ti{position:absolute;left:-9999px;top:0;opacity:0;width:1px;height:1px}
 @media (pointer:coarse){#kb{gap:5px}#kb div{gap:max(2px,0.9vw)}#kb b{width:min(8.4vw,9.5vh,60px);height:min(11vw,10vh,64px);font-size:min(6vw,5.5vh,30px);opacity:.92}
@@ -38,30 +46,62 @@ html,body{height:100dvh}
 <div id="overlay"></div><input id="ti" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
 <script>
 "use strict";
-const STORIES=[
- {name:"Off We Go",theme:"hills",s:[["Mario is up","wave"],["He has a red hat","hat"],["The sun is hot","run"],["Mario can run","run"],["Run Mario run","run"],["He can hop","hop"]]},
- {name:"Pipe Hop",theme:"pipes",s:[["I see a big pipe","run"],["Hop on the pipe","hop"],["It is green","run"],["Mario can jump","hop"],["Up and up he goes","hop"],["He gets a coin","coin"],["Yay Mario","wave"]]},
- {name:"The Big Bridge",theme:"water",s:[["Here is the sea","run"],["The fish say hi","fish"],["Mario runs on the bridge","run"],["Do not fall","run"],["Jump the gap","hop"],["He made it","wave"]]},
- {name:"Coin Cave",theme:"cave",s:[["It is dark in the cave","run"],["I see a gold coin","coin"],["Get the coin","coin"],["One more coin","coin"],["Mario has lots of coins","coin"],["Look a star","star"],["Mario jumps up","hop"]]},
- {name:"Lava Land",theme:"lava",s:[["The land is red and hot","run"],["Hop over the lava","hop"],["Mario is fast","run"],["Jump jump jump","hop"],["Look the castle","run"],["Peach is in there","wave"],["Keep going Mario","run"]]},
- {name:"Save Peach",theme:"castle",s:[["Mario is at the castle","run"],["Bowser is big and green","run"],["Bowser says stop","run"],["Mario jumps very high","hop"],["Bowser runs away","bowser"],["Peach is free","peach"],["Thank you Mario","peach"],["The end","peach"]]}
-];
+const TIERS=[
+{name:"Kindergarten",m:[
+ {name:"Go Go Go",theme:"hills",s:[["I can run","run"],["I see the sun","hop"],["I see a bug","stomp"],["Hit the red box","block"],["I can go up","climb"],["We go go go","ride"]]},
+ {name:"Pipe Hop",theme:"pipes",s:[["I see a big pipe","hop"],["Get the red cap","grow"],["Now I am big","hop"],["Hit the box","block"],["A bug can run","stomp"],["Yes yes yes","star"]]},
+ {name:"Wet Day",theme:"water",s:[["I can dip in","swim"],["A fish can hop","fish"],["Get on the log","ride"],["I see a bug","stomp"],["I am not wet","hop"],["Look up here","climb"]]},
+ {name:"Dark Den",theme:"cave",s:[["It is dim in here","duck"],["Hit the red box","block"],["A bug is in the den","stomp"],["I can duck","duck"],["Look up up up","climb"],["Yes I got it","star"]]},
+ {name:"Hot Hot",theme:"lava",s:[["It is hot","hop"],["Hop and hop","hop"],["Get on the top","ride"],["I can toss a ball","fire"],["A bug is mad","stomp"],["I see Peach","wave"]]},
+ {name:"Help Peach",theme:"castle",s:[["Here we go","run"],["The big king is mad","duck"],["I can toss a ball","fire"],["I can jump","hop"],["He ran away","bowser"],["Peach is here","peach"],["We did it","peach"]]}]},
+{name:"1st Grade",m:[
+ {name:"Grass Trip",theme:"sunset",s:[["Mario went on a trip","run"],["A frog sat on the grass","hop"],["Then a bug ran at him","stomp"],["He hit the block with his fist","block"],["Up the vine he went","climb"],["He said thank you frog","wave"]]},
+ {name:"Pipe Path",theme:"pipes",s:[["Mario must jump the pipes","hop"],["A red cap made him big","grow"],["Stop that bug","stomp"],["Hit the brick for a coin","block"],["Duck down fast","duck"],["Off he goes","ride"]]},
+ {name:"Splash",theme:"water",s:[["Fish swim in the pond","fish"],["Mario jumps in with a splash","swim"],["A crab is on the sand","stomp"],["Then he hops on a raft","ride"],["He gets a star from the shell","star"],["He shakes off the wet","hop"]]},
+ {name:"Gem Cave",theme:"cave",s:[["This cave is dark and damp","duck"],["He hits a block and gets a coin","block"],["Bats flap past him","duck"],["He can climb up the rope","climb"],["A bug runs at him","stomp"],["What a fun trip","star"]]},
+ {name:"Hot Rocks",theme:"lava",s:[["The rocks are red and hot","hop"],["Mario jumps from rock to rock","hop"],["He can toss a fire ball","fire"],["He rides a block over the mud","ride"],["A bug gets in his way","stomp"],["Peach must be in there","wave"]]},
+ {name:"The King",theme:"castle",s:[["Mario steps in the big fort","run"],["The king has a green shell","duck"],["Mario throws a fire ball","fire"],["Then he jumps over him","hop"],["The king runs off","bowser"],["Peach is safe at last","peach"],["Thank you Mario","peach"]]}]},
+{name:"2nd Grade",m:[
+ {name:"Rainy Meadow",theme:"hills",s:[["Mario wakes up at sunrise","hop"],["He eats toast and leaves home","run"],["A sneaky beetle blocks the road","stomp"],["He bumps a golden block","block"],["A mushroom makes him grow","grow"],["He climbs a leafy vine","climb"]]},
+ {name:"Snowy Peaks",theme:"snow",s:[["Snowflakes float down slowly","duck"],["Mario slides on the frozen lake","ride"],["He leaps over a tall pipe","hop"],["A grumpy beetle waddles near","stomp"],["He throws a fireball at the ice","fire"],["Mario smiles and keeps going","star"]]},
+ {name:"Ocean Reef",theme:"water",s:[["The ocean waves are bright blue","swim"],["Mario dives under the water","swim"],["Seahorses wave hello","fish"],["A sleepy crab snores loudly","stomp"],["He rides a wooden boat to shore","ride"],["He finds a shiny coin","block"]]},
+ {name:"Crystal Cavern",theme:"cave",s:[["Crystals glow in the cavern","star"],["Mario ducks under low rocks","duck"],["He finds a hidden coin block","block"],["He climbs a rope ladder","climb"],["A beetle rolls toward him","stomp"],["Mario feels brave and strong","hop"]]},
+ {name:"Desert Sun",theme:"desert",s:[["The desert sand is dry and hot","run"],["Mario jumps over a cactus","hop"],["He rides a floating carpet","ride"],["A beetle crawls closer","stomp"],["He tosses a fireball at a rock","fire"],["Peach is waiting inside","wave"]]},
+ {name:"Bowser Tower",theme:"castle",s:[["Mario reaches the stone tower","run"],["Bowser roars from the bridge","duck"],["Mario throws fireballs back","fire"],["He leaps over the king","hop"],["Bowser slips and rolls away","bowser"],["Princess Peach is free again","peach"],["Everyone cheers hooray","peach"]]}]},
+{name:"3rd Grade",m:[
+ {name:"Morning Adventure",theme:"hills",s:[["Mario packed his backpack for a big adventure","run"],["Butterflies fluttered over the colorful flowers","hop"],["Suddenly a mushroom monster wobbled toward him","stomp"],["A mystery block contained a sparkling coin","block"],["He climbed an enormous beanstalk to look ahead","climb"],["Feeling wonderful he hurried along","ride"]]},
+ {name:"Pipeline Puzzle",theme:"pipes",s:[["Gigantic green pipes stretched across the valley","run"],["Mario carefully jumped from pipe to pipe","hop"],["A magical mushroom made him twice as tall","grow"],["He discovered a secret underground tunnel","duck"],["Floating platforms carried him forward","ride"],["Another grumpy beetle tumbled away","stomp"]]},
+ {name:"Underwater Kingdom",theme:"water",s:[["Mario swam beneath the sparkling ocean","swim"],["Friendly dolphins whistled a cheerful melody","fish"],["Jellyfish drifted gently around the coral","swim"],["A lazy crab wandered across his path","stomp"],["He discovered a treasure chest full of coins","block"],["He rode a wooden raft back to the beach","ride"]]},
+ {name:"Midnight Forest",theme:"night",s:[["Fireflies twinkled in the midnight forest","star"],["Owls hooted quietly from the branches","duck"],["A grumpy beetle interrupted his journey","stomp"],["He practiced throwing fireballs at stumps","fire"],["Climbing a twisted vine he reached the treetops","climb"],["The moonlight showed the way to the castle","run"]]},
+ {name:"Volcano Valley",theme:"lava",s:[["Bubbling lava glowed beneath the volcano","hop"],["Mario balanced on a moving platform","ride"],["Fiery sparks danced through the air","duck"],["He discovered an invincibility star","star"],["Nothing could stop him now","fire"],["He bravely approached the gloomy fortress","wave"]]},
+ {name:"Final Showdown",theme:"castle",s:[["Inside the fortress Bowser was waiting impatiently","run"],["The enormous turtle king stomped his feet","duck"],["Mario launched fireballs with perfect aim","fire"],["He leaped over obstacles without stopping","hop"],["Bowser grumbled and retreated far away","bowser"],["Princess Peach thanked Mario for his courage","peach"],["Everyone celebrated with fireworks and laughter","peach"]]}]}];
+var tier=0;const ST=()=>TIERS[tier].m;
+const HINT={mario:"🧢",peach:"👸",bowser:"🐢"};
 const THEMES={hills:{sky:["#6ec6ff","#bdeaff"],hill:"#3fae49",hill2:"#7cd36f",ground:"#c8743a",top:"#4cc04a"},
 pipes:{sky:["#5ab4ff","#cdf"],hill:"#2f9a3f",hill2:"#6fc96a",ground:"#b5652f",top:"#3db042"},
 water:{sky:["#7fd0ff","#e0f6ff"],hill:"#4aa0c8",hill2:"#88c8e0",ground:"#c8743a",top:"#4cc04a"},
 cave:{sky:["#2b2440","#4a3f66"],hill:"#3a3150",hill2:"#4c4266",ground:"#6a5a7a",top:"#8a7aa0"},
 lava:{sky:["#ff9a5a","#ffd29a"],hill:"#a0503a",hill2:"#c87050",ground:"#6a3a2a",top:"#9a4a30"},
-castle:{sky:["#5a4a8a","#c8a0d8"],hill:"#6a5a7a",hill2:"#8a7a9a",ground:"#777",top:"#999"}};
+castle:{sky:["#5a4a8a","#c8a0d8"],hill:"#6a5a7a",hill2:"#8a7a9a",ground:"#777",top:"#999"},
+sunset:{sky:["#ff8a6a","#ffe0a0"],hill:"#3a9a4a",hill2:"#e0a050",ground:"#b5652f",top:"#58b840"},
+snow:{sky:["#9ad0ff","#f0f8ff"],hill:"#cfe6f5",hill2:"#e8f4ff",ground:"#8aa8c8",top:"#fff"},
+desert:{sky:["#ffc860","#fff0c0"],hill:"#e0a050",hill2:"#f0c878",ground:"#d89a50",top:"#f0c070"},
+night:{sky:["#0a1440","#2a3a7a"],hill:"#1a4a3a",hill2:"#24604a",ground:"#5a3a2a",top:"#2a8a4a"}};
+const FAM={sunset:"hills",snow:"hills",desert:"hills",night:"hills"};
 const STEP=110;
 // ---------- state
-let save=JSON.parse(localStorage.getItem("mta_save")||"null")||{unlocked:1,stars:[0,0,0,0,0,0]};
+const blank=()=>({v:2,tier:0,done:[0,1,2,3].map(()=>[0,0,0,0,0,0])});
+let save=(()=>{let o;try{o=JSON.parse(localStorage.getItem("mta_save")||"null")}catch(e){}
+ if(!o)return blank();if(o.v===2&&o.done)return o;const n=blank();if(o.stars)o.stars.forEach((x,i)=>{if(x>0)n.done[0][i]=1});return n})();
+tier=save.tier||0;
+const tierOpen=t=>t===0||save.done[t-1].every(Boolean),misOpen=(t,m)=>tierOpen(t)&&(m===0||!!save.done[t][m-1]);
 function store(){localStorage.setItem("mta_save",JSON.stringify(save))}
 var mode="start",lvl=0,si=0,wi=0,ci=0,words=[],muted=false,showKb=true,selIdx=0;
-let mario={x:80,tx:80,y:0,vy:0,face:1,anim:0,act:null,actT:0},cam=0,parts=[],coins=[],t=0,ending=0,bowserX=0,bowserGone=0;
+let props=[],wc=0;let mario={x:80,tx:80,y:0,vy:0,face:1,anim:0,act:null,actT:0},cam=0,parts=[],coins=[],t=0,ending=0,bowserX=0,bowserGone=0;
 const cv=document.getElementById("game"),cx=cv.getContext("2d");let W,H,S,GY;
 const TOUCH=matchMedia("(pointer:coarse)").matches||"ontouchstart" in window;
 function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight;S=Math.max(2,Math.round(Math.min(W,H)/(TOUCH?150:170)));setGY()}
-function setGY(){const hh=(mode==="play"&&hud)?hud.offsetHeight:0;GY=Math.round(Math.max(16*S*1.6+40,Math.min(H*0.5,H-hh-4)))}
+function setGY(){const hh=(mode==="play"&&hud)?hud.offsetHeight:0;GY=Math.round(Math.max(16*S*2+60,Math.min(H*(H>W?0.75:0.55),H-hh-S*8)))}
 addEventListener("resize",resize);resize();
 // ---------- audio
 let ac=null;function au(){if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(ac&&ac.state==="suspended")ac.resume()}
@@ -75,35 +115,84 @@ const ROWS=["qwertyuiop","asdfghjkl","zxcvbnm"],FING={q:0,a:0,z:0,w:1,s:1,x:1,e:
 kbEl.innerHTML=ROWS.map(r=>"<div>"+[...r].map(k=>`<b id="k_${k}" class="f${FING[k]}${"fj".includes(k)?" home":""}">${k}</b>`).join("")+"</div>").join("");
 function showStart(){ov.style.justifyContent="";ov.style.paddingTop="";mode="start";hud.classList.add("hidden");ov.classList.remove("hidden");
  ov.innerHTML=`<h1>Mario Typing Adventure</h1><div style="font-size:clamp(20px,3vw,32px)">Help Mario save Princess Peach!</div><p class="big"><span class="tk">Tap or press any key to start</span></p><div class="tip">👪 Parent tip: sit with your child, keep fingers on the home row (bumps on F and J). The glowing key on the keyboard shows what to press next. No timers, no wrong answers — just fun!</div>`}
-function showSelect(){ov.style.justifyContent="";ov.style.paddingTop="";mode="select";hud.classList.add("hidden");ov.classList.remove("hidden");selIdx=Math.min(selIdx,save.unlocked-1);
- ov.innerHTML=`<h1>Pick a Story</h1><div id="levels">${STORIES.map((s,i)=>{const lock=i>=save.unlocked;return `<button data-i="${i}" class="${lock?"lock":""} ${i===selIdx?"sel":""}">${lock?"🔒":"⭐".repeat(save.stars[i])||"▶️"}<br>${i+1}. ${s.name}</button>`}).join("")}</div>
- <div style="font-size:22px">Tap a story (or arrow keys + Enter) &nbsp; <button id="reset" style="font:inherit;font-size:16px;border-radius:10px">Reset progress</button></div>`;
- ov.querySelectorAll("#levels button").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(i<save.unlocked)startLevel(i)});
- document.getElementById("reset").onclick=()=>{if(confirm("Reset all progress?")){save={unlocked:1,stars:[0,0,0,0,0,0]};store();selIdx=0;showSelect()}}}
-function startLevel(i){lvl=i;si=0;wi=0;ci=0;mode="play";ending=0;bowserGone=0;parts=[];coins=[];
- mario={x:80,tx:80,y:0,vy:0,face:1,anim:0,act:null,actT:0};cam=0;
- const total=STORIES[i].s.reduce((a,s)=>a+s[0].split(" ").length,0);bowserX=80+(total+2)*STEP;
+function gridHTML(){return ST().map((st,i)=>{const lock=!misOpen(tier,i),d=save.done[tier][i];return `<button data-i="${i}" class="${lock?"lock":""} ${i===selIdx?"sel":""}">${lock?"🔒":d?"⭐⭐⭐":"▶️"}<br>${i+1}. ${st.name}</button>`}).join("")}
+function bindGrid(){ov.querySelectorAll("#levels button").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(misOpen(tier,i))startLevel(i)})}
+function setTier(v){const msg=document.getElementById("gmsg"),gr=document.getElementById("gr");
+ if(!tierOpen(v)){if(gr)gr.value=tier;if(msg){msg.textContent=`🔒 Finish ${TIERS[v-1].name} to unlock ${TIERS[v].name}!`;msg.classList.remove("shake");void msg.offsetWidth;msg.classList.add("shake")}sfx.boop();return}
+ tier=v;save.tier=v;store();selIdx=0;while(selIdx<5&&misOpen(tier,selIdx+1)&&save.done[tier][selIdx])selIdx++;
+ if(msg)msg.textContent=`${TIERS[v].name} missions`;document.getElementById("levels").innerHTML=gridHTML();bindGrid();
+ ov.querySelectorAll(".tick").forEach((e,i)=>e.classList.toggle("on",i===v))}
+function showSelect(){ov.style.justifyContent="";ov.style.paddingTop="";mode="select";hud.classList.add("hidden");ov.classList.remove("hidden");if(!tierOpen(tier))tier=0;if(!misOpen(tier,selIdx))selIdx=0;
+ ov.innerHTML=`<h1>Pick a Mission</h1><div class="grade"><div class="glabel">Grade level</div><input id="gr" type="range" min="0" max="3" step="1" value="${tier}" aria-label="Grade level">
+ <div class="ticks">${TIERS.map((T,i)=>`<span class="tick ${i===tier?"on":""}" data-t="${i}">${tierOpen(i)?"":"🔒 "}${T.name}</span>`).join("")}</div><div id="gmsg">${TIERS[tier].name} missions</div></div>
+ <div id="levels">${gridHTML()}</div>
+ <div style="font-size:min(4.5vw,20px)">Tap a mission (or arrow keys + Enter) &nbsp; <button id="reset" style="font:inherit;font-size:16px;border-radius:10px">Reset progress</button></div>`;
+ bindGrid();const gr=document.getElementById("gr");gr.addEventListener("input",()=>setTier(+gr.value));gr.addEventListener("keydown",e=>e.stopPropagation());
+ ov.querySelectorAll(".tick").forEach(e=>e.onclick=()=>{gr.value=e.dataset.t;setTier(+e.dataset.t)});
+ document.getElementById("reset").onclick=()=>{if(confirm("Reset all progress?")){save=blank();tier=0;store();selIdx=0;showSelect()}}}
+function startLevel(i){lvl=i;si=0;wi=0;ci=0;mode="play";ending=0;bowserGone=0;parts=[];coins=[];props=[];fw=[];
+ mario={x:80,tx:80,y:0,vy:0,face:1,anim:0,act:null,actT:0,big:false};cam=0;
+ const total=ST()[i].s.reduce((a,s)=>a+s[0].split(" ").length,0);bowserX=80+(total+3)*STEP;
  ov.classList.add("hidden");hud.classList.remove("hidden");loadSentence()}
-function loadSentence(){words=STORIES[lvl].s[si][0].split(" ");wi=0;ci=0;render()}
+function loadSentence(){words=ST()[lvl].s[si][0].split(" ");wi=0;ci=0;render()}
 function render(){setTimeout(setGY,0);sEl.innerHTML=words.map((w,i)=>`<span class="${i<wi?"done":i===wi?"cur":""}">${w}</span>`).join(" ");
- const w=words[wi]||"";wEl.innerHTML=[...w].map((c,i)=>i<ci?`<span class="ok">${c}</span>`:i===ci?`<span class="next">${c}</span>`:`<span>${c}</span>`).join("");
+ const w=words[wi]||"";wEl.innerHTML=[...w].map((c,i)=>i<ci?`<span class="ok">${c}</span>`:i===ci?`<span class="next">${c}</span>`:`<span>${c}</span>`).join("")+(HINT[w.toLowerCase()]?`<span style="font-size:.55em;vertical-align:middle"> ${HINT[w.toLowerCase()]}</span>`:"");
  kbEl.classList.toggle("hidden",!showKb);kbEl.querySelectorAll("b").forEach(b=>b.classList.remove("hi"));const n=(w[ci]||"").toLowerCase();const kb=document.getElementById("k_"+n);if(kb)kb.classList.add("hi")}
 function shake(){wEl.classList.remove("shake");void wEl.offsetWidth;wEl.classList.add("shake")}
-function doAction(a){mario.act=a;mario.actT=0;
- if(a==="hop"||a==="star"){mario.vy=-9;sfx.jump()} if(a==="star"){for(let i=0;i<14;i++)parts.push(p(mario.x,-40,"✦","#ff0"))}
- if(a==="coin"){coins.push({x:mario.x+10,y:-60,vy:-7,life:50});mario.vy=-6;sfx.coin()}
- if(a==="fish"){for(let i=0;i<3;i++)coins.push({x:mario.x+60+i*50,y:40,vy:-9-i,life:60,fish:1})}
+function doAction(a){const m=mario;m.act=a;m.actT=0;m.ax=m.x;
+ if(a==="hop"||a==="run"){m.vy=a==="hop"?-11:-7;m.tx+=a==="run"?STEP*.6:STEP*.3;sfx.jump()}
+ if(a==="block"){props.push({k:"q",x:m.tx+6*S,t:0});m.vy=-11.5;sfx.jump()}
+ if(a==="stomp"){props.push({k:"g",x:m.x+260,t:0,flat:0})}
+ if(a==="grow"){props.push({k:"sh",x:m.x+240,t:0})}
+ if(a==="fire"){for(let i=0;i<3;i++)props.push({k:"f",x:m.x+12*S,y:-10*S,vx:7,vy:-2,t:-i*12})}
+ if(a==="star"){props.push({k:"st",x:m.x+220,y:-90,t:0})}
+ if(a==="duck"){props.push({k:"puff",x:m.x+380,t:0})}
+ if(a==="swim"){props.push({k:"wt",x:m.x,t:0});sfx.jump()}
+ if(a==="climb"){props.push({k:"vine",x:m.x+14*S,t:0});m.tx=m.x+12*S}
+ if(a==="ride"){props.push({k:"plat",t:0})}
+ if(a==="wave"){m.vy=-6;for(let i=0;i<6;i++)parts.push(p(m.x+20,-50,"♪","#fff"))}
+ if(a==="fish"){for(let i=0;i<3;i++)coins.push({x:m.x+60+i*50,y:40,vy:-9-i,life:60,fish:1})}
  if(a==="bowser"){bowserGone=1}
- if(a==="peach"){for(let i=0;i<8;i++)parts.push(p(mario.x+40,-50,"♥","#ff4f9a"))}}
+ if(a==="peach"){m.vy=-8;for(let i=0;i<8;i++)parts.push(p(m.x+40,-50,"♥","#ff4f9a"))}}
+function wordReact(){const m=mario,k=wc++%3;if(m.act&&m.actT<90)return;if(k===0&&m.y===0)m.vy=-5;else if(k===1){coins.push({x:m.x+10,y:-60,vy:-7,life:40});sfx.coin()}else for(let i=0;i<5;i++)parts.push(p(m.x+20,-20,"✦","#ffe95a"))}
+function actUpdate(){const m=mario;m.hold=false;m.duck=false;m.rain=false;if(!m.act)return;const a=m.act,T=++m.actT;
+ if(a==="climb"&&T>15&&T<85){m.hold=true;m.y=Math.max(-S*45,-(T-15)*4);m.vy=0}
+ if(a==="swim"&&T<110){m.hold=true;m.y=-S*10-Math.sin(T/9)*S*6;m.tx+=1;if(T%8===0)parts.push({x:m.x+40,y:m.y-10,vx:0,vy:-1,life:40,ch:"○",col:"#dff"})}
+ if(a==="ride"&&T<90){m.hold=true;m.y=Math.max(-S*8,m.y-2);m.tx+=2.2;m.x=m.tx}
+ if(a==="duck"&&T<70)m.duck=true;
+ if(a==="leap"&&T>34){m.act="slide";m.actT=0;m.sy0=Math.min(m.y,-S*40)}
+ if(a==="slide"){m.hold=true;m.y=m.sy0*(1-Math.min(1,T/55));if(T===56){m.vy=-8;m.tx+=STEP}}
+ if(a==="sliderain"){}
+ if(m.starT>0){m.starT--;m.rain=true}
+ if(T>200&&a!=="slide")m.act=null}
+function propsUpdate(ox){const m=mario,base=GY;for(const q of props){q.t++;
+ if(q.k==="q"){const y=base-16*S*(mario.big?1.35:1)-S*8-105,bump=q.t>14&&q.t<22?-S*2:0;bricks(ox+q.x-8*S,y+bump,1);if(q.t===17){coins.push({x:q.x,y:y-base+16*S-S*8,vy:-9,life:45});sfx.coin()}if(q.t>110)q.dead=1}
+ if(q.k==="g"){if(!q.flat){q.x-=2.6;if(!q.jumped&&q.x-m.x<110){q.jumped=1;m.vy=-11;m.tx=q.x+8;sfx.jump()}
+   if(q.jumped&&m.vy>0&&Math.abs(m.x+6*S-q.x)<10*S&&m.y>-10*S||q.t>120){q.flat=1;m.vy=-7;tone(220,.12,"square",.08);tone(440,.1,"square",.06,.08);for(let i=0;i<6;i++)parts.push(p(q.x,-4,"★","#ffd800"))}}
+  else if(++q.flat>45)q.dead=1;goomba(ox+q.x,base,q.flat)}
+ if(q.k==="sh"){q.x-=4;mushroom(ox+q.x,base);if(q.x<=m.x+8*S){q.dead=1;m.big=true;[523,659,784,1047].forEach((f,i)=>tone(f,.08,"square",.07,i*.06));for(let i=0;i<8;i++)parts.push(p(m.x+20,-30,"✦","#ff6"))}}
+ if(q.k==="f"){if(q.t>0){q.x+=q.vx;q.vy+=.6;q.y+=q.vy;if(q.y>-3*S){q.y=-3*S;q.vy=-6}if(q.t===1)tone(600,.08,"sawtooth",.05);
+   cx.fillStyle=q.t%6<3?"#ff6a00":"#ffd000";cx.beginPath();cx.arc(ox+q.x,base+q.y,S*2.5,0,7);cx.fill();cx.fillStyle="#fff6a0";cx.beginPath();cx.arc(ox+q.x,base+q.y,S*1.2,0,7);cx.fill()}if(q.t>70)q.dead=1}
+ if(q.k==="st"){q.x+=(m.x+6*S-q.x)*.06;q.y+=(m.y-10*S-q.y)*.06;cx.font=`${S*12}px sans-serif`;cx.textAlign="center";cx.fillStyle="#ffd800";cx.fillText("★",ox+q.x,base+q.y+Math.sin(t/4)*5);
+   if(q.t>45){q.dead=1;m.starT=150;m.vy=-9;[784,988,1175,1568].forEach((f,i)=>tone(f,.1,"square",.06,i*.07))}}
+ if(q.k==="puff"){q.x-=7;const y=base-16*S-S*2;cx.fillStyle="#fff";cx.beginPath();cx.arc(ox+q.x,y,S*5,0,7);cx.arc(ox+q.x+S*6,y-S*2,S*6,0,7);cx.arc(ox+q.x+S*12,y,S*5,0,7);cx.fill();cx.fillStyle="#333";cx.fillRect(ox+q.x-S*2,y-S,S,S*2);cx.fillRect(ox+q.x+S*2,y-S,S,S*2);if(q.t>90)q.dead=1}
+ if(q.k==="wt"){cx.fillStyle="rgba(40,140,230,.45)";cx.fillRect(ox+q.x-200,base-S*40,600+q.t*2,S*40);cx.fillStyle="#fff8";for(let i=0;i<10;i++)cx.fillRect(ox+q.x-200+i*60+Math.sin(t/8+i)*6,base-S*40,S*6,S);if(q.t>115)q.dead=1}
+ if(q.k==="vine"){const h=Math.min(S*62,q.t*6);cx.fillStyle="#2a9a2a";cx.fillRect(ox+q.x,base-h,S*2,h);for(let y=S*6;y<h;y+=S*8){cx.fillStyle="#4ccc4a";cx.beginPath();cx.ellipse(ox+q.x+((y/S/8)%2?-S*3:S*5),base-y,S*3,S*1.5,0,0,7);cx.fill()}if(q.t>120)q.dead=1}
+ if(q.k==="plat"){const sc=m.big?1.35:1;cx.fillStyle="#c86a1e";cx.fillRect(ox+m.x-S*3,base+m.y,S*18*sc,S*3);cx.fillStyle="#ffd060";cx.fillRect(ox+m.x-S*3,base+m.y,S*18*sc,S);if(q.t>95)q.dead=1}
+ }props=props.filter(q=>!q.dead)}
+function goomba(x,y,flat){const h=flat?S*4:S*12,w=S*14,bob=flat?0:Math.sin(t/4)*S;cx.fillStyle="#8a4a1e";cx.beginPath();cx.ellipse(x,y-h*.6,w/2,h*.55,0,Math.PI,0);cx.fill();cx.fillRect(x-w/2,y-h*.62,w,h*.2);
+ cx.fillStyle="#f2d0a0";cx.fillRect(x-w*.3,y-h*.45,w*.6,h*.35);if(!flat){cx.fillStyle="#fff";cx.fillRect(x-S*4,y-h*.75,S*3,S*3);cx.fillRect(x+S,y-h*.75,S*3,S*3);cx.fillStyle="#222";cx.fillRect(x-S*3,y-h*.7,S*2,S*2);cx.fillRect(x+S*2,y-h*.7,S*2,S*2)}
+ cx.fillStyle="#3a2010";cx.fillRect(x-w*.45,y-S*2+bob,w*.35,S*2);cx.fillRect(x+w*.1,y-S*2-bob,w*.35,S*2)}
+function mushroom(x,y){const w=S*12;cx.fillStyle="#f5e6c8";cx.fillRect(x-w*.3,y-S*7,w*.6,S*7);cx.fillStyle="#e52521";cx.beginPath();cx.ellipse(x,y-S*7,w/2,S*6,0,Math.PI,0);cx.fill();cx.fillStyle="#fff";cx.beginPath();cx.arc(x-S*3,y-S*10,S*1.6,0,7);cx.arc(x+S*3,y-S*9,S*1.4,0,7);cx.fill();cx.fillStyle="#222";cx.fillRect(x-S*2,y-S*5,S,S*2);cx.fillRect(x+S,y-S*5,S,S*2)}
 function p(x,y,ch,col){return{x,y,vx:(Math.random()-.5)*6,vy:-Math.random()*6-2,life:60+Math.random()*30,ch,col}}
 function key(e){au();const k=e.key;
  if(mode==="start"){showSelect();return}
- if(mode==="select"){if(k==="ArrowRight")selIdx=Math.min(save.unlocked-1,selIdx+1);else if(k==="ArrowLeft")selIdx=Math.max(0,selIdx-1);else if(k==="ArrowDown")selIdx=Math.min(save.unlocked-1,selIdx+3);else if(k==="ArrowUp")selIdx=Math.max(0,selIdx-3);else if(k==="Enter"||k===" "){startLevel(selIdx);return}else return;showSelect();return}
- if(mode==="done"){if(ending>90&&(k==="Enter"||k===" ")){if(lvl<5&&lvl+1<save.unlocked)startLevel(lvl+1);else showSelect()}return}
+ if(mode==="select"){let n=selIdx;if(k==="ArrowRight")n++;else if(k==="ArrowLeft")n--;else if(k==="ArrowDown")n+=3;else if(k==="ArrowUp")n-=3;else if(k==="Enter"||k===" "){if(misOpen(tier,selIdx))startLevel(selIdx);return}else return;if(n>=0&&n<6&&misOpen(tier,n))selIdx=n;document.getElementById("levels").innerHTML=gridHTML();bindGrid();return}
+ if(mode==="done"){if(ending>90&&(k==="Enter"||k===" ")){if(lvl<5&&misOpen(tier,lvl+1))startLevel(lvl+1);else{if(lvl===5&&tier<3&&tierOpen(tier+1)){tier++;save.tier=tier;store();selIdx=0}showSelect()}}return}
  if(mode!=="play"||k.length!==1||e.ctrlKey||e.metaKey)return;e.preventDefault();if(k===" ")return;
  const w=words[wi];if(k.toLowerCase()===w[ci].toLowerCase()){ci++;sfx.blip();mario.tx+=STEP/w.length*0.3;
-  if(ci>=w.length){wi++;ci=0;sfx.word();mario.tx=Math.round((mario.tx-80)/STEP+0.7)*STEP+80;if(Math.random()<.4&&mario.y===0){mario.vy=-6}
-   if(wi>=words.length){doAction(STORIES[lvl].s[si][1]);si++;if(si>=STORIES[lvl].s.length){finish();render();return}setTimeout(()=>{if(mode==="play")loadSentence()},500);words=[...words];render();wEl.innerHTML="⭐";return}}
+  if(ci>=w.length){wi++;ci=0;sfx.word();mario.tx=Math.round((mario.tx-80)/STEP+0.7)*STEP+80;wordReact();
+   if(wi>=words.length){doAction(ST()[lvl].s[si][1]);si++;if(si>=ST()[lvl].s.length){finish();render();return}setTimeout(()=>{if(mode==="play")loadSentence()},700);words=[...words];render();wEl.innerHTML="⭐";return}}
   render()}else{sfx.boop();shake()}}
 addEventListener("keydown",e=>{if(e.target.id==="ti")return;key(e)});
 const fake=k=>({key:k,preventDefault(){}});
@@ -111,14 +200,16 @@ kbEl.addEventListener("pointerdown",e=>{const b=e.target.closest("b");if(!b)retu
 ov.addEventListener("pointerup",e=>{if(e.target.closest("button"))return;if(mode==="start")key(fake("x"));else if(mode==="done")key(fake("Enter"))});
 const ti=document.getElementById("ti");ti.addEventListener("input",()=>{for(const c of ti.value)key(fake(c));ti.value=""});
 wEl.addEventListener("pointerdown",()=>{if(TOUCH&&!showKb)ti.focus()});
-function finish(){mode="done";ending=0;save.stars[lvl]=3;if(save.unlocked<lvl+2)save.unlocked=Math.min(6,lvl+2);store();sfx.fan();mario.tx=bowserX-(lvl===5?60:0);if(lvl===5&&!bowserGone)bowserGone=1;
+function finish(){mode="done";ending=0;save.done[tier][lvl]=1;store();sfx.fan();const m=mario;
+ if(lvl===5){m.tx=bowserX-60;if(!bowserGone)bowserGone=1}else{m.tx=bowserX+STEP*.5-12*S;m.vy=-15;m.act="leap";m.actT=0}
+ const last=lvl===5,nextT=last&&tier<3?TIERS[tier+1].name:"";
  setTimeout(()=>{if(mode!=="done")return;ov.classList.remove("hidden");ov.style.justifyContent="flex-start";ov.style.paddingTop="40px";hud.classList.add("hidden");
- ov.innerHTML=lvl===5?`<h1>You saved Peach! 💖</h1><div class="big">⭐⭐⭐ You are a typing hero! ⭐⭐⭐</div><div class="tip" style="font-size:22px">Tap or press Enter to play again</div>`:`<h1>Great job! ⭐⭐⭐</h1><div style="font-size:32px">Story ${lvl+1} done!</div><div class="tip" style="font-size:22px">Tap or press Enter for the next story</div>`},1500)}
+ ov.innerHTML=last?`<h1>You saved Peach! 💖</h1><div class="big">⭐⭐⭐ ${TIERS[tier].name} hero! ⭐⭐⭐</div>${nextT?`<div style="font-size:min(6vw,32px)">🔓 ${nextT} missions unlocked!</div>`:`<div style="font-size:min(6vw,32px)">You beat every grade! 🏆</div>`}<div class="tip" style="font-size:22px">Tap or press Enter to continue</div>`:`<h1>Great job! ⭐⭐⭐</h1><div style="font-size:min(6vw,32px)">${TIERS[tier].name} mission ${lvl+1} done!</div><div class="tip" style="font-size:22px">Tap or press Enter for the next mission</div>`},2200)}
 document.getElementById("muteBtn").onclick=e=>{muted=!muted;e.target.textContent=muted?"🔇":"🔊";e.target.blur()};
 document.getElementById("kbBtn").onclick=e=>{showKb=!showKb;render();if(TOUCH&&!showKb)ti.focus();else{ti.blur();e.target.blur()}};
 document.getElementById("menuBtn").onclick=e=>{e.target.blur();showSelect()};
 // ---------- drawing
-function px(map,pal,x,y,flip){const s=S;for(let r=0;r<map.length;r++)for(let c=0;c<map[r].length;c++){const ch=map[r][c];if(ch==="."||!pal[ch])continue;cx.fillStyle=pal[ch];const cc=flip?map[r].length-1-c:c;cx.fillRect(Math.round(x+cc*s),Math.round(y+r*s),s,s)}}
+function px(map,pal,x,y,flip,sc=1,sy=1){const s=S*sc,sv=s*sy;for(let r=0;r<map.length;r++)for(let c=0;c<map[r].length;c++){const ch=map[r][c];if(ch==="."||!pal[ch])continue;cx.fillStyle=pal[ch];const cc=flip?map[r].length-1-c:c;cx.fillRect(Math.round(x+cc*s),Math.round(y+r*sv),Math.ceil(s),Math.ceil(sv))}}
 const HERO=["...RRRRR....","..RRRRRRRRR.","..HHHSSKS...",".HSHSSSKSSS.",".HSHHSSSKSSS","..HSSSSKKKK.","...SSSSSSS..","..RRBRRR....",".RRRBRRBRRR.","RRRRBBBBRRRR","SSRBYBBYBRSS","SSSBBBBBBSSS","SSBBBBBBBBSS","..BBB..BBB..",".HHH....HHH.","HHHH....HHHH"];
 const HERO2=["...RRRRR....","..RRRRRRRRR.","..HHHSSKS...",".HSHSSSKSSS.",".HSHHSSSKSSS","..HSSSSKKKK.","...SSSSSSS..","..RRBRRRR...",".RRRRBBRRSS.","SRRRBBYBBSS.","SS.BBBBBBB..","...BBBBBBB..","..BBBB.BBB..","..HHH..BBB..","..HHHH.HHH..","........HHHH"];
 const HPAL={R:"#e52521",H:"#6b3a12",S:"#ffc69a",K:"#2a1a0a",B:"#2a56d8",Y:"#ffd800"};
@@ -127,9 +218,10 @@ const PPAL={Y:"#ffd23a",O:"#40c0ff",S:"#ffd6b8",K:"#333",P:"#ff7ac0",W:"#fff"};
 const BOWSER=["......OO.OO......","....RRRRRR.......","...GGGGGGGG......","..GGWKGGGGGG.....","..GGGGGGGGGGOO...","..YYYYGGGGGGGGO..","...YWYWGGGGGGGGO.","....YYY.GTGTGTGO.",".....GGGGTGTGTGT.","....YGGYYGGGGGGG.","...YYGYYYYGGGGG..","...YYYYYYYYGGG...","....YYYYYYYGG....","....GGG...GGG....","...WGGG...GGGW..."];
 const BPAL={O:"#fff3c0",R:"#ff6a1a",G:"#3aa83a",W:"#fff",K:"#222",Y:"#ffe08a",T:"#fff"};
 function grad(c1,c2){const g=cx.createLinearGradient(0,0,0,H);g.addColorStop(0,c1);g.addColorStop(1,c2);return g}
-function drawWorld(){const th=THEMES[STORIES[lvl].theme],T=STORIES[lvl].theme;
+function drawWorld(){const TH=ST()[lvl].theme,th=THEMES[TH],T=FAM[TH]||TH;
  cx.fillStyle=grad(th.sky[0],th.sky[1]);cx.fillRect(0,0,W,H);
- if(T!=="cave"&&T!=="castle"){cx.fillStyle=T==="lava"?"#fff2":"#fff";for(let i=0;i<8;i++){const x=((i*260-cam*.15)%(W+300)+W+300)%(W+300)-150,y=40+(i%3)*45;cloud(x,y)}}
+ if(TH==="night"){cx.fillStyle="#fffbe0";cx.beginPath();cx.arc(W*.8,H*.12,S*10,0,7);cx.fill();for(let i=0;i<40;i++){cx.fillStyle=(t+i*13)%60<30?"#fff":"#fff6";cx.fillRect(((i*97-cam*.1)%W+W)%W,(i*53)%(GY*.7),S,S)}}
+ else if(T!=="cave"&&T!=="castle"){cx.fillStyle=T==="lava"?"#fff2":"#fff";for(let i=0;i<8;i++){const x=((i*260-cam*.15)%(W+300)+W+300)%(W+300)-150,y=40+(i%3)*45;cloud(x,y)}}
  else{cx.fillStyle="#fff8";for(let i=0;i<30;i++){const x=((i*97-cam*.1)%W+W)%W;cx.fillRect(x,(i*53)%(GY*.7),S,S)}}
  for(const [sp,col,hh] of [[.3,th.hill2,.35],[.55,th.hill,.22]]){cx.fillStyle=col;for(let i=-1;i<W/180+2;i++){const off=-((cam*sp)%360);const x=off+i*360;cx.beginPath();cx.ellipse(x+180,GY,170,H*hh,0,Math.PI,0);cx.fill()}}
  // ground
@@ -141,7 +233,7 @@ function drawWorld(){const th=THEMES[STORIES[lvl].theme],T=STORIES[lvl].theme;
   cx.fillStyle=th.ground;cx.fillRect(x,GY,tile+1,H);cx.fillStyle=th.top;cx.fillRect(x,GY,tile+1,S*2);cx.fillStyle="#0002";cx.fillRect(x,GY+tile,tile,S);cx.fillRect(x+tile-S,GY,S,H)}
  // props
  for(let i=1;i<60;i++){const wx=80+i*STEP*2.5;const x=ox+wx;if(x<-200||x>W+200)continue;
-  if(T==="pipes"||(T==="hills"&&i%3===0))pipe(x+40,i%2?2:3);
+  if(TH==="desert"&&i%2)cactus(x+40);else if(TH==="night"&&i%2)tree(x+40);else if(T==="pipes"||(T==="hills"&&i%3===0))pipe(x+40,i%2?2:3);
   if(T==="cave"&&i%2){coin(x+30,GY-tile*3+Math.sin(t/8+i)*4)}
   if(T==="hills"||T==="cave"||T==="pipes"){if(i%3===1)bricks(x,GY-tile*4)}
   if(T==="castle"&&i%2){cx.fillStyle="#555";cx.fillRect(x,GY-tile*6,tile*1.2,tile*6);cx.fillStyle="#ff8a2a";cx.fillRect(x+tile*.4,GY-tile*4,tile*.4,tile*.6+Math.sin(t/5+i)*3)}
@@ -150,16 +242,23 @@ function drawWorld(){const th=THEMES[STORIES[lvl].theme],T=STORIES[lvl].theme;
  else flag(ox+bowserX+STEP*.5);
  if(T==="castle"){const bx=ox+bowserX+(bowserGone?Math.min(2000,(ending+bowserGone)*6):0);if(bowserGone)bowserGone++;px(BOWSER,BPAL,bx,GY-15*S*1.3,1-1);
   const peachX=ox+bowserX+STEP*1.4;px(PEACH,PPAL,peachX,GY-16*S+(mode==="done"?-Math.abs(Math.sin(t/8))*S*4:0),true)}
+ propsUpdate(ox);
  // hero
- const m=mario,hx=ox+m.x,hy=GY-16*S+m.y;const running=Math.abs(m.tx-m.x)>1;px((running&&(t>>2)%2)||m.y<0?HERO2:HERO,HPAL,hx,hy,m.face<0);
+ const m=mario,sc=m.big?1.35:1,sy=m.duck?.6:1,hx=ox+m.x,hy=GY-16*S*sc*sy+m.y;const running=Math.abs(m.tx-m.x)>1;
+ const pal=m.rain?{...HPAL,R:["#ff3a3a","#ffd800","#3ae05a","#3ab0ff","#d04aff"][(t>>2)%5],B:["#ffd800","#3ab0ff","#ff3a3a"][(t>>3)%3]}:HPAL;
+ if(m.rain&&t%4===0)parts.push(p(m.x+20,m.y-10,"✦",["#ff0","#f6f","#6ff"][t%3]));
+ px((running&&(t>>2)%2)||m.y<0?HERO2:HERO,pal,hx,hy,m.face<0,sc,sy);
+ if(TH==="snow"){cx.fillStyle="#fff";for(let i=0;i<40;i++)cx.fillRect(((i*131+Math.sin(t/30+i)*20-cam*.2)%W+W)%W,(i*71+t*(1+i%3))%H,S,S)}
  for(const c of coins){if(c.fish){fish(ox+c.x,GY+c.y)}else coin(ox+c.x,GY-16*S+c.y)}
  cx.textAlign="center";for(const q of parts){cx.fillStyle=q.col;cx.font=`${S*7}px sans-serif`;cx.fillText(q.ch,ox+q.x,GY-16*S+q.y)}
  // level title
- cx.fillStyle="#fffd";cx.font=`bold ${S*6}px sans-serif`;cx.textAlign="left";cx.fillText(`Story ${lvl+1}: ${STORIES[lvl].name}`,14,S*9);
- const tot=STORIES[lvl].s.length;cx.fillText("⭐".repeat(Math.min(si,tot)),14,S*17)}
+ cx.fillStyle="#fffd";cx.font=`bold ${S*6}px sans-serif`;cx.textAlign="left";cx.fillText(`${TIERS[tier].name} · ${lvl+1}: ${ST()[lvl].name}`,14,S*9);
+ const tot=ST()[lvl].s.length;cx.fillText("⭐".repeat(Math.min(si,tot)),14,S*17)}
+function cactus(x){cx.fillStyle="#3a9a3a";cx.fillRect(x,GY-S*24,S*5,S*24);cx.fillRect(x-S*5,GY-S*16,S*5,S*3);cx.fillRect(x-S*5,GY-S*21,S*3,S*6);cx.fillRect(x+S*5,GY-S*13,S*5,S*3);cx.fillRect(x+S*8,GY-S*19,S*3,S*7)}
+function tree(x){cx.fillStyle="#4a2a1a";cx.fillRect(x,GY-S*20,S*4,S*20);cx.fillStyle="#1f6a3a";cx.beginPath();cx.arc(x+S*2,GY-S*26,S*10,0,7);cx.fill();if((t>>4)%2){cx.fillStyle="#ffff80";cx.fillRect(x+S*8,GY-S*30,S,S)}}
 function cloud(x,y){cx.beginPath();cx.arc(x,y,24,0,7);cx.arc(x+28,y-12,30,0,7);cx.arc(x+58,y,24,0,7);cx.fill()}
 function pipe(x,h){const tl=8*S;cx.fillStyle="#1f9d2f";cx.fillRect(x,GY-tl*h,tl*1.6,tl*h);cx.fillStyle="#5fe06a";cx.fillRect(x+S,GY-tl*h,S*2,tl*h);cx.fillStyle="#1f9d2f";cx.fillRect(x-S*2,GY-tl*h-tl*.7,tl*1.6+S*4,tl*.7);cx.fillStyle="#0a5a14";cx.strokeStyle="#0a5a14";cx.lineWidth=S;cx.strokeRect(x-S*2,GY-tl*h-tl*.7,tl*1.6+S*4,tl*.7)}
-function bricks(x,y){const b=8*S;for(let i=0;i<3;i++){cx.fillStyle=i===1?"#ffb800":"#b8501e";cx.fillRect(x+i*b,y,b-1,b-1);cx.fillStyle="#0004";if(i===1){cx.fillStyle="#7a4a00";cx.font=`bold ${b*.8}px sans-serif`;cx.textAlign="center";cx.fillText("?",x+i*b+b/2,y+b*.8)}else{cx.fillRect(x+i*b,y+b/2,b,S/2);cx.fillRect(x+i*b+b/2,y,S/2,b/2)}}}
+function bricks(x,y,one){const b=8*S;for(let i=one?1:0;i<(one?2:3);i++){if(one)x-=0;cx.fillStyle=i===1?"#ffb800":"#b8501e";cx.fillRect(x+i*b,y,b-1,b-1);cx.fillStyle="#0004";if(i===1){cx.fillStyle="#7a4a00";cx.font=`bold ${b*.8}px sans-serif`;cx.textAlign="center";cx.fillText("?",x+i*b+b/2,y+b*.8)}else{cx.fillRect(x+i*b,y+b/2,b,S/2);cx.fillRect(x+i*b+b/2,y,S/2,b/2)}}}
 function coin(x,y){const w=Math.abs(Math.sin(t/8))*S*3+S;cx.fillStyle="#ffd800";cx.fillRect(x-w/2,y,w,S*6);cx.fillStyle="#fff8a0";cx.fillRect(x-w/4,y+S,Math.max(1,w/4),S*4)}
 function fish(x,y){cx.fillStyle="#ff7a3a";cx.beginPath();cx.ellipse(x,y,S*4,S*2.5,0,0,7);cx.fill();cx.beginPath();cx.moveTo(x-S*3,y);cx.lineTo(x-S*7,y-S*3);cx.lineTo(x-S*7,y+S*3);cx.fill();cx.fillStyle="#000";cx.fillRect(x+S*2,y-S,S,S)}
 function flag(x){cx.fillStyle="#ddd";cx.fillRect(x,GY-S*60,S*1.5,S*60);cx.fillStyle="#2c2";const fy=mode==="done"?Math.min(GY-S*12,GY-S*58+ending*3):GY-S*58;cx.beginPath();cx.moveTo(x,fy);cx.lineTo(x-S*12,fy+S*5);cx.lineTo(x,fy+S*10);cx.fill();cx.fillStyle="#2c2";cx.beginPath();cx.arc(x+S,GY-S*61,S*2,0,7);cx.fill()}
@@ -172,8 +271,8 @@ function titleBg(){cx.fillStyle=grad("#4aa8ff","#bfe6ff");cx.fillRect(0,0,W,H);c
  const hx=((t*2)%(W+200))-100;px((t>>3)%2?HERO2:HERO,HPAL,hx,H*.85-16*S,false);px(PEACH,PPAL,W*.82,H*.85-16*S,true)}
 function loop(){t++;if(t%15===0)setGY();
  if(mode==="start"||mode==="select")titleBg();
- else{const m=mario;m.x+=(m.tx-m.x)*.08;m.vy+=.6;m.y+=m.vy;if(m.y>=0){m.y=0;m.vy=0}
-  if(mode==="done"){ending++;if(lvl<5&&ending%40===0&&ending<200)m.vy=-8}
+ else{const m=mario;actUpdate();m.x+=(m.tx-m.x)*.08;if(!m.hold){m.vy+=.6;m.y+=m.vy;if(m.y>=0){m.y=0;m.vy=0}}
+  if(mode==="done"){ending++;if(lvl<5&&ending>130&&ending%40===0&&ending<300)m.vy=-8}
   cam+=(m.x-cam)*.1;
   for(const c of coins){c.y+=c.vy;c.vy+=.5;c.life--}coins=coins.filter(c=>c.life>0);
   for(const q of parts){q.x+=q.vx;q.y+=q.vy;q.vy+=.15;q.life--}parts=parts.filter(q=>q.life>0);
@@ -181,6 +280,6 @@ function loop(){t++;if(t%15===0)setGY();
   if(mode==="done"){if(lvl===5){fireworks();if(t%10===0)parts.push(p(mario.x+60,-30,"♥","#ff4f9a"))}else if(t%15===0)parts.push(p(mario.x,-40,"★","#ffd800"))}}
  requestAnimationFrame(loop)}
 // debug hook for testing
-window.__mta={startLevel,finish,get state(){return{mode,lvl,si,wi,ci,save}}};
+window.__mta={startLevel,finish,doAction,showSelect,setTier,markTier(t){save.done[t]=[1,1,1,1,1,1];store()},get state(){return{mode,tier,lvl,si,wi,ci,save}}};
 showStart();loop();
 </script></body></html>
