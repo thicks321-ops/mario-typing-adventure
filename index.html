@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Mario Typing Adventure</title>
+<title>Princess Amelia's Typing Adventure</title>
 <style>
 *{box-sizing:border-box}html,body{margin:0;height:100%;background:#222;font-family:"Comic Sans MS","Trebuchet MS",Arial,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent;position:fixed;width:100%;overscroll-behavior:none}
 html,body{height:100dvh}
@@ -24,6 +24,14 @@ html,body{height:100dvh}
 #levels button{font:inherit;font-size:22px;padding:14px;border-radius:18px;border:4px solid #333;background:#fff;color:#333;cursor:pointer;text-shadow:none}
 #levels button.lock{background:#999;cursor:default}#levels button.sel{outline:6px solid #ffd800}
 .hidden{display:none!important}
+#kbrow{display:flex;align-items:flex-end;gap:10px}.hand{display:flex;align-items:flex-end;gap:3px;padding:6px 6px 0;background:#ffe0c8;border-radius:22px 22px 10px 10px;border:2px solid #0004;margin-bottom:2px}
+.fg{width:clamp(9px,1.4vw,16px);border-radius:8px 8px 3px 3px;border:2px solid #0005;transition:transform .15s}.fg.th{background:#e8c4a8}.fg.on{transform:translateY(-10px) scale(1.2);box-shadow:0 0 10px 3px #ff0;border-color:#000}
+.panel{background:#fff;color:#222;text-shadow:none;border-radius:20px;padding:12px 16px;width:min(96vw,760px);max-height:80vh;overflow:auto;text-align:left;font-size:min(4vw,18px)}
+.panel table{border-collapse:collapse;width:100%}.panel td,.panel th{border-bottom:1px solid #ddd;padding:4px 6px;text-align:center}
+.sgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:6px 0 12px}.sgrid div{font-size:min(8vw,40px);text-align:center;background:#f3f0ff;border-radius:12px;padding:4px}.sgrid .no{opacity:.35;filter:grayscale(1)}
+.ofit{display:flex;flex-wrap:wrap;gap:8px}.ofit button{font:inherit;font-size:min(3.6vw,16px);border-radius:14px;border:3px solid #333;background:#fff;padding:6px 10px;cursor:pointer}.ofit button.on{outline:5px solid #ffd800}.ofit i{display:inline-block;width:20px;height:20px;border-radius:50%;vertical-align:middle;margin-right:4px;border:2px solid #0004}
+.menu2{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:6px}.menu2 button{font:inherit;font-size:min(4vw,18px);border-radius:12px;border:3px solid #333;background:#fff;padding:6px 12px;cursor:pointer;text-shadow:none}
+@media (pointer:coarse){.hand{padding:4px 3px 0}.fg{width:7px}}
 @media (max-height:500px){#overlay h1{font-size:30px;margin:0}#levels{grid-template-columns:repeat(6,1fr);width:96vw;gap:6px}#levels button{font-size:14px;padding:6px}.grade{padding:4px 12px;margin:2px}#gr{margin:6px 0 2px}}
 .grade{background:#0008;border-radius:20px;padding:10px 18px;margin:4px 0 8px;text-shadow:none;width:min(94vw,640px)}
 .glabel{font-size:min(5vw,22px);color:#ffd800}
@@ -41,42 +49,45 @@ html,body{height:100dvh}
 @media (pointer:coarse) and (orientation:landscape){#hud{flex-direction:row;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:8px;padding-top:0}#sentence{width:100%;margin:0;text-align:center}#kb{margin:0}#word{font-size:min(9vw,14vh)}#kb b{height:min(9vh,48px);width:min(5.4vw,9vh,52px);font-size:min(4vh,22px)}}
 </style></head><body>
 <canvas id="game"></canvas>
-<div id="top"><button id="kbBtn" title="Keyboard">⌨️</button><button id="muteBtn" title="Sound">🔊</button><button id="menuBtn" title="Levels">🏠</button></div>
-<div id="hud" class="hidden"><div id="sentence"></div><div id="word"></div><div id="kb"></div></div>
+<div id="top"><button id="kbBtn" title="Keyboard">⌨️</button><button id="muteBtn" title="Sound">🔊</button><button id="handBtn" title="Finger guide">✋</button><button id="menuBtn" title="Levels">🏠</button></div>
+<div id="hud" class="hidden"><div id="sentence"></div><div id="word"></div><div id="kbrow"><div class="hand" id="hL"></div><div id="kb"></div><div class="hand" id="hR"></div></div></div>
 <div id="overlay"></div><input id="ti" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
 <script>
 "use strict";
 const TIERS=[
 {name:"Kindergarten",m:[
- {name:"Go Go Go",theme:"hills",s:[["I can run","run"],["I see the sun","hop"],["I see a bug","stomp"],["Hit the red box","block"],["I can go up","climb"],["We go go go","ride"]]},
- {name:"Pipe Hop",theme:"pipes",s:[["I see a big pipe","hop"],["Get the red cap","grow"],["Now I am big","hop"],["Hit the box","block"],["A bug can run","stomp"],["Yes yes yes","star"]]},
- {name:"Wet Day",theme:"water",s:[["I can dip in","swim"],["A fish can hop","fish"],["Get on the log","ride"],["I see a bug","stomp"],["I am not wet","hop"],["Look up here","climb"]]},
- {name:"Dark Den",theme:"cave",s:[["It is dim in here","duck"],["Hit the red box","block"],["A bug is in the den","stomp"],["I can duck","duck"],["Look up up up","climb"],["Yes I got it","star"]]},
- {name:"Hot Hot",theme:"lava",s:[["It is hot","hop"],["Hop and hop","hop"],["Get on the top","ride"],["I can toss a ball","fire"],["A bug is mad","stomp"],["I see Peach","wave"]]},
- {name:"Help Peach",theme:"castle",s:[["Here we go","run"],["The big king is mad","duck"],["I can toss a ball","fire"],["I can jump","hop"],["He ran away","bowser"],["Peach is here","peach"],["We did it","peach"]]}]},
+ {name:"Go Go Go",theme:"hills",s:[["Amelia can run","run"],["Mario can run too","hop"],["I see a bug","stomp"],["Amelia hits the box","block"],["We go up","climb"],["Go Amelia go","ride"]]},
+ {name:"Pipe Hop",theme:"pipes",s:[["Amelia sees a big pipe","hop"],["Get the red cap","grow"],["Mario is big now","hop"],["Amelia hits the box","block"],["A bug can run","stomp"],["Yes Amelia yes","star"]]},
+ {name:"Wet Day",theme:"water",s:[["We dip in","swim"],["A fish can hop","fish"],["Amelia gets on the log","ride"],["I see a bug","stomp"],["Mario is not wet","hop"],["Amelia can look up","climb"]]},
+ {name:"Dark Den",theme:"cave",s:[["It is dim in here","duck"],["Amelia has a wand","block"],["A bug is in the den","stomp"],["Mario can duck","duck"],["Up up we go","climb"],["Amelia got a star","star"]]},
+ {name:"Hot Hot",theme:"lava",s:[["It is hot","hop"],["Amelia can hop","hop"],["Get on the top","ride"],["Mario can toss a ball","fire"],["A bug is mad","stomp"],["Amelia can see Peach","wave"]]},
+ {name:"Help Peach",theme:"castle",s:[["Here we go Amelia","run"],["The big king is mad","duck"],["Mario can toss a ball","fire"],["Amelia can jump","hop"],["He ran away","bowser"],["Peach hugs Amelia","peach"],["We did it","peach"]]}]},
 {name:"1st Grade",m:[
- {name:"Grass Trip",theme:"sunset",s:[["Mario went on a trip","run"],["A frog sat on the grass","hop"],["Then a bug ran at him","stomp"],["He hit the block with his fist","block"],["Up the vine he went","climb"],["He said thank you frog","wave"]]},
- {name:"Pipe Path",theme:"pipes",s:[["Mario must jump the pipes","hop"],["A red cap made him big","grow"],["Stop that bug","stomp"],["Hit the brick for a coin","block"],["Duck down fast","duck"],["Off he goes","ride"]]},
- {name:"Splash",theme:"water",s:[["Fish swim in the pond","fish"],["Mario jumps in with a splash","swim"],["A crab is on the sand","stomp"],["Then he hops on a raft","ride"],["He gets a star from the shell","star"],["He shakes off the wet","hop"]]},
- {name:"Gem Cave",theme:"cave",s:[["This cave is dark and damp","duck"],["He hits a block and gets a coin","block"],["Bats flap past him","duck"],["He can climb up the rope","climb"],["A bug runs at him","stomp"],["What a fun trip","star"]]},
- {name:"Hot Rocks",theme:"lava",s:[["The rocks are red and hot","hop"],["Mario jumps from rock to rock","hop"],["He can toss a fire ball","fire"],["He rides a block over the mud","ride"],["A bug gets in his way","stomp"],["Peach must be in there","wave"]]},
- {name:"The King",theme:"castle",s:[["Mario steps in the big fort","run"],["The king has a green shell","duck"],["Mario throws a fire ball","fire"],["Then he jumps over him","hop"],["The king runs off","bowser"],["Peach is safe at last","peach"],["Thank you Mario","peach"]]}]},
+ {name:"Grass Trip",theme:"sunset",s:[["Amelia and Mario went on a trip","run"],["A frog sat on the grass","hop"],["Then a bug ran at them","stomp"],["Amelia taps the block with her wand","block"],["She helps Mario up the vine","climb"],["They clap and say thank you frog","wave"]]},
+ {name:"Pipe Path",theme:"pipes",s:[["Amelia must jump the pipes","hop"],["A red cap made Mario big","grow"],["Stop that bug","stomp"],["Amelia hits the brick for a coin","block"],["Duck down fast","duck"],["Off they go","ride"]]},
+ {name:"Splash",theme:"water",s:[["Fish swim in the pond","fish"],["Amelia jumps in with a splash","swim"],["A crab is on the sand","stomp"],["Then they hop on a raft","ride"],["Amelia gets a star from a shell","star"],["Mario shakes off the wet","hop"]]},
+ {name:"Gem Cave",theme:"cave",s:[["This cave is dark and damp","duck"],["Amelia lights it with her wand","star"],["She hits a block and gets a coin","block"],["Bats flap past them","duck"],["Mario and Amelia climb the rope","climb"],["A bug runs at them","stomp"]]},
+ {name:"Hot Rocks",theme:"lava",s:[["The rocks are red and hot","hop"],["Amelia jumps from rock to rock","hop"],["Mario tosses a fire ball","fire"],["They ride a block over the mud","ride"],["A bug gets in the way","stomp"],["Amelia says Peach is in there","wave"]]},
+ {name:"The King",theme:"castle",s:[["Amelia and Mario step in the fort","run"],["The king has a green shell","duck"],["Mario throws a fire ball","fire"],["Amelia jumps over him","hop"],["The king runs off","bowser"],["Peach is safe at last","peach"],["Thank you Amelia","peach"]]}]},
 {name:"2nd Grade",m:[
- {name:"Rainy Meadow",theme:"hills",s:[["Mario wakes up at sunrise","hop"],["He eats toast and leaves home","run"],["A sneaky beetle blocks the road","stomp"],["He bumps a golden block","block"],["A mushroom makes him grow","grow"],["He climbs a leafy vine","climb"]]},
- {name:"Snowy Peaks",theme:"snow",s:[["Snowflakes float down slowly","duck"],["Mario slides on the frozen lake","ride"],["He leaps over a tall pipe","hop"],["A grumpy beetle waddles near","stomp"],["He throws a fireball at the ice","fire"],["Mario smiles and keeps going","star"]]},
- {name:"Ocean Reef",theme:"water",s:[["The ocean waves are bright blue","swim"],["Mario dives under the water","swim"],["Seahorses wave hello","fish"],["A sleepy crab snores loudly","stomp"],["He rides a wooden boat to shore","ride"],["He finds a shiny coin","block"]]},
- {name:"Crystal Cavern",theme:"cave",s:[["Crystals glow in the cavern","star"],["Mario ducks under low rocks","duck"],["He finds a hidden coin block","block"],["He climbs a rope ladder","climb"],["A beetle rolls toward him","stomp"],["Mario feels brave and strong","hop"]]},
- {name:"Desert Sun",theme:"desert",s:[["The desert sand is dry and hot","run"],["Mario jumps over a cactus","hop"],["He rides a floating carpet","ride"],["A beetle crawls closer","stomp"],["He tosses a fireball at a rock","fire"],["Peach is waiting inside","wave"]]},
- {name:"Bowser Tower",theme:"castle",s:[["Mario reaches the stone tower","run"],["Bowser roars from the bridge","duck"],["Mario throws fireballs back","fire"],["He leaps over the king","hop"],["Bowser slips and rolls away","bowser"],["Princess Peach is free again","peach"],["Everyone cheers hooray","peach"]]}]},
+ {name:"Rainy Meadow",theme:"hills",s:[["Amelia wakes up at sunrise","hop"],["She meets Mario on the road","run"],["A sneaky beetle blocks the way","stomp"],["Amelia waves her wand at a golden block","block"],["A mushroom makes Mario grow","grow"],["They climb a leafy vine","climb"]]},
+ {name:"Snowy Peaks",theme:"snow",s:[["Snowflakes float down slowly","duck"],["Amelia slides on the frozen lake","ride"],["Mario leaps over a tall pipe","hop"],["A grumpy beetle waddles near","stomp"],["Mario throws a fireball at the ice","fire"],["Amelia smiles and keeps going","star"]]},
+ {name:"Ocean Reef",theme:"water",s:[["The ocean waves are bright blue","swim"],["Amelia dives under the water","swim"],["Seahorses wave hello to Amelia","fish"],["A sleepy crab snores loudly","stomp"],["They ride a wooden boat to shore","ride"],["Amelia finds a shiny coin","block"]]},
+ {name:"Crystal Cavern",theme:"cave",s:[["Crystals glow in the cavern","star"],["Mario ducks under low rocks","duck"],["Amelia finds a hidden coin block","block"],["She helps Mario climb a rope ladder","climb"],["A beetle rolls toward them","stomp"],["Amelia feels brave and strong","hop"]]},
+ {name:"Desert Sun",theme:"desert",s:[["The desert sand is dry and hot","run"],["Amelia jumps over a cactus","hop"],["They ride a floating carpet","ride"],["A beetle crawls closer","stomp"],["Mario tosses a fireball at a rock","fire"],["Amelia knows Peach is waiting","wave"]]},
+ {name:"Bowser Tower",theme:"castle",s:[["Amelia reaches the stone tower","run"],["Bowser roars from the bridge","duck"],["Mario throws fireballs back","fire"],["Amelia leaps over the king","hop"],["Bowser slips and rolls away","bowser"],["Princess Peach thanks Amelia","peach"],["Everyone cheers hooray","peach"]]}]},
 {name:"3rd Grade",m:[
- {name:"Morning Adventure",theme:"hills",s:[["Mario packed his backpack for a big adventure","run"],["Butterflies fluttered over the colorful flowers","hop"],["Suddenly a mushroom monster wobbled toward him","stomp"],["A mystery block contained a sparkling coin","block"],["He climbed an enormous beanstalk to look ahead","climb"],["Feeling wonderful he hurried along","ride"]]},
- {name:"Pipeline Puzzle",theme:"pipes",s:[["Gigantic green pipes stretched across the valley","run"],["Mario carefully jumped from pipe to pipe","hop"],["A magical mushroom made him twice as tall","grow"],["He discovered a secret underground tunnel","duck"],["Floating platforms carried him forward","ride"],["Another grumpy beetle tumbled away","stomp"]]},
- {name:"Underwater Kingdom",theme:"water",s:[["Mario swam beneath the sparkling ocean","swim"],["Friendly dolphins whistled a cheerful melody","fish"],["Jellyfish drifted gently around the coral","swim"],["A lazy crab wandered across his path","stomp"],["He discovered a treasure chest full of coins","block"],["He rode a wooden raft back to the beach","ride"]]},
- {name:"Midnight Forest",theme:"night",s:[["Fireflies twinkled in the midnight forest","star"],["Owls hooted quietly from the branches","duck"],["A grumpy beetle interrupted his journey","stomp"],["He practiced throwing fireballs at stumps","fire"],["Climbing a twisted vine he reached the treetops","climb"],["The moonlight showed the way to the castle","run"]]},
- {name:"Volcano Valley",theme:"lava",s:[["Bubbling lava glowed beneath the volcano","hop"],["Mario balanced on a moving platform","ride"],["Fiery sparks danced through the air","duck"],["He discovered an invincibility star","star"],["Nothing could stop him now","fire"],["He bravely approached the gloomy fortress","wave"]]},
- {name:"Final Showdown",theme:"castle",s:[["Inside the fortress Bowser was waiting impatiently","run"],["The enormous turtle king stomped his feet","duck"],["Mario launched fireballs with perfect aim","fire"],["He leaped over obstacles without stopping","hop"],["Bowser grumbled and retreated far away","bowser"],["Princess Peach thanked Mario for his courage","peach"],["Everyone celebrated with fireworks and laughter","peach"]]}]}];
-var tier=0;const ST=()=>TIERS[tier].m;
-const HINT={mario:"🧢",peach:"👸",bowser:"🐢"};
+ {name:"Morning Adventure",theme:"hills",s:[["Princess Amelia packed her backpack for a big adventure","run"],["She and Mario hurried past colorful flowers","hop"],["Suddenly a mushroom monster wobbled toward them","stomp"],["Amelia tapped a mystery block with her magic wand","block"],["Together they climbed an enormous beanstalk","climb"],["Feeling wonderful they traveled onward","ride"]]},
+ {name:"Pipeline Puzzle",theme:"pipes",s:[["Gigantic green pipes stretched across the valley","run"],["Amelia carefully jumped from pipe to pipe","hop"],["A magical mushroom made Mario twice as tall","grow"],["They discovered a secret underground tunnel","duck"],["Floating platforms carried them forward","ride"],["Another grumpy beetle tumbled away","stomp"]]},
+ {name:"Underwater Kingdom",theme:"water",s:[["Amelia swam beneath the sparkling ocean","swim"],["Friendly dolphins whistled a cheerful melody","fish"],["Jellyfish drifted gently around the coral","swim"],["A lazy crab wandered across their path","stomp"],["Amelia discovered a treasure chest full of coins","block"],["They rode a wooden raft back to the beach","ride"]]},
+ {name:"Midnight Forest",theme:"night",s:[["Fireflies twinkled around Amelia in the forest","star"],["Owls hooted quietly from the branches","duck"],["A grumpy beetle interrupted their journey","stomp"],["Mario practiced throwing fireballs at stumps","fire"],["Amelia helped Mario climb a twisted vine","climb"],["The moonlight showed them the way to the castle","run"]]},
+ {name:"Volcano Valley",theme:"lava",s:[["Bubbling lava glowed beneath the volcano","hop"],["Amelia balanced on a moving platform","ride"],["Fiery sparks danced through the air","duck"],["She discovered an invincibility star","star"],["Nothing could stop Amelia and Mario now","fire"],["They bravely approached the gloomy fortress","wave"]]},
+ {name:"Final Showdown",theme:"castle",s:[["Inside the fortress Bowser was waiting impatiently","run"],["The enormous turtle king stomped his feet","duck"],["Mario launched fireballs while Amelia cheered","fire"],["Amelia leaped over obstacles without stopping","hop"],["Bowser grumbled and retreated far away","bowser"],["Princess Peach thanked Amelia for her courage","peach"],["Everyone celebrated with fireworks and laughter","peach"]]}]}];
+const STK=["🐞","🍄","🐟","🦇","🔥","👑","🐸","🌿","🦀","💎","🌋","🏰","🌈","❄️","🐬","🔮","🌵","🐢","🦋","🧩","🐙","🦉","🌟","🎆"];
+const OUTFITS=[{n:"Purple Princess",P:"#9b4dff",L:"#d6b4ff"},{n:"Teal Tide",P:"#14b0a0",L:"#9ff0e6"},{n:"Sunny Gold",P:"#f0a818",L:"#fff0a0"},{n:"Ruby Red",P:"#e0304a",L:"#ffb0c0"},{n:"Sky Blue",P:"#3a8aff",L:"#b8d8ff"},{n:"Mint Leaf",P:"#30b860",L:"#b8f5c8"},{n:"Midnight Star",P:"#2a2a8a",L:"#ffd800"},{n:"Snow Queen",P:"#d8ecff",L:"#5ab0ff"},{n:"Rainbow",P:"#ff4f9a",L:"#ffd800",rainbow:1}];
+let warm=null;
+var tier=0;const ST=()=>TIERS[tier].m,MIS=()=>warm||ST()[lvl];
+const HINT={amelia:"👑",mario:"🧢",peach:"👸",bowser:"🐢"};
 const THEMES={hills:{sky:["#6ec6ff","#bdeaff"],hill:"#3fae49",hill2:"#7cd36f",ground:"#c8743a",top:"#4cc04a"},
 pipes:{sky:["#5ab4ff","#cdf"],hill:"#2f9a3f",hill2:"#6fc96a",ground:"#b5652f",top:"#3db042"},
 water:{sky:["#7fd0ff","#e0f6ff"],hill:"#4aa0c8",hill2:"#88c8e0",ground:"#c8743a",top:"#4cc04a"},
@@ -93,11 +104,12 @@ const STEP=110;
 const blank=()=>({v:2,tier:0,done:[0,1,2,3].map(()=>[0,0,0,0,0,0])});
 let save=(()=>{let o;try{o=JSON.parse(localStorage.getItem("mta_save")||"null")}catch(e){}
  if(!o)return blank();if(o.v===2&&o.done)return o;const n=blank();if(o.stars)o.stars.forEach((x,i)=>{if(x>0)n.done[0][i]=1});return n})();
-tier=save.tier||0;
+tier=save.tier||0;save.stats=save.stats||{days:{},mw:{},miss:{}};save.outfit=save.outfit||0;
+const doneCount=()=>save.done.flat().filter(Boolean).length,outfitOpen=i=>i<=Math.floor(doneCount()/3);
 const tierOpen=t=>t===0||save.done[t-1].every(Boolean),misOpen=(t,m)=>tierOpen(t)&&(m===0||!!save.done[t][m-1]);
 function store(){localStorage.setItem("mta_save",JSON.stringify(save))}
 var mode="start",lvl=0,si=0,wi=0,ci=0,words=[],muted=false,showKb=true,selIdx=0;
-let props=[],wc=0;let mario={x:80,tx:80,y:0,vy:0,face:1,anim:0,act:null,actT:0},cam=0,parts=[],coins=[],t=0,ending=0,bowserX=0,bowserGone=0;
+let props=[],wc=0,am={x:0,y:0,vy:0,tw:0},lastK=0,wordMiss=false;let mario={x:80,tx:80,y:0,vy:0,face:1,anim:0,act:null,actT:0},cam=0,parts=[],coins=[],t=0,ending=0,bowserX=0,bowserGone=0;
 const cv=document.getElementById("game"),cx=cv.getContext("2d");let W,H,S,GY;
 const TOUCH=matchMedia("(pointer:coarse)").matches||"ontouchstart" in window;
 function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight;S=Math.max(2,Math.round(Math.min(W,H)/(TOUCH?150:170)));setGY()}
@@ -114,7 +126,7 @@ const ov=document.getElementById("overlay"),hud=document.getElementById("hud"),s
 const ROWS=["qwertyuiop","asdfghjkl","zxcvbnm"],FING={q:0,a:0,z:0,w:1,s:1,x:1,e:2,d:2,c:2,r:3,f:3,v:3,t:3,g:3,b:3,y:4,h:4,n:4,u:4,j:4,m:4,i:2,k:2,o:1,l:1,p:0};
 kbEl.innerHTML=ROWS.map(r=>"<div>"+[...r].map(k=>`<b id="k_${k}" class="f${FING[k]}${"fj".includes(k)?" home":""}">${k}</b>`).join("")+"</div>").join("");
 function showStart(){ov.style.justifyContent="";ov.style.paddingTop="";mode="start";hud.classList.add("hidden");ov.classList.remove("hidden");
- ov.innerHTML=`<h1>Mario Typing Adventure</h1><div style="font-size:clamp(20px,3vw,32px)">Help Mario save Princess Peach!</div><p class="big"><span class="tk">Tap or press any key to start</span></p><div class="tip">👪 Parent tip: sit with your child, keep fingers on the home row (bumps on F and J). The glowing key on the keyboard shows what to press next. No timers, no wrong answers — just fun!</div>`}
+ ov.innerHTML=`<h1>Princess Amelia's Typing Adventure</h1><div style="font-size:clamp(20px,3vw,32px)">👑 Help Mario rescue Princess Peach! 🍄</div><p class="big"><span class="tk">Tap or press any key to start</span></p><div class="tip">👪 Parent tip: sit with your child, keep fingers on the home row (bumps on F and J). The glowing key on the keyboard shows what to press next. No timers, no wrong answers — just fun!</div>`}
 function gridHTML(){return ST().map((st,i)=>{const lock=!misOpen(tier,i),d=save.done[tier][i];return `<button data-i="${i}" class="${lock?"lock":""} ${i===selIdx?"sel":""}">${lock?"🔒":d?"⭐⭐⭐":"▶️"}<br>${i+1}. ${st.name}</button>`}).join("")}
 function bindGrid(){ov.querySelectorAll("#levels button").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(misOpen(tier,i))startLevel(i)})}
 function setTier(v){const msg=document.getElementById("gmsg"),gr=document.getElementById("gr");
@@ -126,18 +138,21 @@ function showSelect(){ov.style.justifyContent="";ov.style.paddingTop="";mode="se
  ov.innerHTML=`<h1>Pick a Mission</h1><div class="grade"><div class="glabel">Grade level</div><input id="gr" type="range" min="0" max="3" step="1" value="${tier}" aria-label="Grade level">
  <div class="ticks">${TIERS.map((T,i)=>`<span class="tick ${i===tier?"on":""}" data-t="${i}">${tierOpen(i)?"":"🔒 "}${T.name}</span>`).join("")}</div><div id="gmsg">${TIERS[tier].name} missions</div></div>
  <div id="levels">${gridHTML()}</div>
- <div style="font-size:min(4.5vw,20px)">Tap a mission (or arrow keys + Enter) &nbsp; <button id="reset" style="font:inherit;font-size:16px;border-radius:10px">Reset progress</button></div>`;
+ <div class="menu2"><button id="warmBtn">🔥 Warm-up</button><button id="stkBtn">📒 Sticker Book</button><button id="parBtn">👪 Parents</button><button id="reset">Reset progress</button></div>`;
+ document.getElementById("warmBtn").onclick=startWarm;document.getElementById("stkBtn").onclick=showStickers;document.getElementById("parBtn").onclick=showGate;
  bindGrid();const gr=document.getElementById("gr");gr.addEventListener("input",()=>setTier(+gr.value));gr.addEventListener("keydown",e=>e.stopPropagation());
  ov.querySelectorAll(".tick").forEach(e=>e.onclick=()=>{gr.value=e.dataset.t;setTier(+e.dataset.t)});
  document.getElementById("reset").onclick=()=>{if(confirm("Reset all progress?")){save=blank();tier=0;store();selIdx=0;showSelect()}}}
-function startLevel(i){lvl=i;si=0;wi=0;ci=0;mode="play";ending=0;bowserGone=0;parts=[];coins=[];props=[];fw=[];
+function startLevel(i,w){warm=w||null;lvl=i;am={x:80-15*S,y:0,vy:0,tw:0};si=0;wi=0;ci=0;mode="play";ending=0;bowserGone=0;parts=[];coins=[];props=[];fw=[];
  mario={x:80,tx:80,y:0,vy:0,face:1,anim:0,act:null,actT:0,big:false};cam=0;
- const total=ST()[i].s.reduce((a,s)=>a+s[0].split(" ").length,0);bowserX=80+(total+3)*STEP;
+ const total=MIS().s.reduce((a,s)=>a+s[0].split(" ").length,0);bowserX=80+(total+3)*STEP;
  ov.classList.add("hidden");hud.classList.remove("hidden");loadSentence()}
-function loadSentence(){words=ST()[lvl].s[si][0].split(" ");wi=0;ci=0;render()}
+function loadSentence(){words=MIS().s[si][0].split(" ");wi=0;ci=0;render();say(words[0])}
 function render(){setTimeout(setGY,0);sEl.innerHTML=words.map((w,i)=>`<span class="${i<wi?"done":i===wi?"cur":""}">${w}</span>`).join(" ");
  const w=words[wi]||"";wEl.innerHTML=[...w].map((c,i)=>i<ci?`<span class="ok">${c}</span>`:i===ci?`<span class="next">${c}</span>`:`<span>${c}</span>`).join("")+(HINT[w.toLowerCase()]?`<span style="font-size:.55em;vertical-align:middle"> ${HINT[w.toLowerCase()]}</span>`:"");
- kbEl.classList.toggle("hidden",!showKb);kbEl.querySelectorAll("b").forEach(b=>b.classList.remove("hi"));const n=(w[ci]||"").toLowerCase();const kb=document.getElementById("k_"+n);if(kb)kb.classList.add("hi")}
+ kbEl.classList.toggle("hidden",!showKb);kbEl.querySelectorAll("b").forEach(b=>b.classList.remove("hi"));const n=(w[ci]||"").toLowerCase();const kb=document.getElementById("k_"+n);if(kb)kb.classList.add("hi");
+ document.querySelectorAll(".fg.on").forEach(e=>e.classList.remove("on"));document.getElementById("hL").classList.toggle("hidden",!showHands);document.getElementById("hR").classList.toggle("hidden",!showHands);
+ if(n in FING){const hand="qwertasdfgzxcvb".includes(n)?"hL":"hR";const f=document.querySelector(`#${hand} .f${FING[n]}`);if(f)f.classList.add("on")}}
 function shake(){wEl.classList.remove("shake");void wEl.offsetWidth;wEl.classList.add("shake")}
 function doAction(a){const m=mario;m.act=a;m.actT=0;m.ax=m.x;
  if(a==="hop"||a==="run"){m.vy=a==="hop"?-11:-7;m.tx+=a==="run"?STEP*.6:STEP*.3;sfx.jump()}
@@ -166,7 +181,7 @@ function actUpdate(){const m=mario;m.hold=false;m.duck=false;m.rain=false;if(!m.
  if(m.starT>0){m.starT--;m.rain=true}
  if(T>200&&a!=="slide")m.act=null}
 function propsUpdate(ox){const m=mario,base=GY;for(const q of props){q.t++;
- if(q.k==="q"){const y=base-16*S*(mario.big?1.35:1)-S*8-105,bump=q.t>14&&q.t<22?-S*2:0;bricks(ox+q.x-8*S,y+bump,1);if(q.t===17){coins.push({x:q.x,y:y-base+16*S-S*8,vy:-9,life:45});sfx.coin()}if(q.t>110)q.dead=1}
+ if(q.k==="q"){const y=base-16*S*(mario.big?1.35:1)-S*8-105,bump=q.t>14&&q.t<22?-S*2:0;bricks(ox+q.x-8*S,y+bump,1);if(q.t===6)for(let i=0;i<8;i++)parts.push({x:am.x+14*S+i*((q.x-am.x-14*S)/8),y:-24*S+i*2,vx:0,vy:-.5,life:30,ch:"✦",col:"#e6a8ff"});if(q.t===17){coins.push({x:q.x,y:y-base+16*S-S*8,vy:-9,life:45});sfx.coin()}if(q.t>110)q.dead=1}
  if(q.k==="g"){if(!q.flat){q.x-=2.6;if(!q.jumped&&q.x-m.x<110){q.jumped=1;m.vy=-11;m.tx=q.x+8;sfx.jump()}
    if(q.jumped&&m.vy>0&&Math.abs(m.x+6*S-q.x)<10*S&&m.y>-10*S||q.t>120){q.flat=1;m.vy=-7;tone(220,.12,"square",.08);tone(440,.1,"square",.06,.08);for(let i=0;i<6;i++)parts.push(p(q.x,-4,"★","#ffd800"))}}
   else if(++q.flat>45)q.dead=1;goomba(ox+q.x,base,q.flat)}
@@ -185,27 +200,34 @@ function goomba(x,y,flat){const h=flat?S*4:S*12,w=S*14,bob=flat?0:Math.sin(t/4)*
  cx.fillStyle="#3a2010";cx.fillRect(x-w*.45,y-S*2+bob,w*.35,S*2);cx.fillRect(x+w*.1,y-S*2-bob,w*.35,S*2)}
 function mushroom(x,y){const w=S*12;cx.fillStyle="#f5e6c8";cx.fillRect(x-w*.3,y-S*7,w*.6,S*7);cx.fillStyle="#e52521";cx.beginPath();cx.ellipse(x,y-S*7,w/2,S*6,0,Math.PI,0);cx.fill();cx.fillStyle="#fff";cx.beginPath();cx.arc(x-S*3,y-S*10,S*1.6,0,7);cx.arc(x+S*3,y-S*9,S*1.4,0,7);cx.fill();cx.fillStyle="#222";cx.fillRect(x-S*2,y-S*5,S,S*2);cx.fillRect(x+S,y-S*5,S,S*2)}
 function p(x,y,ch,col){return{x,y,vx:(Math.random()-.5)*6,vy:-Math.random()*6-2,life:60+Math.random()*30,ch,col}}
-function key(e){au();const k=e.key;
+function say(txt){if(muted||!window.speechSynthesis||!txt)return;try{const u=new SpeechSynthesisUtterance(txt);u.rate=.8;u.pitch=1.15;u.lang="en-US";speechSynthesis.speak(u)}catch(e){}}
+let spOk=false;function spUnlock(){if(spOk||!window.speechSynthesis)return;spOk=true;try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u)}catch(e){}}
+const dkey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+function stat(){const k=dkey(new Date());return save.stats.days[k]||(save.stats.days[k]={keys:0,miss:0,words:0,ms:0})}
+function key(e){au();spUnlock();const k=e.key;
+ if(mode==="stickers"||mode==="parents"||mode==="gate"){if(k==="Escape")showSelect();return}
  if(mode==="start"){showSelect();return}
  if(mode==="select"){let n=selIdx;if(k==="ArrowRight")n++;else if(k==="ArrowLeft")n--;else if(k==="ArrowDown")n+=3;else if(k==="ArrowUp")n-=3;else if(k==="Enter"||k===" "){if(misOpen(tier,selIdx))startLevel(selIdx);return}else return;if(n>=0&&n<6&&misOpen(tier,n))selIdx=n;document.getElementById("levels").innerHTML=gridHTML();bindGrid();return}
- if(mode==="done"){if(ending>90&&(k==="Enter"||k===" ")){if(lvl<5&&misOpen(tier,lvl+1))startLevel(lvl+1);else{if(lvl===5&&tier<3&&tierOpen(tier+1)){tier++;save.tier=tier;store();selIdx=0}showSelect()}}return}
+ if(mode==="done"){if(ending>90&&(k==="Enter"||k===" ")){if(warm){showSelect();return}if(lvl<5&&misOpen(tier,lvl+1))startLevel(lvl+1);else{if(lvl===5&&tier<3&&tierOpen(tier+1)){tier++;save.tier=tier;store();selIdx=0}showSelect()}}return}
  if(mode!=="play"||k.length!==1||e.ctrlKey||e.metaKey)return;e.preventDefault();if(k===" ")return;
- const w=words[wi];if(k.toLowerCase()===w[ci].toLowerCase()){ci++;sfx.blip();mario.tx+=STEP/w.length*0.3;
-  if(ci>=w.length){wi++;ci=0;sfx.word();mario.tx=Math.round((mario.tx-80)/STEP+0.7)*STEP+80;wordReact();
-   if(wi>=words.length){doAction(ST()[lvl].s[si][1]);si++;if(si>=ST()[lvl].s.length){finish();render();return}setTimeout(()=>{if(mode==="play")loadSentence()},700);words=[...words];render();wEl.innerHTML="⭐";return}}
-  render()}else{sfx.boop();shake()}}
+ const w=words[wi],now=Date.now();if(lastK&&now-lastK<10000)stat().ms+=now-lastK;lastK=now;if(k.toLowerCase()===w[ci].toLowerCase()){ci++;stat().keys++;sfx.blip();mario.tx+=STEP/w.length*0.3;
+  if(ci>=w.length){wi++;ci=0;sfx.word();mario.tx=Math.round((mario.tx-80)/STEP+0.7)*STEP+80;wordReact();am.tw=20;stat().words++;if(!wordMiss){const lw=w.toLowerCase();save.stats.mw[lw]=(save.stats.mw[lw]||0)+1}wordMiss=false;store();if(wi<words.length)say(words[wi]);else say(words.join(" "));
+   if(wi>=words.length){doAction(MIS().s[si][1]);si++;if(si>=MIS().s.length){finish();render();return}setTimeout(()=>{if(mode==="play")loadSentence()},700);words=[...words];render();wEl.innerHTML="⭐";return}}
+  render()}else{const ex=w[ci].toLowerCase();stat().miss++;save.stats.miss[ex]=(save.stats.miss[ex]||0)+1;wordMiss=true;sfx.boop();shake()}}
 addEventListener("keydown",e=>{if(e.target.id==="ti")return;key(e)});
 const fake=k=>({key:k,preventDefault(){}});
 kbEl.addEventListener("pointerdown",e=>{const b=e.target.closest("b");if(!b)return;e.preventDefault();key(fake(b.textContent))});
-ov.addEventListener("pointerup",e=>{if(e.target.closest("button"))return;if(mode==="start")key(fake("x"));else if(mode==="done")key(fake("Enter"))});
+ov.addEventListener("pointerup",e=>{if(e.target.closest("button")||e.target.closest(".panel"))return;if(mode==="start")key(fake("x"));else if(mode==="done")key(fake("Enter"))});
 const ti=document.getElementById("ti");ti.addEventListener("input",()=>{for(const c of ti.value)key(fake(c));ti.value=""});
-wEl.addEventListener("pointerdown",()=>{if(TOUCH&&!showKb)ti.focus()});
-function finish(){mode="done";ending=0;save.done[tier][lvl]=1;store();sfx.fan();const m=mario;
+wEl.addEventListener("pointerdown",()=>{if(mode==="play")say(words[wi]);if(TOUCH&&!showKb)ti.focus()});
+function finish(){mode="done";ending=0;const before=doneCount(),wasDone=save.done[tier][lvl];if(!warm){save.done[tier][lvl]=1;store()}const newOutfit=!warm&&!wasDone&&Math.floor(doneCount()/3)>Math.floor(before/3)&&Math.floor(doneCount()/3)<OUTFITS.length;
+ for(let i=0;i<10;i++)parts.push(p(mario.x-6*S,-30,i%2?"✋":"✨","#fff"));sfx.fan();const m=mario;
  if(lvl===5){m.tx=bowserX-60;if(!bowserGone)bowserGone=1}else{m.tx=bowserX+STEP*.5-12*S;m.vy=-15;m.act="leap";m.actT=0}
- const last=lvl===5,nextT=last&&tier<3?TIERS[tier+1].name:"";
+ const last=lvl===5&&!warm,nextT=last&&tier<3?TIERS[tier+1].name:"";
  setTimeout(()=>{if(mode!=="done")return;ov.classList.remove("hidden");ov.style.justifyContent="flex-start";ov.style.paddingTop="40px";hud.classList.add("hidden");
- ov.innerHTML=last?`<h1>You saved Peach! 💖</h1><div class="big">⭐⭐⭐ ${TIERS[tier].name} hero! ⭐⭐⭐</div>${nextT?`<div style="font-size:min(6vw,32px)">🔓 ${nextT} missions unlocked!</div>`:`<div style="font-size:min(6vw,32px)">You beat every grade! 🏆</div>`}<div class="tip" style="font-size:22px">Tap or press Enter to continue</div>`:`<h1>Great job! ⭐⭐⭐</h1><div style="font-size:min(6vw,32px)">${TIERS[tier].name} mission ${lvl+1} done!</div><div class="tip" style="font-size:22px">Tap or press Enter for the next mission</div>`},2200)}
-document.getElementById("muteBtn").onclick=e=>{muted=!muted;e.target.textContent=muted?"🔇":"🔊";e.target.blur()};
+ const stk=warm?"":`<div style="font-size:min(6vw,30px)">New sticker: <span style="font-size:1.6em">${STK[tier*6+lvl]}</span>${newOutfit?" &nbsp;👗 New outfit for Amelia!":""}</div>`;
+ ov.innerHTML=warm?`<h1>Warm-up done! 💪</h1><div class="tip" style="font-size:22px">Tap or press Enter to go back</div>`:last?`<h1>Peach says: Thank you, Amelia! 💖</h1><div class="big">⭐⭐⭐ ${TIERS[tier].name} hero! ⭐⭐⭐</div>${stk}${nextT?`<div style="font-size:min(6vw,32px)">🔓 ${nextT} missions unlocked!</div>`:`<div style="font-size:min(6vw,32px)">You beat every grade! 🏆</div>`}<div class="tip" style="font-size:22px">Tap or press Enter to continue</div>`:`<h1>Great job, Amelia! ⭐⭐⭐</h1>${stk}<div style="font-size:min(6vw,32px)">${TIERS[tier].name} mission ${lvl+1} done!</div><div class="tip" style="font-size:22px">Tap or press Enter for the next mission</div>`},2200)}
+document.getElementById("muteBtn").onclick=e=>{muted=!muted;if(muted&&window.speechSynthesis)speechSynthesis.cancel();e.target.textContent=muted?"🔇":"🔊";e.target.blur()};
 document.getElementById("kbBtn").onclick=e=>{showKb=!showKb;render();if(TOUCH&&!showKb)ti.focus();else{ti.blur();e.target.blur()}};
 document.getElementById("menuBtn").onclick=e=>{e.target.blur();showSelect()};
 // ---------- drawing
@@ -215,10 +237,12 @@ const HERO2=["...RRRRR....","..RRRRRRRRR.","..HHHSSKS...",".HSHSSSKSSS.",".HSHHS
 const HPAL={R:"#e52521",H:"#6b3a12",S:"#ffc69a",K:"#2a1a0a",B:"#2a56d8",Y:"#ffd800"};
 const PEACH=["....YYYY....","...YOYYOY...","..YYYYYYYY..","..YSSKSKSY..","..YSSSSSSY..","..YYSSSSYY..","...YPPPPY...","..PPPWWPPP..",".SPPPPPPPPS.",".S.PPPPPP.S.","...PPPPPPP..","..PPPPPPPP..","..PPWPPWPP..",".PPPPPPPPPP.",".PPPPPPPPPP.","PPPPPPPPPPPP"];
 const PPAL={Y:"#ffd23a",O:"#40c0ff",S:"#ffd6b8",K:"#333",P:"#ff7ac0",W:"#fff"};
+const AMELIA=["...Y.Y.Y....","...YYYYY....","..HHHHHHH...",".HHSSSSSHH..",".HSKSSKSSH..",".HSSSSSSSH..",".HHSSMSSHH..","..HPPPPPH...",".SPPWPPPPS..","S.PPPPPPP.S.","..PPPPPPP...",".PPPPPPPPP..",".PPLPPPLPP..","PPPPPPPPPPP.","..SS...SS...","..KK...KK..."];
+function apal(){const o=OUTFITS[save.outfit]||OUTFITS[0];let P=o.P,L=o.L;if(o.rainbow){const c=["#ff4f9a","#ff9a3a","#ffd23a","#4fd06a","#3ab0ff","#9b4dff"];P=c[(t>>3)%6];L=c[((t>>3)+2)%6]}return{Y:"#ffd23a",H:"#8a4a20",S:"#ffd6b8",K:"#3a2a2a",M:"#ff7a9a",P,W:"#fff",L}}
 const BOWSER=["......OO.OO......","....RRRRRR.......","...GGGGGGGG......","..GGWKGGGGGG.....","..GGGGGGGGGGOO...","..YYYYGGGGGGGGO..","...YWYWGGGGGGGGO.","....YYY.GTGTGTGO.",".....GGGGTGTGTGT.","....YGGYYGGGGGGG.","...YYGYYYYGGGGG..","...YYYYYYYYGGG...","....YYYYYYYGG....","....GGG...GGG....","...WGGG...GGGW..."];
 const BPAL={O:"#fff3c0",R:"#ff6a1a",G:"#3aa83a",W:"#fff",K:"#222",Y:"#ffe08a",T:"#fff"};
 function grad(c1,c2){const g=cx.createLinearGradient(0,0,0,H);g.addColorStop(0,c1);g.addColorStop(1,c2);return g}
-function drawWorld(){const TH=ST()[lvl].theme,th=THEMES[TH],T=FAM[TH]||TH;
+function drawWorld(){const TH=MIS().theme,th=THEMES[TH],T=FAM[TH]||TH;
  cx.fillStyle=grad(th.sky[0],th.sky[1]);cx.fillRect(0,0,W,H);
  if(TH==="night"){cx.fillStyle="#fffbe0";cx.beginPath();cx.arc(W*.8,H*.12,S*10,0,7);cx.fill();for(let i=0;i<40;i++){cx.fillStyle=(t+i*13)%60<30?"#fff":"#fff6";cx.fillRect(((i*97-cam*.1)%W+W)%W,(i*53)%(GY*.7),S,S)}}
  else if(T!=="cave"&&T!=="castle"){cx.fillStyle=T==="lava"?"#fff2":"#fff";for(let i=0;i<8;i++){const x=((i*260-cam*.15)%(W+300)+W+300)%(W+300)-150,y=40+(i%3)*45;cloud(x,y)}}
@@ -244,6 +268,9 @@ function drawWorld(){const TH=ST()[lvl].theme,th=THEMES[TH],T=FAM[TH]||TH;
   const peachX=ox+bowserX+STEP*1.4;px(PEACH,PPAL,peachX,GY-16*S+(mode==="done"?-Math.abs(Math.sin(t/8))*S*4:0),true)}
  propsUpdate(ox);
  // hero
+ {const m=mario,ax=ox+am.x,ay=GY-17*S+am.y,flip=am.tw>0?((am.tw>>2)%2===1):false;px(AMELIA,apal(),ax,ay,flip);
+  cx.fillStyle="#c08a3a";cx.fillRect(ax+(flip?-2*S:12*S),ay+9*S,S,6*S);cx.fillStyle=(t>>3)%2?"#fff":"#ffe95a";cx.font=`${S*5}px sans-serif`;cx.textAlign="center";cx.fillText("★",ax+(flip?-1.5*S:12.5*S),ay+10*S);
+  if(m.act==="climb"&&m.actT<85&&m.actT>15&&t%6===0)parts.push(p(am.x+12*S,am.y-10*S,"✦","#e6a8ff"))}
  const m=mario,sc=m.big?1.35:1,sy=m.duck?.6:1,hx=ox+m.x,hy=GY-16*S*sc*sy+m.y;const running=Math.abs(m.tx-m.x)>1;
  const pal=m.rain?{...HPAL,R:["#ff3a3a","#ffd800","#3ae05a","#3ab0ff","#d04aff"][(t>>2)%5],B:["#ffd800","#3ab0ff","#ff3a3a"][(t>>3)%3]}:HPAL;
  if(m.rain&&t%4===0)parts.push(p(m.x+20,m.y-10,"✦",["#ff0","#f6f","#6ff"][t%3]));
@@ -252,8 +279,8 @@ function drawWorld(){const TH=ST()[lvl].theme,th=THEMES[TH],T=FAM[TH]||TH;
  for(const c of coins){if(c.fish){fish(ox+c.x,GY+c.y)}else coin(ox+c.x,GY-16*S+c.y)}
  cx.textAlign="center";for(const q of parts){cx.fillStyle=q.col;cx.font=`${S*7}px sans-serif`;cx.fillText(q.ch,ox+q.x,GY-16*S+q.y)}
  // level title
- cx.fillStyle="#fffd";cx.font=`bold ${S*6}px sans-serif`;cx.textAlign="left";cx.fillText(`${TIERS[tier].name} · ${lvl+1}: ${ST()[lvl].name}`,14,S*9);
- const tot=ST()[lvl].s.length;cx.fillText("⭐".repeat(Math.min(si,tot)),14,S*17)}
+ cx.fillStyle="#fffd";cx.font=`bold ${S*6}px sans-serif`;cx.textAlign="left";cx.fillText(warm?MIS().name:`${TIERS[tier].name} · ${lvl+1}: ${MIS().name}`,14,S*9);
+ const tot=MIS().s.length;cx.fillText("⭐".repeat(Math.min(si,tot)),14,S*17)}
 function cactus(x){cx.fillStyle="#3a9a3a";cx.fillRect(x,GY-S*24,S*5,S*24);cx.fillRect(x-S*5,GY-S*16,S*5,S*3);cx.fillRect(x-S*5,GY-S*21,S*3,S*6);cx.fillRect(x+S*5,GY-S*13,S*5,S*3);cx.fillRect(x+S*8,GY-S*19,S*3,S*7)}
 function tree(x){cx.fillStyle="#4a2a1a";cx.fillRect(x,GY-S*20,S*4,S*20);cx.fillStyle="#1f6a3a";cx.beginPath();cx.arc(x+S*2,GY-S*26,S*10,0,7);cx.fill();if((t>>4)%2){cx.fillStyle="#ffff80";cx.fillRect(x+S*8,GY-S*30,S,S)}}
 function cloud(x,y){cx.beginPath();cx.arc(x,y,24,0,7);cx.arc(x+28,y-12,30,0,7);cx.arc(x+58,y,24,0,7);cx.fill()}
@@ -268,11 +295,12 @@ function fireworks(){if(t%18===0){const fx=W*(.15+Math.random()*.7),fy=H*(.1+Mat
 let fw=[];
 function titleBg(){cx.fillStyle=grad("#4aa8ff","#bfe6ff");cx.fillRect(0,0,W,H);cx.fillStyle="#fff";for(let i=0;i<6;i++)cloud(((i*300+t*.5)%(W+300))-150,50+(i%3)*60);
  cx.fillStyle="#3fae49";cx.beginPath();cx.ellipse(W*.2,H*.85,W*.3,H*.25,0,Math.PI,0);cx.fill();cx.fillStyle="#c8743a";cx.fillRect(0,H*.85,W,H);cx.fillStyle="#4cc04a";cx.fillRect(0,H*.85,W,S*2);
- const hx=((t*2)%(W+200))-100;px((t>>3)%2?HERO2:HERO,HPAL,hx,H*.85-16*S,false);px(PEACH,PPAL,W*.82,H*.85-16*S,true)}
+ const hx=((t*2)%(W+200))-100;px((t>>3)%2?HERO2:HERO,HPAL,hx,H*.85-16*S,false);px(PEACH,PPAL,W*.82,H*.85-16*S,true);px(AMELIA,apal(),hx+16*S,H*.85-17*S,false)}
 function loop(){t++;if(t%15===0)setGY();
- if(mode==="start"||mode==="select")titleBg();
+ if(mode!=="play"&&mode!=="done")titleBg();
  else{const m=mario;actUpdate();m.x+=(m.tx-m.x)*.08;if(!m.hold){m.vy+=.6;m.y+=m.vy;if(m.y>=0){m.y=0;m.vy=0}}
   if(mode==="done"){ending++;if(lvl<5&&ending>130&&ending%40===0&&ending<300)m.vy=-8}
+  {const tx=m.x-15*S;am.x+=(tx-am.x)*.1;if(m.hold){am.y+=(m.y-am.y)*.2;am.vy=0}else{if(m.vy<-4&&am.y===0)am.vy=m.vy*.95;am.vy+=.6;am.y+=am.vy;if(am.y>=0){am.y=0;am.vy=0}}if(am.tw>0)am.tw--;if(mode==="done"&&lvl===5&&t%12===0)parts.push(p(am.x+6*S,-30,"♥","#ff4f9a"))}
   cam+=(m.x-cam)*.1;
   for(const c of coins){c.y+=c.vy;c.vy+=.5;c.life--}coins=coins.filter(c=>c.life>0);
   for(const q of parts){q.x+=q.vx;q.y+=q.vy;q.vy+=.15;q.life--}parts=parts.filter(q=>q.life>0);
@@ -280,6 +308,32 @@ function loop(){t++;if(t%15===0)setGY();
   if(mode==="done"){if(lvl===5){fireworks();if(t%10===0)parts.push(p(mario.x+60,-30,"♥","#ff4f9a"))}else if(t%15===0)parts.push(p(mario.x,-40,"★","#ffd800"))}}
  requestAnimationFrame(loop)}
 // debug hook for testing
-window.__mta={startLevel,finish,doAction,showSelect,setTier,markTier(t){save.done[t]=[1,1,1,1,1,1];store()},get state(){return{mode,tier,lvl,si,wi,ci,save}}};
+// ---------- hands, stickers, parents, warm-up
+let showHands=save.hands!==undefined?save.hands:!(TOUCH&&innerHeight>innerWidth&&innerWidth<500);
+document.getElementById("hL").innerHTML=[[0,52],[1,64],[2,70],[3,62]].map(([f,h])=>`<div class="fg f${f}" style="height:${h*.6}px"></div>`).join("")+`<div class="fg th" style="height:24px"></div>`;
+document.getElementById("hR").innerHTML=`<div class="fg th" style="height:24px"></div>`+[[4,62],[2,70],[1,64],[0,52]].map(([f,h])=>`<div class="fg f${f}" style="height:${h*.6}px"></div>`).join("");
+document.getElementById("handBtn").onclick=e=>{showHands=!showHands;save.hands=showHands;store();render();e.target.blur()};
+function panel(title,html){ov.style.justifyContent="";ov.style.paddingTop="";hud.classList.add("hidden");ov.classList.remove("hidden");ov.innerHTML=`<h1 style="font-size:min(8vw,52px)">${title}</h1><div class="panel">${html}</div><div class="menu2"><button id="backBtn">⬅ Back</button></div>`;document.getElementById("backBtn").onclick=showSelect}
+function showStickers(){mode="stickers";let h="";TIERS.forEach((T,ti)=>{h+=`<b>${T.name}</b><div class="sgrid">${T.m.map((m,i)=>`<div class="${save.done[ti][i]?"":"no"}" title="${m.name}">${save.done[ti][i]?STK[ti*6+i]:"❔"}</div>`).join("")}</div>`});
+ h+=`<b>Amelia's outfits</b> <span style="opacity:.7">(a new one every 3 missions)</span><div class="ofit">${OUTFITS.map((o,i)=>`<button data-o="${i}" class="${i===save.outfit?"on":""}" ${outfitOpen(i)?"":"disabled"}><i style="background:${o.rainbow?"linear-gradient(90deg,#f4a,#fd3,#4d6,#3af)":o.P}"></i>${outfitOpen(i)?o.n:"🔒 "+(i*3)+" missions"}</button>`).join("")}</div>`;
+ panel("📒 Sticker Book",h);ov.querySelectorAll(".ofit button").forEach(b=>b.onclick=()=>{const i=+b.dataset.o;if(!outfitOpen(i))return;save.outfit=i;store();showStickers()})}
+function showGate(){mode="gate";const opts=[5,6,7,8,9].sort(()=>Math.random()-.5);panel("👪 Grown-ups",`<div style="text-align:center;font-size:22px">What is 3 + 4?<div class="menu2">${opts.map(n=>`<button data-n="${n}">${n}</button>`).join("")}</div></div>`);
+ ov.querySelectorAll(".panel button").forEach(b=>b.onclick=()=>{if(+b.dataset.n===7)showParents();else showSelect()})}
+function weekKey(ds){const d=new Date(ds+"T12:00:00");d.setDate(d.getDate()-((d.getDay()+6)%7));return dkey(d)}
+function showParents(){mode="parents";const st=save.stats,wk={};for(const [d,v] of Object.entries(st.days)){const k=weekKey(d);const w=wk[k]||(wk[k]={keys:0,miss:0,words:0,ms:0});for(const f in w)w[f]+=v[f]}
+ const rows=Object.keys(wk).sort().reverse().slice(0,8).map(k=>{const w=wk[k],acc=w.keys+w.miss?Math.round(100*w.keys/(w.keys+w.miss)):0,wpm=w.ms>5000?(w.words/(w.ms/60000)).toFixed(1):"–";return `<tr><td>${k}</td><td>${acc}%</td><td>${wpm}</td><td>${w.words}</td><td>${Math.round(w.ms/60000)}</td></tr>`}).join("")||`<tr><td colspan=5>No typing yet</td></tr>`;
+ const miss=Object.entries(st.miss).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([l,n])=>`<b>${l.toUpperCase()}</b> (${n})`).join(", ")||"none yet";
+ const mast=Object.entries(st.mw).filter(([w,n])=>n>=3).map(([w])=>w).sort();
+ panel("👪 Parent Progress",`<table><tr><th>Week of</th><th>Accuracy</th><th>Words/min</th><th>Words</th><th>Minutes</th></tr>${rows}</table>
+ <p><b>Missions done:</b> ${doneCount()} / 24 (${TIERS.map((T,i)=>T.name+": "+save.done[i].filter(Boolean).length).join(", ")})</p><p><b>Stickers:</b> ${doneCount()} &nbsp; <b>Outfits:</b> ${Math.min(OUTFITS.length,1+Math.floor(doneCount()/3))}</p>
+ <p><b>Most-missed letters:</b> ${miss}</p><p><b>Mastered words</b> (typed right 3+ times, ${mast.length}): ${mast.join(", ")||"none yet"}</p>
+ <p style="opacity:.7">All data stays on this device. Words/min counts active typing time only.</p><button id="rstStats">Reset stats</button>`);
+ document.getElementById("rstStats").onclick=()=>{if(confirm("Reset typing stats? (missions and stickers are kept)")){save.stats={days:{},mw:{},miss:{}};store();showParents()}}}
+function startWarm(){const top=Object.entries(save.stats.miss).sort((a,b)=>b[1]-a[1]).slice(0,5).map(x=>x[0]);const L=top.length?top:["a","s","d","f","j"];
+ const bank=[...new Set(TIERS[tier].m.flatMap(m=>m.s.flatMap(x=>x[0].toLowerCase().split(" "))))].filter(w=>!HINT[w]&&w.length<=(tier<2?5:8));
+ let pick=bank.filter(w=>L.some(l=>w.includes(l))).sort(()=>Math.random()-.5);if(pick.length<9)pick=pick.concat(bank.sort(()=>Math.random()-.5)).slice(0,12);
+ pick=pick.slice(0,12);const acts=["hop","block","star","stomp"],sn=[];for(let i=0;i<pick.length;i+=3)sn.push([pick.slice(i,i+3).join(" "),acts[sn.length%4]]);
+ startLevel(0,{name:"Warm-up: "+L.join(" ").toUpperCase(),theme:"hills",s:sn})}
+window.__mta={startWarm,showStickers,showParents,showGate,startLevel,finish,doAction,showSelect,setTier,markTier(t){save.done[t]=[1,1,1,1,1,1];store()},get state(){return{mode,tier,lvl,si,wi,ci,save}}};
 showStart();loop();
 </script></body></html>
