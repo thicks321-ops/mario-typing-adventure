@@ -13,6 +13,9 @@ html,body{height:100dvh}
 .shake{animation:shake .3s}@keyframes shake{25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
 #kb{margin-top:8px;display:flex;flex-direction:column;align-items:center;gap:4px}#kb div{display:flex;gap:4px}
 #kb b{cursor:pointer;touch-action:none;width:clamp(26px,3.6vw,46px);height:clamp(26px,3.6vw,46px);display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:clamp(14px,2vw,22px);color:#222;border:2px solid #0004;opacity:.75}
+#kb b.sp{width:clamp(180px,32vw,340px)!important;font-size:clamp(12px,1.6vw,18px)!important}.spc{opacity:.35;margin-left:.15em}.spc.next{opacity:1}
+#worlds{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(42vw,190px),1fr));gap:12px;width:min(94vw,820px);margin:10px auto}#worlds button{font-size:clamp(16px,2.4vw,22px);padding:12px 8px;border-radius:18px;border:3px solid #fff;color:#fff;text-shadow:0 2px 3px #0008;cursor:pointer;font-weight:bold}#worlds .wi{font-size:2em;display:block}#worlds button.lock{opacity:.6}
+.qz .qq{font-size:clamp(20px,3.6vw,32px);margin-bottom:14px;cursor:pointer}.qopts{display:flex;flex-direction:column;gap:12px}.qopts button{font-size:clamp(20px,4vw,30px);padding:16px;border-radius:16px;border:3px solid #333;background:#fff;cursor:pointer;min-height:64px}.qopts small{opacity:.5;margin-right:8px}.qopts .good{background:#7ee07e}.qopts .try{background:#ffd27a}#qfb{font-size:24px;min-height:34px;margin-top:10px;text-align:center}
 #kb b.home{border-bottom:5px solid #333}#kb b.hi{opacity:1;transform:scale(1.25);outline:4px solid #fff;box-shadow:0 0 14px #ff0}
 .f0{background:#ff9aa2}.f1{background:#ffdac1}.f2{background:#e2f0cb}.f3{background:#b5ead7}.f4{background:#c7ceea}
 #top{position:absolute;top:8px;right:10px;display:flex;gap:8px}#top button{font:inherit;font-size:20px;padding:6px 12px;border-radius:12px;border:3px solid #333;background:#fff;cursor:pointer}
@@ -85,8 +88,475 @@ const TIERS=[
  {name:"Final Showdown",theme:"castle",s:[["Inside the fortress Bowser was waiting impatiently","run"],["The enormous turtle king stomped his feet","duck"],["Mario launched fireballs while Amelia cheered","fire"],["Amelia leaped over obstacles without stopping","hop"],["Bowser grumbled and retreated far away","bowser"],["Princess Peach thanked Amelia for her courage","peach"],["Everyone celebrated with fireworks and laughter","peach"]]}]}];
 const STK=["🐞","🍄","🐟","🦇","🔥","👑","🐸","🌿","🦀","💎","🌋","🏰","🌈","❄️","🐬","🔮","🌵","🐢","🦋","🧩","🐙","🦉","🌟","🎆"];
 const OUTFITS=[{n:"Purple Princess",P:"#9b4dff",L:"#d6b4ff"},{n:"Teal Tide",P:"#14b0a0",L:"#9ff0e6"},{n:"Sunny Gold",P:"#f0a818",L:"#fff0a0"},{n:"Ruby Red",P:"#e0304a",L:"#ffb0c0"},{n:"Sky Blue",P:"#3a8aff",L:"#b8d8ff"},{n:"Mint Leaf",P:"#30b860",L:"#b8f5c8"},{n:"Midnight Star",P:"#2a2a8a",L:"#ffd800"},{n:"Snow Queen",P:"#d8ecff",L:"#5ab0ff"},{n:"Rainbow",P:"#ff4f9a",L:"#ffd800",rainbow:1}];
-let warm=null;
-var tier=0;const ST=()=>TIERS[tier].m,MIS=()=>warm||ST()[lvl];
+// ---------- subject worlds content
+const WORLDS=[{id:"read",n:"Reading",ic:"📖",bg:"#ff7ac0"},{id:"math",n:"Math",ic:"➕",bg:"#3a8aff"},{id:"sci",n:"Science",ic:"🔬",bg:"#30b860"},{id:"soc",n:"Social Studies",ic:"🗺️",bg:"#f0a818"},{id:"spell",n:"Spelling",ic:"🐝",bg:"#9b4dff"},{id:"art",n:"Art & Music",ic:"🎨",bg:"#e0304a"}];
+const WSTK={math:["🔢","➕","➖","🧮","📏","🏅"],sci:["🔬","🌱","🌦️","🪐","🫀","🧪"],soc:["🚒","🗺️","🏛️","🗽","🧭","🎉"],spell:["🐝","✏️","📚","🔤","📝","🏆"],art:["🎨","🎵","🖌️","🎹","🌈","🎻"]};
+const WTH={math:["hills","pipes","sunset","snow","desert","night"],sci:["hills","water","sunset","night","hills","cave"],soc:["sunset","hills","desert","snow","sunset","hills"],spell:["snow","hills","night","sunset","water","pipes"],art:["hills","sunset","desert","night","water","hills"]};
+const FACTS={sci:[
+[["Animal Friends",
+"A cow says moo|What does a cow say?|moo|quack|tweet|🐄",
+"A fish can swim|What can a fish do?|swim|fly|bark|🐟",
+"A bird has wings|What does a bird have?|wings|fins|hooves|🐦",
+"A dog can bark|What sound does a dog make?|bark|moo|oink|🐶"],
+["Little Seeds",
+"A seed can grow|What can a seed do?|grow|run|sing|🌱",
+"Plants need sun|What do plants need?|sun|candy|shoes|🌻",
+"Plants need water|What else do plants need?|water|juice|sand|💧",
+"Roots go in the dirt|Where do roots go?|in the dirt|in the sky|in a box|🥕"],
+["Weather Watch",
+"The sun is hot|What is hot?|the sun|the snow|the moon|☀️",
+"Rain is wet|What is wet?|rain|sun|wind|🌧️",
+"Snow is cold|What is cold?|snow|fire|soup|❄️",
+"Wind can blow|What can wind do?|blow|swim|bark|🌬️"],
+["Night Sky",
+"We see the moon at night|When do we often see the moon?|at night|at lunch|never|🌙",
+"The sun is a star|What is the sun?|a star|a planet|a cloud|⭐",
+"We live on Earth|Where do we live?|Earth|the Moon|Mars|🌍",
+"Stars shine at night|When can we see stars?|at night|at noon|never|✨"],
+["My Senses",
+"I see with my eyes|What do you see with?|eyes|ears|feet|👀",
+"I hear with my ears|What do you hear with?|ears|nose|hands|👂",
+"I smell with my nose|What do you smell with?|nose|eyes|knees|👃",
+"I taste with my tongue|What do you taste with?|tongue|elbow|hair|👅"],
+["Animal Homes",
+"A bird lives in a nest|Where does a bird live?|a nest|a cave|a pond|🪺",
+"A bee makes honey|What does a bee make?|honey|milk|eggs|🐝",
+"A frog can hop|What can a frog do?|hop|fly|bark|🐸",
+"A hen lays eggs|What does a hen lay?|eggs|nuts|rocks|🐔"]],
+[["Growing Up",
+"A baby frog is a tadpole|What is a baby frog called?|tadpole|puppy|chick|🐸",
+"A caterpillar turns into a butterfly|What does a caterpillar become?|butterfly|bee|bird|🦋",
+"Fish breathe with gills|What do fish breathe with?|gills|lungs|wings|🐟",
+"Some bears sleep all winter|When do some bears sleep a lot?|winter|summer|lunch|🐻"],
+["Plant Parts",
+"A plant has roots stems and leaves|What part holds a plant in the dirt?|roots|leaves|petals|🌿",
+"Leaves use sunlight to make food|What do leaves use to make food?|sunlight|moonlight|candy|🍃",
+"Seeds can grow into new plants|What can seeds grow into?|new plants|rocks|fish|🌱",
+"Bees help flowers make seeds|Who helps flowers make seeds?|bees|cats|snails|🌸"],
+["Sky and Clouds",
+"Clouds are made of tiny drops of water|What are clouds made of?|tiny water drops|cotton|smoke|☁️",
+"A rainbow can show after rain|When can a rainbow show?|after rain|at midnight|in a cave|🌈",
+"Thunder comes after lightning|What comes after lightning?|thunder|snow|sunshine|⚡",
+"We wear coats when it is cold|When do we wear coats?|when it is cold|when it is hot|in the bath|🧥"],
+["Sun and Moon",
+"Earth goes around the sun|What does Earth go around?|the sun|the moon|Mars|🌍",
+"The moon goes around Earth|What goes around Earth?|the moon|the sun|a comet|🌙",
+"There are eight planets|How many planets are there?|eight|three|twenty|🪐",
+"The sun gives us light and heat|What gives us light and heat?|the sun|the moon|clouds|☀️"],
+["Healthy Body",
+"Your heart pumps blood|What pumps blood?|heart|nose|hair|❤️",
+"Your bones hold you up|What holds you up?|bones|ears|teeth|🦴",
+"Your lungs help you breathe|What helps you breathe?|lungs|toes|knees|🫁",
+"Brush your teeth two times a day|How often should you brush?|two times a day|once a year|never|🪥"],
+["Ice and Water",
+"Ice is water that froze|What is ice?|frozen water|hot milk|glass|🧊",
+"Ice melts when it gets warm|What happens to ice when it is warm?|it melts|it grows|it sings|💧",
+"A rock is a solid|What is a rock?|a solid|a liquid|a gas|🪨",
+"Juice is a liquid|What is juice?|a liquid|a solid|a gas|🧃"]],
+[["Animal Groups",
+"Mammals have hair or fur|What do mammals have?|hair or fur|feathers|scales|🐻",
+"Birds have feathers and lay eggs|What do birds have?|feathers|fur|gills|🐦",
+"Reptiles have dry scaly skin|What kind of skin do reptiles have?|dry and scaly|furry|feathery|🦎",
+"Insects have six legs|How many legs do insects have?|six|eight|four|🐞"],
+["Life Cycles",
+"A butterfly starts as an egg|How does a butterfly start?|as an egg|as a seed|as a frog|🥚",
+"A caterpillar makes a chrysalis|What does a caterpillar make?|a chrysalis|a nest|a web|🐛",
+"Frogs start life in water|Where do frogs start life?|in water|in trees|in sand|🐸",
+"A seed sprouts into a seedling|What does a seed sprout into?|a seedling|a rock|a shell|🌱"],
+["Water Cycle",
+"The sun warms water and it evaporates|What does warm water do?|evaporates|freezes|stops|☀️",
+"Water vapor cools and makes clouds|What does cool water vapor make?|clouds|rocks|fire|☁️",
+"Rain and snow fall from clouds|What falls from clouds?|rain and snow|leaves|sand|🌧️",
+"A thermometer measures temperature|What does a thermometer measure?|temperature|length|weight|🌡️"],
+["Spinning Earth",
+"Earth spins around once each day|How often does Earth spin around?|once each day|once a year|once a week|🌍",
+"Earth takes one year to go around the sun|How long does Earth take to go around the sun?|one year|one day|one hour|☀️",
+"Moonlight is sunlight bouncing off the moon|Where does moonlight come from?|the sun|the moon itself|lamps|🌙",
+"Mars is called the red planet|Which planet is the red planet?|Mars|Earth|Neptune|🔴"],
+["Body Systems",
+"Your brain helps you think|What helps you think?|brain|stomach|knees|🧠",
+"Muscles help you move|What helps you move?|muscles|hair|nails|💪",
+"Your stomach helps digest food|What helps digest food?|stomach|ears|eyes|🍎",
+"Your skin protects your body|What protects your body?|skin|socks|hats|🖐️"],
+["Habitats",
+"Camels live in the hot desert|Where do camels live?|the desert|the ocean|the Arctic|🐪",
+"Polar bears live in the cold Arctic|Where do polar bears live?|the Arctic|the desert|a jungle|🐻‍❄️",
+"Whales live in the ocean|Where do whales live?|the ocean|the desert|a forest|🐋",
+"Many monkeys live in rainforests|Where do many monkeys live?|rainforests|the Arctic|deserts|🐒"]],
+[["Food Chains",
+"Plants are producers because they make their own food|Why are plants producers?|they make their own food|they eat bugs|they walk|🌿",
+"Animals that eat plants are called herbivores|What is an animal that eats plants?|herbivore|carnivore|producer|🐰",
+"Animals that eat meat are called carnivores|What is an animal that eats meat?|carnivore|herbivore|producer|🦁",
+"Decomposers like mushrooms break down dead things|What do decomposers do?|break down dead things|make sunlight|fly south|🍄"],
+["Forces",
+"A push or a pull is a force|What is a force?|a push or a pull|a color|a sound|🛒",
+"Gravity pulls things down toward Earth|What pulls things down to Earth?|gravity|wind|music|🍎",
+"Magnets attract some metals like iron|What can magnets attract?|iron|wood|paper|🧲",
+"Friction slows moving things down|What slows moving things?|friction|light|color|🛝"],
+["Weather and Climate",
+"Climate is the usual weather of a place over many years|What is climate?|usual weather over many years|weather for one hour|a cloud|🌎",
+"Hurricanes are huge storms that form over warm oceans|Where do hurricanes form?|over warm oceans|in deserts|on mountain tops|🌀",
+"A rain gauge measures how much rain falls|What does a rain gauge measure?|rain|wind|heat|🌧️",
+"Wind is moving air|What is wind?|moving air|moving water|sunlight|🌬️"],
+["Solar System",
+"Jupiter is the largest planet in our solar system|What is the largest planet?|Jupiter|Mars|Earth|🪐",
+"Mercury is the planet closest to the sun|Which planet is closest to the sun?|Mercury|Neptune|Saturn|☀️",
+"Saturn has beautiful rings made of ice and rock|Which planet has famous rings?|Saturn|Mercury|Mars|💫",
+"The moon phases change over about a month|How long do the moon phases take?|about a month|one day|ten years|🌗"],
+["Inside the Body",
+"An adult skeleton has more than two hundred bones|How many bones does an adult have?|more than two hundred|ten|fifty|🦴",
+"Your heart is a muscle that keeps working|What kind of body part is the heart?|a muscle|a bone|a tooth|❤️",
+"Lungs take in oxygen from the air|What do lungs take in?|oxygen|sugar|water|🫁",
+"Nerves carry messages to your brain|What carries messages to your brain?|nerves|bones|hair|🧠"],
+["Matter and Energy",
+"Matter can be a solid a liquid or a gas|What are the three states of matter?|solid liquid gas|hot cold warm|red blue green|🧪",
+"Steam is water as a gas|What is steam?|water as a gas|frozen water|smoke|♨️",
+"Heat makes ice melt into liquid water|What makes ice melt?|heat|cold|darkness|🧊",
+"Sunlight is a kind of energy|What is sunlight?|energy|a liquid|a rock|⚡"]]],
+soc:[
+[["Helpers",
+"A vet helps sick pets|Who helps sick pets?|a vet|a pilot|a chef|🐾",
+"A cook makes food|Who makes food?|a cook|a nurse|a vet|🍳",
+"A firefighter puts out fires|Who puts out fires?|a firefighter|a baker|a farmer|🚒",
+"A teacher helps us learn|Who helps us learn?|a teacher|a plumber|a pilot|🍎"],
+["Good Friends",
+"We share with friends|What do we do with friends?|share|grab|yell|🤝",
+"We take turns|What should we take?|turns|toys away|naps all day|🔄",
+"We say please and thank you|What kind words do we say?|please and thank you|go away|no no|🙏",
+"Family can help us|Who can help us at home?|family|Bowser|a bug|👪"],
+["Maps",
+"A map shows places|What shows places?|a map|a cup|a hat|🗺️",
+"Up is the top|Where is up?|the top|the bottom|the side|⬆️",
+"Down is the bottom|Where is down?|the bottom|the top|the sky|⬇️",
+"A globe is round like Earth|What is round like Earth?|a globe|a box|a book|🌐"],
+["Stay Safe",
+"Red means stop|What does a red light mean?|stop|go|jump|🛑",
+"Green means go|What does a green light mean?|go|stop|sleep|🟢",
+"Look both ways|What do you do before you cross?|look both ways|run fast|close your eyes|🚸",
+"Wear a helmet on a bike|What do you wear on a bike?|a helmet|a crown|a sock|🚲"],
+["Holidays",
+"We give thanks on Thanksgiving|What do we give on Thanksgiving?|thanks|snowballs|eggs|🦃",
+"New Year starts in January|When does the New Year start?|January|July|May|🎉",
+"We see fireworks on the Fourth of July|When do we see fireworks?|Fourth of July|Halloween|Thanksgiving|🎆",
+"We carve pumpkins for Halloween|What do we carve for Halloween?|pumpkins|snowmen|eggs|🎃"],
+["Our Flag",
+"The flag is red white and blue|What colors is the US flag?|red white and blue|pink and green|black and gold|🇺🇸",
+"The bald eagle is a US symbol|What bird is a US symbol?|bald eagle|duck|parrot|🦅",
+"The flag has stars and stripes|What does the US flag have?|stars and stripes|dots|hearts|⭐",
+"The President leads the country|Who leads the country?|the President|a pirate|a clown|🏛️"]],
+[["Town Helpers",
+"A mail carrier brings letters to homes|Who brings letters?|a mail carrier|a dentist|a coach|📬",
+"A doctor helps people stay healthy|Who helps people stay healthy?|a doctor|a pilot|a painter|🩺",
+"A police officer helps keep us safe|Who helps keep us safe?|a police officer|a baker|a farmer|👮",
+"A farmer grows food for us|Who grows food?|a farmer|a dentist|a librarian|🚜"],
+["Rules",
+"Rules help keep us safe and fair|Why do we have rules?|to keep us safe and fair|to be mean|to make noise|📏",
+"At school we raise our hand to talk|What do we do to talk at school?|raise our hand|shout|stomp|✋",
+"Laws are rules for a town or country|What are rules for a country called?|laws|games|songs|⚖️",
+"A good citizen helps others|What does a good citizen do?|helps others|litters|is rude|🤗"],
+["Map Skills",
+"A map key tells what the symbols mean|What tells what map symbols mean?|the map key|the title|the paper|🔑",
+"The four directions are north south east and west|Which one is a direction?|north|purple|Tuesday|🧭",
+"North is at the top of most maps|What is at the top of most maps?|north|south|west|⬆️",
+"Blue on a map often shows water|What does blue often show on a map?|water|roads|cities|🌊"],
+["Long Ago",
+"Long ago people used candles for light|What did people use for light long ago?|candles|light bulbs|phones|🕯️",
+"Today we use electric lights|What do we use for light today?|electric lights|torches|stars|💡",
+"Long ago people rode horses to travel|How did people travel long ago?|horses|airplanes|rockets|🐎",
+"A timeline shows events in order|What shows events in order?|a timeline|a map|a menu|📅"],
+["Special Days",
+"On Thanksgiving families share a big meal|What do families share on Thanksgiving?|a big meal|a nap|a race|🦃",
+"Martin Luther King worked for fairness for all people|What did Martin Luther King work for?|fairness for all people|more candy|bigger cars|✊",
+"Independence Day is on July fourth|When is Independence Day?|July fourth|December first|May tenth|🎆",
+"Presidents Day honors American presidents|Who does Presidents Day honor?|presidents|pirates|chefs|🎩"],
+["American Symbols",
+"The Statue of Liberty stands for freedom|What does the Statue of Liberty stand for?|freedom|food|sports|🗽",
+"The Liberty Bell is in Philadelphia|Where is the Liberty Bell?|Philadelphia|Miami|Seattle|🔔",
+"The President lives in the White House|Where does the President live?|the White House|a castle|a boat|🏛️",
+"We say the Pledge of Allegiance to the flag|What do we say to the flag?|the Pledge of Allegiance|a joke|a riddle|🇺🇸"]],
+[["Communities",
+"A community is where people live work and play|What is a community?|where people live work and play|a kind of food|a big shoe|🏘️",
+"Cities are busy places with many people|Which place has many people?|a city|an empty field|a quiet desert|🏙️",
+"Rural areas have farms and open land|What do rural areas have?|farms and open land|tall skyscrapers|subways|🌾",
+"Suburbs are near cities and have many homes|Where are suburbs?|near cities|on the moon|under the sea|🏡"],
+["Goods and Services",
+"Goods are things people make or grow|What are goods?|things people make or grow|jobs people do|feelings|🧺",
+"Services are jobs people do to help others|What is a haircut?|a service|a good|a planet|💇",
+"People use money to buy what they need|What do people use to buy things?|money|leaves|rocks|💵",
+"Needs are things we must have like food and water|Which one is a need?|water|a toy robot|a video game|🥤"],
+["Our World",
+"There are seven continents on Earth|How many continents are there?|seven|three|twelve|🌍",
+"The United States is in North America|Which continent is the United States on?|North America|Africa|Asia|🗺️",
+"The Pacific is the largest ocean|What is the largest ocean?|Pacific|Atlantic|Arctic|🌊",
+"A compass rose shows directions on a map|What shows directions on a map?|a compass rose|a flower|a stamp|🧭"],
+["Leaders",
+"The President is the leader of the United States|Who leads the United States?|the President|the mayor|a king|🏛️",
+"A mayor leads a city or town|Who leads a city?|a mayor|a president|a pilot|🏙️",
+"Citizens vote to choose leaders|How do citizens choose leaders?|they vote|they race|they guess|🗳️",
+"Taxes help pay for schools and roads|What do taxes help pay for?|schools and roads|candy|toys|🏫"],
+["Famous Americans",
+"George Washington was the first President|Who was the first President?|George Washington|Abraham Lincoln|Ben Franklin|🎩",
+"Abraham Lincoln was the sixteenth President|Who was the sixteenth President?|Abraham Lincoln|George Washington|Paul Revere|🎩",
+"Harriet Tubman helped people escape slavery|What did Harriet Tubman do?|helped people escape slavery|built a car|wrote songs|⭐",
+"Rosa Parks bravely stood up for fair rules on buses|Where did Rosa Parks stand up for fairness?|on a bus|in a castle|on the moon|🚌"],
+["Flag Facts",
+"The bald eagle is our national bird|What is our national bird?|bald eagle|robin|owl|🦅",
+"The US flag has fifty stars for fifty states|How many stars are on the flag?|fifty|thirteen|ten|🇺🇸",
+"The flag has thirteen stripes for the first colonies|How many stripes are on the flag?|thirteen|fifty|seven|🎏",
+"Veterans Day honors people who served in the military|Who does Veterans Day honor?|people who served in the military|chefs|astronauts|🎖️"]],
+[["Landforms",
+"Landforms include mountains valleys and plains|Which one is a landform?|a mountain|a cloud|a boat|⛰️",
+"A peninsula is land with water on three sides|What has water on three sides?|a peninsula|an island|a desert|🏖️",
+"An island is land with water all around it|What has water all around it?|an island|a peninsula|a valley|🏝️",
+"The Mississippi is one of the longest rivers in America|What is a long river in America?|Mississippi|Sahara|Everest|🏞️"],
+["Government",
+"Our government has three branches|How many branches does our government have?|three|two|five|🏛️",
+"Congress makes the laws|Who makes the laws?|Congress|the mayor|the police|📜",
+"The President carries out the laws|Who carries out the laws?|the President|Congress|the judges|🇺🇸",
+"Courts and judges decide what laws mean|Who decides what laws mean?|courts and judges|singers|farmers|⚖️"],
+["Early America",
+"Native Americans were the first people to live in America|Who were the first people in America?|Native Americans|explorers|Pilgrims|🪶",
+"The Pilgrims sailed on the Mayflower|What ship did the Pilgrims sail on?|the Mayflower|the Titanic|a submarine|⛵",
+"The Declaration of Independence was signed in seventeen seventy six|When was the Declaration of Independence signed?|1776|1492|1999|📜",
+"Benjamin Franklin was an inventor and a leader|Who was an inventor and a leader?|Benjamin Franklin|Bowser|Paul Bunyan|💡"],
+["Money Smarts",
+"A producer makes goods or services|Who makes goods or services?|a producer|a consumer|a tourist|🏭",
+"A consumer buys and uses goods and services|Who buys and uses goods?|a consumer|a producer|a factory|🛍️",
+"Saving money means keeping it to use later|What is saving money?|keeping it to use later|losing it|spending it all|🐷",
+"Trade means swapping goods or services|What is trade?|swapping goods or services|sleeping|painting|🔄"],
+["Globe Lines",
+"The equator is an imaginary line around the middle of Earth|What is the equator?|a line around the middle of Earth|a mountain|a river|🌐",
+"Lines of latitude run east and west|Which way do lines of latitude run?|east and west|north and south|up and down|↔️",
+"A map scale helps measure distance|What helps measure distance on a map?|a map scale|the title|a crayon|📏",
+"The United States has fifty states|How many states are in the United States?|fifty|forty|sixty|🗺️"],
+["Citizens and Cultures",
+"Culture is the way a group of people lives|What is culture?|the way a group of people lives|a kind of rock|the weather|🌎",
+"People in different places celebrate different holidays|Do all people celebrate the same holidays?|no they are different|yes always|there is only one|🎉",
+"Good citizens follow laws and help their community|What do good citizens do?|follow laws and help|break rules|litter|🤝",
+"Volunteers help others without being paid|Who helps others without being paid?|volunteers|bosses|robots|💛"]]],
+art:[
+[["Paint Colors",
+"Paint the sky blue|What color did we paint the sky?|blue|red|green|p:#3a8aff",
+"The sun is yellow|What color is the sun in pictures?|yellow|purple|black|p:#ffd800",
+"The grass is green|What color is grass?|green|pink|blue|p:#3fae49",
+"An apple can be red|What color can an apple be?|red|blue|white|p:#e52521"],
+["Shape Land",
+"A ball is a circle|What shape is a ball?|circle|square|triangle|s:circle",
+"A box has square sides|What shape are the box sides?|square|circle|star|s:square",
+"A triangle has three sides|How many sides does a triangle have?|three|four|six|s:triangle",
+"A star has five points|How many points does this star have?|five|two|ten|s:star"],
+["More Colors",
+"Grapes can be purple|What color can grapes be?|purple|orange|white|p:#9b4dff",
+"An orange is orange|What color is an orange?|orange|blue|gray|p:#ff9a1a",
+"Snow is white|What color is snow?|white|black|red|p:#ffffff",
+"A pig is pink|What color is a pig?|pink|green|blue|p:#ff9ac0"],
+["Clap and Sing",
+"A song has a beat|What does a song have?|a beat|a nose|a tail|n:CCGG",
+"Clap clap clap|What do we do with our hands?|clap|kick|blink|n:CCC",
+"Bells can ring|What do bells do?|ring|bark|swim|n:GEC",
+"We can sing high and low|How can we sing?|high and low|only sideways|never|n:CEGc"],
+["Shape Hunt",
+"A door is a rectangle|What shape is a door?|rectangle|circle|triangle|s:rect",
+"A pizza slice is a triangle|What shape is a pizza slice?|triangle|square|circle|s:triangle",
+"A heart is for love|What shape means love?|heart|square|line|s:heart",
+"A clock is a circle|What shape is a clock?|circle|triangle|star|s:circle"],
+["Rainbow Mix",
+"A rainbow has many colors|What has many colors?|a rainbow|a rock|milk|p:rainbow",
+"Red and blue make purple|What do red and blue make?|purple|green|white|p:#9b4dff",
+"Red and yellow make orange|What do red and yellow make?|orange|blue|gray|p:#ff9a1a",
+"Blue and yellow make green|What do blue and yellow make?|green|pink|black|p:#3fae49"]],
+[["Primary Colors",
+"Red yellow and blue are primary colors|Which one is a primary color?|blue|green|purple|p:#3a8aff",
+"Mixing primary colors makes new colors|What does mixing colors make?|new colors|no colors|music|p:rainbow",
+"Green orange and purple are secondary colors|Which one is a secondary color?|green|red|blue|p:#3fae49",
+"White makes a color lighter|What makes a color lighter?|white|black|brown|p:#d6eaff"],
+["Lines",
+"A line can be straight or curvy|How can a line be?|straight or curvy|loud|tasty|s:line",
+"A zigzag line goes up and down|Which line goes up and down?|zigzag|dot|circle|s:zigzag",
+"A spiral goes round and round|What goes round and round?|a spiral|a square|a dot|s:spiral",
+"Dots can make a pattern|What can dots make?|a pattern|a sound|a smell|s:dots"],
+["Fast and Slow",
+"Music can be fast or slow|How can music be?|fast or slow|wet or dry|hot or cold|n:CDEFG",
+"Forte means loud|What music word means loud?|forte|piano|tempo|n:GGG",
+"Piano means soft in music|What music word means soft?|piano|forte|drum|n:EDC",
+"The beat is the steady pulse of music|What is the steady pulse of music?|the beat|the color|the title|n:CCCC"],
+["Instruments",
+"You strum a guitar|What do you strum?|guitar|drum|flute|n:CEG",
+"You blow into a flute|What do you blow into?|flute|piano|drum|n:GAB",
+"You tap a drum|What do you tap?|drum|flute|violin|n:CC",
+"A piano has black and white keys|What has black and white keys?|piano|trumpet|drum|n:CDEC"],
+["Art Studio",
+"Artists use brushes to paint|What do artists paint with?|brushes|forks|shoes|p:#ff4f9a",
+"Clay can be shaped into art|What can be shaped into art?|clay|water|air|🏺",
+"A sculpture is art you can walk around|What art can you walk around?|a sculpture|a song|a poem|🗿",
+"A portrait is a picture of a person|What is a picture of a person?|a portrait|a landscape|a map|🖼️"],
+["Melody Time",
+"Play the notes C D E|Which notes did we play?|C D E|X Y Z|1 2 3|n:CDE",
+"A melody is a tune you can sing|What is a melody?|a tune you can sing|a color|a shape|n:EDCDEEE",
+"Twinkle twinkle little star|What song did we play?|Twinkle Twinkle Little Star|Happy Birthday|Jingle Bells|n:CCGGAAG",
+"Mary had a little lamb|What animal is in the Mary song?|a lamb|a cat|a fish|n:EDCDEEE"]],
+[["Warm and Cool",
+"Warm colors are red orange and yellow|Which one is a warm color?|orange|blue|green|p:#ff9a1a",
+"Cool colors are blue green and purple|Which one is a cool color?|blue|red|yellow|p:#3a8aff",
+"Warm colors can feel sunny and happy|How can warm colors feel?|sunny|icy|sleepy|p:#ffd800",
+"Cool colors can feel calm like water|How can cool colors feel?|calm|loud|spicy|p:#14b0a0"],
+["Shapes in 3D",
+"A cube has six square faces|What shape has six square faces?|a cube|a circle|a line|s:square",
+"A sphere is round like a ball|What shape is round like a ball?|a sphere|a cube|a cone|s:circle",
+"An ice cream cone is shaped like a cone|What shape is an ice cream cone?|cone|cube|cylinder|s:triangle",
+"A hexagon has six sides|How many sides does a hexagon have?|six|five|eight|s:hexagon"],
+["Rhythm",
+"Rhythm is a pattern of long and short sounds|What is a pattern of long and short sounds?|rhythm|color|shape|n:CCCC",
+"A quarter note gets one beat|How many beats does a quarter note get?|one|four|ten|n:C",
+"A half note gets two beats|How many beats does a half note get?|two|one|five|n:CC",
+"A whole note gets four beats|How many beats does a whole note get?|four|two|one|n:CCCC"],
+["Instrument Families",
+"Violins and cellos are string instruments|What family is a violin in?|strings|brass|percussion|n:GAB",
+"Trumpets are brass instruments|What family is a trumpet in?|brass|strings|woodwinds|n:CEG",
+"Drums are percussion instruments|What family are drums in?|percussion|brass|strings|n:CCCC",
+"Flutes and clarinets are woodwinds|What family is a clarinet in?|woodwinds|percussion|brass|n:EFG"],
+["Famous Painters",
+"Vincent van Gogh painted The Starry Night|Who painted The Starry Night?|Vincent van Gogh|Mario|Bowser|🌌",
+"Claude Monet painted water lilies|What did Monet paint?|water lilies|race cars|robots|🪷",
+"Frida Kahlo painted many pictures of herself|What did Frida Kahlo paint a lot?|pictures of herself|maps|cars|🖼️",
+"A landscape is a painting of the outdoors|What is a painting of the outdoors?|a landscape|a portrait|a song|🏞️"],
+["Song Time",
+"The music staff has five lines|How many lines are on a music staff?|five|three|ten|n:EGBdf",
+"Notes sit higher on the staff when the sound is higher|Where do higher notes sit?|higher on the staff|off the page|nowhere|n:CDEFGABc",
+"Jingle bells jingle all the way|What song did we play?|Jingle Bells|Happy Birthday|Twinkle Twinkle|n:EEEEEEEGCDE",
+"Happy birthday to you|What song did we play?|Happy Birthday|Jingle Bells|Mary Had a Little Lamb|n:GGAGcB"]],
+[["Elements of Art",
+"The elements of art include line shape and color|Which one is an element of art?|color|noise|smell|p:rainbow",
+"Texture is how something feels or looks like it feels|What is texture?|how something feels|its color|its sound|🧶",
+"Value means how light or dark a color is|What is value in art?|how light or dark|how loud|how heavy|p:#555555",
+"Space in art is the area around and between things|What is space in art?|the area around and between things|outer space only|a sound|🌌"],
+["Color Wheel",
+"Complementary colors sit across from each other on the color wheel|Where are complementary colors?|across the color wheel|next to each other|nowhere|p:#ff9a1a",
+"Red and green are complementary colors|Which color is complementary to red?|green|orange|pink|p:#3fae49",
+"Blue and orange are complementary colors|Which color is complementary to blue?|orange|purple|green|p:#ff9a1a",
+"A tint is a color mixed with white|What is a color mixed with white?|a tint|a shade|a primary|p:#ffd6ee"],
+["Music Words",
+"Tempo is how fast or slow music goes|What is tempo?|how fast or slow|how loud|how high|n:CDEFGFEDC",
+"Dynamics are how loud or soft music is|What are dynamics?|loud or soft|fast or slow|high or low|n:GGGccc",
+"Pitch is how high or low a sound is|What is pitch?|how high or low|how fast|how long|n:CEGcGEC",
+"A crescendo means get louder little by little|What does crescendo mean?|get louder|get softer|stop|n:CDEFG"],
+["The Orchestra",
+"An orchestra has strings woodwinds brass and percussion|Which family plays in an orchestra?|brass|kazoos only|spoons only|n:CEGc",
+"The conductor leads the orchestra|Who leads the orchestra?|the conductor|the drummer|the audience|🎼",
+"The cello is bigger than the violin and sounds lower|Which one sounds lower?|cello|violin|flute|n:C",
+"The tuba is the biggest brass instrument|What is the biggest brass instrument?|tuba|trumpet|piccolo|n:CC"],
+["Great Artists",
+"Leonardo da Vinci painted the Mona Lisa|Who painted the Mona Lisa?|Leonardo da Vinci|Claude Monet|Frida Kahlo|🖼️",
+"Pablo Picasso helped create a style called cubism|What style did Picasso help create?|cubism|cartoons|photos|🔷",
+"Mozart wrote music when he was a young child|Who wrote music as a young child?|Mozart|Picasso|Monet|🎹",
+"Beethoven kept writing music after he lost his hearing|Who wrote music after losing his hearing?|Beethoven|Mozart|Picasso|🎵"],
+["Composer Camp",
+"A composer writes music|Who writes music?|a composer|a sculptor|a painter|n:CDEC",
+"A scale is notes going up or down in order|What is a scale?|notes in order|a fish|a picture|n:CDEFGABc",
+"A chord is three or more notes played together|What is a chord?|notes played together|one note|a drum|n:CEG",
+"Ode to Joy was written by Beethoven|Who wrote Ode to Joy?|Beethoven|Mozart|Picasso|n:EEFGGFEDCCDEEDD"]]]};
+const SPELL=[
+"cat:The cat naps in the sun|dog:My dog likes to run|sun:The sun is hot|hat:I have a red hat|big:That is a big tree|red:The apple is red|run:I can run fast|up:Look up at the sky|can:I can hop|see:I see a bird|go:We go to the park|mom:Mom gives me a hug|dad:Dad reads a book|bed:I sleep in my bed|pig:The pig is pink|hop:A frog can hop|man:The man has a hat|fun:We have fun|top:The cat is on top|sit:Sit on the mat|we:We like to play|me:Play with me|is:It is a sunny day|it:I like it|at:Look at the moon|and:Mario and Amelia run|the:The bug is small|you:I like you|like:I like cake|play:We play tag",
+"ship:The ship sails on the sea|fish:A fish can swim|tree:A bird is in the tree|frog:The frog is green|jump:I can jump high|rain:The rain is wet|boat:We ride in a boat|cake:We eat cake at the party|bike:I ride my bike|home:We go home|kite:My kite flies high|snow:The snow is cold|look:Look at the stars|book:I read a book|said:She said hello|have:I have a pet|they:They are my friends|what:What is that|when:When can we go|where:Where is my hat|green:The grass is green|black:The cat is black|stop:Stop at the red light|sleep:I sleep at night|train:The train goes fast|chick:A chick says peep|fast:Mario runs fast|hand:Raise your hand|went:We went to the zoo|wish:I wish on a star",
+"because:I smile because I am happy|friend:Amelia is a good friend|school:We learn at school|again:Let us play again|about:This book is about frogs|light:Turn on the light|night:Owls hoot at night|right:Turn to the right|should:You should brush your teeth|could:She could see the castle|would:Would you like to play|around:We walk around the pond|laugh:Jokes make me laugh|enough:We have enough snacks|people:Many people came|water:Fish swim in water|happy:The puppy is happy|little:A little bug crawls|family:My family eats dinner|mother:My mother sings|father:My father cooks|sister:My sister reads|brother:My brother runs|rabbit:The rabbit hops|garden:Flowers grow in the garden|winter:Winter is cold|summer:Summer is hot|before:Wash hands before you eat|after:We rest after lunch|every:I read every day",
+"beautiful:The sunset is beautiful|different:Every snowflake is different|important:Sleep is important|through:We walked through the forest|thought:I thought about the puzzle|caught:Mario caught the ball|believe:I believe in you|favorite:Blue is my favorite color|together:We work together|probably:It will probably rain|surprise:The party was a surprise|remember:Remember your backpack|minute:Wait one minute|special:Today is a special day|answer:She knows the answer|question:Ask a question|library:We borrow books at the library|weather:The weather is sunny|breakfast:I eat breakfast in the morning|neighbor:Our neighbor has a dog|measure:Use a ruler to measure|nature:We hike in nature|picture:Draw a picture|adventure:Amelia loves an adventure|knowledge:Reading gives us knowledge|early:I woke up early|heard:I heard a bird sing|finally:We finally saved Peach|castle:Bowser lives in a castle|calendar:Look at the calendar"].map(g=>g.split("|").map(x=>x.split(":")));
+const MNAMES=["Count Hop","Number Path","Add It Up","Take Away","Hop Back","Mix It Up"];
+
+// ---------- subject engine
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function rng(s){s=s%2147483647||7;return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
+function mathProb(t,m,k){const r=rng(1000+t*997+m*131+k*17),ri=(a,b)=>a+Math.floor(r()*(b-a+1));
+ const op=m<=2?"+":m<=4?"-":(k%2?"-":"+");let a,b,c=0;
+ if(t===0){const mx=m===5?10:5;if(op==="+"){a=ri(0,mx-1);b=ri(1,mx-a)}else{a=ri(2,mx);b=ri(1,a)}}
+ else if(t===1){if(op==="+"){a=ri(2,12);b=ri(2,Math.min(9,20-a))}else{a=ri(10,20);b=ri(2,9)}}
+ else if(t===2){if(op==="+"){if(m===0){a=ri(1,8)*10;b=ri(1,9-a/10)*10}else{a=ri(11,70);b=ri(3,Math.min(29,99-a))}}else{if(m===3){a=ri(3,9)*10;b=ri(1,a/10-1)*10}else{a=ri(30,99);b=ri(3,Math.min(29,a-1))}}}
+ else{if(m===5){a=ri(200,500);b=ri(1,4)*100+ri(1,9)*10;c=ri(1,2)*100+ri(1,9)*10;return{a,b,c,op:"+-",ans:a+b-c}}
+  if(op==="+"){if(m===0){a=ri(1,8)*100;b=ri(1,9-a/100)*100}else{a=ri(120,700);b=ri(2,9)*10+ri(0,2)*100}}else{if(m===3){a=ri(3,9)*100;b=ri(1,a/100-1)*100}else{a=ri(300,999);b=ri(2,9)*10+ri(1,2)*100}}}
+ return{a,b,c,op,ans:op==="+"?a+b:a-b}}
+function hopsFor(v,d){const out=[],sg=Math.sign(d);let n=Math.abs(d);if(n<=10){for(let i=0;i<n;i++)out.push(v+=sg);return out}
+ for(const u of[100,10]){while(n>=u){n-=u;out.push(v+=sg*u)}}if(n)out.push(v+=sg*n);return out}
+const NW=["zero","one","two","three","four","five","six","seven","eight","nine","ten"];
+function readQuiz(mis){const ss=mis.s.map(x=>x[0]);const q=[{q:"Who is helping Mario in this story?",a:"Amelia",o:["Amelia","Bowser","a beetle"]}];
+ const skip=["amelia","mario","peach","princess"];const pickW=s=>s.split(" ").filter(w=>!skip.includes(w.toLowerCase())).sort((a,b)=>b.length-a.length)[0];
+ const idx=[0,2,4].filter(i=>ss[i]);for(const i of idx){const w=pickW(ss[i]);if(!w)continue;const others=shuf(ss.filter((_,j)=>j!==i).map(pickW).filter(x=>x&&x.toLowerCase()!==w.toLowerCase()));
+  const o=[w,...[...new Set(others)].slice(0,2)];q.push({q:`Finish the sentence: "${ss[i].replace(new RegExp("\\b"+w+"\\b"),"____")}"`,a:w,o})}return q}
+function miss1(w){const V="aeiou",out=new Set(),tr=[()=>{for(let i=1;i<w.length;i++)if(V.includes(w[i]))return w.slice(0,i)+V[(V.indexOf(w[i])+1+i%3)%5]+w.slice(i+1)},
+ ()=>{for(let i=w.length-2;i>0;i--)if(w[i]!==w[i+1])return w.slice(0,i)+w[i+1]+w[i]+w.slice(i+2)},
+ ()=>{for(let i=1;i<w.length;i++)if(!V.includes(w[i])&&w[i]!==w[i-1])return w.slice(0,i)+w[i]+w.slice(i)},()=>w.length>3?w.slice(0,-2)+w.slice(-1):w+"e",()=>w+w.slice(-1)];
+ for(const f of tr){const x=f();if(x&&x!==w)out.add(x);if(out.size>=2)break}return[...out]}
+const ACTS=["hop","block","star","ride","climb","wave"];
+function wnames(w,t){return w==="read"?TIERS[t].m.map(m=>m.name):w==="math"?MNAMES:w==="spell"?["Word Bees","Buzzy Words","Honey Words","Spell Hive","Word Garden","Spelling Bee"]:FACTS[w][t].map(m=>m[0])}
+function buildMission(w,t,m){
+ if(w==="read"){const b=TIERS[t].m[m];return{...b,kind:"read",quiz:readQuiz(b)}}
+ if(w==="math"){const ps=[0,1,2,3,4].map(k=>mathProb(t,m,k)),st=t<=1?1:t===2?10:100;
+  const s=ps.map(p=>{const vals=[p.a,...(p.op==="+-"?(()=>{const h1=hopsFor(p.a,p.b);return[...h1,...hopsFor(h1[h1.length-1],-p.c)]})():hopsFor(p.a,p.op==="+"?p.b:-p.b))];
+   let lo=Math.min(...vals),hi=Math.max(...vals);if(t<=1){lo=0;hi=t===0?10:20}else{lo=Math.floor(lo/st)*st;hi=Math.ceil(hi/st)*st;if(hi-lo<st*2)hi=lo+st*2}
+   const show=p.op==="+-"?`${p.a} + ${p.b} - ${p.c} = ?`:`${p.a} ${p.op} ${p.b} = ?`,sw=show.replace("+","plus").replace("-","minus").replace("+","plus").replace("= ?","");
+   return[String(p.ans),"hop",{hide:1,show:"🔢 "+show,sayq:sw,nl:{vals,lo,hi,st}}]});
+  return{name:MNAMES[m],theme:WTH.math[m],kind:"math",s,quiz:ps.map(p=>{const q=p.op==="+-"?`${p.a} + ${p.b} - ${p.c} = ?`:`${p.a} ${p.op} ${p.b} = ?`,d=t<=1?1:10;const o=[p.ans,p.ans+d,p.ans-d>=0?p.ans-d:p.ans+2*d].map(String);return{q,a:String(p.ans),o}})}}
+ if(w==="spell"){const L=SPELL[t].slice(m*5,m*5+5);return{name:wnames(w,t)[m],theme:WTH.spell[m],kind:"spell",
+  s:L.map(([wd,se],j)=>[wd,["hop","block","star","stomp","ride"][j],{hide:1,show:"🐝 Listen and spell the word! (tap the box to hear it again)",sayw:`${wd}. ${se}. ${wd}.`}]),
+  quiz:L.map(([wd])=>({q:`Which word is spelled right? 🔊`,a:wd,o:[wd,...miss1(wd)],sayq:`Which one spells ${wd}?`}))}}
+ const F=FACTS[w][t][m];const fs=F.slice(1).map(x=>x.split("|"));
+ return{name:F[0],theme:WTH[w][m],kind:w,s:fs.map((f,j)=>[f[0],ACTS[j%6],{fx:f[5]}]),quiz:fs.map(f=>({q:f[1],a:f[2],o:[f[2],f[3],f[4]]}))}}
+// scene fx + number line
+let SC={},NL=null;const NOTE={C:262,D:294,E:330,F:349,G:392,A:440,B:494,c:523,d:587,e:659,f:698};
+function playNotes(s,dl=0){[...s].forEach((n,i)=>NOTE[n]&&tone(NOTE[n],.28,"triangle",.12,dl+i*.3))}
+function applyFx(fx,done){if(!fx)return;if(fx.startsWith("p:")){if(done){SC.col=fx.slice(2);SC.ct=t;for(let i=0;i<12;i++)parts.push(p(mario.x+40,-60,"🎨","#fff"))}}
+ else if(fx.startsWith("s:")){if(done){SC.shape=fx.slice(2);SC.st=t}}else if(fx.startsWith("n:")){if(done)playNotes(fx.slice(2),.2);SC.emo="🎵"}else SC.emo=fx}
+function overlayDraw(){const cxW=W*.7,cyW=GY*.32,R=S*13;
+ if(SC.col){cx.save();cx.globalAlpha=.28;if(SC.col==="rainbow"){["#ff4f4f","#ff9a1a","#ffd800","#3fae49","#3a8aff","#9b4dff"].forEach((c,i)=>{cx.fillStyle=c;cx.fillRect(0,i*GY/6,W,GY/6)})}else{cx.fillStyle=SC.col;cx.fillRect(0,0,W,GY)}cx.restore()}
+ if(SC.emo&&!NL){cx.font=`${S*20}px sans-serif`;cx.textAlign="center";cx.fillText(SC.emo,cxW,cyW+Math.sin(t/15)*S*2)}
+ if(SC.shape){const k=Math.min(1,(t-SC.st)/30),x=W*.3,y=GY*.3;cx.save();cx.translate(x,y);cx.scale(k,k);cx.fillStyle=SC.col&&SC.col!=="rainbow"?SC.col:"#ff4f9a";cx.strokeStyle="#333";cx.lineWidth=S;cx.beginPath();const sh=SC.shape;
+  if(sh==="circle")cx.arc(0,0,R,0,7);else if(sh==="square")cx.rect(-R,-R,2*R,2*R);else if(sh==="rect")cx.rect(-R*.7,-R*1.2,R*1.4,R*2.4);else if(sh==="triangle"){cx.moveTo(0,-R);cx.lineTo(R,R);cx.lineTo(-R,R);cx.closePath()}
+  else if(sh==="star"||sh==="hexagon"){const n=sh==="star"?10:6;for(let i=0;i<n;i++){const a=i/n*Math.PI*2-Math.PI/2,r=sh==="star"&&i%2?R*.45:R;cx.lineTo(Math.cos(a)*r,Math.sin(a)*r)}cx.closePath()}
+  else if(sh==="heart"){cx.moveTo(0,R*.9);cx.bezierCurveTo(-R*1.6,-R*.2,-R*.6,-R*1.3,0,-R*.4);cx.bezierCurveTo(R*.6,-R*1.3,R*1.6,-R*.2,0,R*.9)}
+  else if(sh==="line"){cx.moveTo(-R*1.5,0);cx.lineTo(R*1.5,0);cx.moveTo(-R*1.5,R*.6);cx.bezierCurveTo(-R*.5,-R*.4,R*.5,R*1.4,R*1.5,R*.2)}
+  else if(sh==="zigzag"){for(let i=0;i<=6;i++)cx.lineTo(-R*1.5+i*R/2,i%2?-R*.6:R*.6)}else if(sh==="spiral"){for(let a=0;a<18;a+=.2)cx.lineTo(Math.cos(a)*a*R/18,Math.sin(a)*a*R/18)}
+  else if(sh==="dots"){for(let i=0;i<9;i++){cx.moveTo(-R+(i%3)*R+S*2,-R+Math.floor(i/3)*R);cx.arc(-R+(i%3)*R,-R+Math.floor(i/3)*R,S*2,0,7)}}
+  if(["line","zigzag","spiral"].includes(sh)){cx.lineWidth=S*1.5;cx.strokeStyle=SC.col&&SC.col!=="rainbow"?SC.col:"#ff4f9a";cx.stroke()}else{cx.fill();cx.stroke()}cx.restore()}
+ if(NL){const L=NL,x0=W*.07,x1=W*.93,y=Math.min(GY*.42,GY-26*S),X=v=>x0+(v-L.lo)/(L.hi-L.lo)*(x1-x0);let st=L.st;while((L.hi-L.lo)/st>20)st*=2;
+  cx.fillStyle="#fffe";cx.fillRect(x0-S*4,y-S*26,x1-x0+S*8,S*36);cx.strokeStyle="#333";cx.lineWidth=S;cx.beginPath();cx.moveTo(x0,y);cx.lineTo(x1,y);cx.stroke();
+  cx.fillStyle="#333";cx.font=`bold ${S*(st===1&&L.hi>12?4:5)}px sans-serif`;cx.textAlign="center";for(let v=L.lo;v<=L.hi;v+=st){cx.fillRect(X(v)-S/2,y-S*2,S,S*4);cx.fillText(v,X(v),y+S*8)}
+  const dt=t-L.t0,per=Math.max(14,Math.min(36,Math.floor(360/L.vals.length))),k=Math.min(L.vals.length-1,Math.max(0,Math.floor((dt-30)/per)+1)),f=dt<30?0:((dt-30)%per)/per;
+  if(k>L.k){L.k=k;sfx.jump();if(L.vals.length<=12)say(String(L.vals[k]));if(k===L.vals.length-1)say(String(L.vals[k]))}
+  cx.strokeStyle="#ff4f9a";cx.lineWidth=S*.8;for(let i=1;i<=k;i++){const a=X(L.vals[i-1]),b=X(L.vals[i]);cx.beginPath();cx.moveTo(a,y);cx.quadraticCurveTo((a+b)/2,y-S*14,b,y);cx.stroke()}
+  let ax=X(L.vals[k]),ay=y;if(k<L.vals.length-1&&dt>=30){const a=X(L.vals[k]),b=X(L.vals[k+1]);ax=a+(b-a)*f;ay=y-Math.sin(f*Math.PI)*S*10}
+  if(k===L.vals.length-1){cx.fillStyle="#ff4f9a";cx.beginPath();cx.arc(X(L.vals[k]),y,S*3,0,7);cx.fill()}
+  const sv=S;S=Math.max(1,Math.round(sv*.55));px(AMELIA,apal(),ax-6*S,ay-17*S,false);S=sv}}
+// quiz
+let QZ=null;
+function afterTyping(){if(warm){finish();return}mode="quiz";setTimeout(startQuiz,1300)}
+function startQuiz(){const M=MIS();QZ={list:shuf(M.quiz).map(q=>({...q,o:shuf(q.o)})),i:0,right:0,missed:[]};mode="quiz";showQ()}
+function showQ(){const q=QZ.list[QZ.i];hud.classList.add("hidden");ov.classList.remove("hidden");ov.style.justifyContent="";ov.style.paddingTop="";
+ ov.innerHTML=`<h1 style="font-size:min(8vw,46px)">⭐ Quick Check! ${QZ.i+1} / ${QZ.list.length}</h1><div class="panel qz"><div class="qq">${q.q}</div><div class="qopts">${q.o.map((o,j)=>`<button data-j="${j}"><small>${j+1}</small> ${o}</button>`).join("")}</div><div id="qfb"></div></div><div class="tip">Tap an answer or press 1, 2 or 3 · tap the question to hear it</div>`;
+ ov.querySelectorAll(".qopts button").forEach(b=>b.onclick=()=>answerQ(+b.dataset.j));ov.querySelector(".qq").onclick=()=>sayQ(q);sayQ(q)}
+function sayQ(q){if(window.speechSynthesis)speechSynthesis.cancel();say((q.sayq||q.q.replace(/[^\w\s?,'+=-]/g," ").replace("+"," plus ").replace(/ - /g," minus ").replace("= ?","equals what?").replace("____","blank"))+" "+q.o.join(", or "))}
+function answerQ(j){if(!QZ||QZ.lock)return;const q=QZ.list[QZ.i],ok=q.o[j]===q.a;QZ.lock=1;const bs=ov.querySelectorAll(".qopts button");
+ const R=save.qz[world]||(save.qz[world]={r:0,n:0,att:0,pass:0,missed:[]});R.n++;
+ if(ok){QZ.right++;R.r++;sfx.coin();bs[j].classList.add("good");document.getElementById("qfb").textContent="🎉 Yes! Great job!";say("Yes!");am.tw=20}
+ else{QZ.missed.push(q);R.missed.unshift(`${q.q} → ${q.a}`);R.missed=R.missed.slice(0,12);bs[j].classList.add("try");bs[q.o.indexOf(q.a)].classList.add("good");document.getElementById("qfb").textContent=`💜 Good try! It is: ${q.a}`;say("Good try! It is "+q.a)}
+ store();setTimeout(()=>{QZ.lock=0;QZ.i++;if(QZ.i<QZ.list.length)showQ();else endQuiz()},ok?1300:2600)}
+function endQuiz(){const n=QZ.list.length,need=Math.ceil(n*.75),R=save.qz[world];R.att++;
+ if(QZ.right>=need){R.pass++;store();QZ=null;mode="play";finish();return}store();mode="review";
+ ov.innerHTML=`<h1 style="font-size:min(8vw,46px)">Let's review together! 💜</h1><div class="panel"><p>You got <b>${QZ.right}</b> of ${n}. You need ${need} to earn the star — you can do it!</p>${QZ.missed.map(q=>`<p>❓ ${q.q}<br>✅ <b>${q.a}</b></p>`).join("")}</div><div class="menu2"><button id="retryQ">🔁 Try again</button><button id="replayM">▶️ Play the mission again</button></div>`;
+ say("Let's review. "+QZ.missed.map(q=>q.a).join(". "));document.getElementById("retryQ").onclick=startQuiz;document.getElementById("replayM").onclick=()=>startLevel(lvl)}
+// world map
+function showMap(){ov.style.justifyContent="";ov.style.paddingTop="";mode="map";hud.classList.add("hidden");ov.classList.remove("hidden");if(!tierOpen(tier))tier=0;
+ const cas=misOpen(tier,5,"read"),cd=save.done[tier][5];
+ ov.innerHTML=`<h1 style="font-size:min(8vw,52px)">🗺️ Amelia's World Map</h1><div class="grade"><div class="glabel">Grade level</div><input id="gr" type="range" min="0" max="3" step="1" value="${tier}" aria-label="Grade level">
+ <div class="ticks">${TIERS.map((T,i)=>`<span class="tick ${i===tier?"on":""}" data-t="${i}">${tierOpen(i)?"":"🔒 "}${T.name}</span>`).join("")}</div><div id="gmsg">${TIERS[tier].name}</div></div>
+ <div id="worlds">${WORLDS.map(w=>{const d=D(w.id)[tier].filter(Boolean).length-(w.id==="read"&&cd?1:0),tot=w.id==="read"?5:6;return `<button data-w="${w.id}" style="background:${w.bg}"><span class="wi">${w.ic}</span>${w.n}<br><small>${"⭐".repeat(d)}${"☆".repeat(tot-d)}</small></button>`}).join("")}
+ <button id="castleBtn" class="${cas?"":"lock"}" style="background:#5a5a6a">${cas?"🏰":"🔒"} Rescue Peach!<br><small>${cd?"👑 Peach is safe!":cas?"Bowser's castle is open!":"Reading 1-5 + mission 1 in every world"}</small></button></div>
+ <div class="menu2"><button id="stkBtn">📒 Sticker Book</button><button id="parBtn">👪 Parents</button><button id="reset">Reset progress</button></div>`;
+ ov.querySelectorAll("#worlds button[data-w]").forEach(b=>b.onclick=()=>{world=b.dataset.w;selIdx=0;showSelect()});
+ document.getElementById("castleBtn").onclick=()=>{if(misOpen(tier,5,"read")){world="read";startLevel(5)}else{const m=document.getElementById("gmsg");m.textContent="🔒 Finish Reading 1-5 and the first mission in every world!";m.classList.remove("shake");void m.offsetWidth;m.classList.add("shake");sfx.boop()}};
+ document.getElementById("stkBtn").onclick=showStickers;document.getElementById("parBtn").onclick=showGate;
+ const gr=document.getElementById("gr");gr.addEventListener("input",()=>setTier(+gr.value));gr.addEventListener("keydown",e=>e.stopPropagation());ov.querySelectorAll(".tick").forEach(e=>e.onclick=()=>{gr.value=e.dataset.t;setTier(+e.dataset.t)});
+ document.getElementById("reset").onclick=()=>{if(confirm("Reset all progress?")){save=mig(blank());tier=0;store();selIdx=0;showMap()}}}
+
+let warm=null,curMis=null;
+var tier=0;const ST=()=>TIERS[tier].m,MIS=()=>warm||curMis;
 const HINT={amelia:"👑",mario:"🧢",peach:"👸",bowser:"🐢"};
 const THEMES={hills:{sky:["#6ec6ff","#bdeaff"],hill:"#3fae49",hill2:"#7cd36f",ground:"#c8743a",top:"#4cc04a"},
 pipes:{sky:["#5ab4ff","#cdf"],hill:"#2f9a3f",hill2:"#6fc96a",ground:"#b5652f",top:"#3db042"},
@@ -104,9 +574,11 @@ const STEP=110;
 const blank=()=>({v:2,tier:0,done:[0,1,2,3].map(()=>[0,0,0,0,0,0])});
 let save=(()=>{let o;try{o=JSON.parse(localStorage.getItem("mta_save")||"null")}catch(e){}
  if(!o)return blank();if(o.v===2&&o.done)return o;const n=blank();if(o.stars)o.stars.forEach((x,i)=>{if(x>0)n.done[0][i]=1});return n})();
+function mig(o){o.w=o.w||{};for(const w of["math","sci","soc","spell","art"])o.w[w]=o.w[w]||[0,1,2,3].map(()=>[0,0,0,0,0,0]);o.qz=o.qz||{};o.stats=o.stats||{days:{},mw:{},miss:{}};o.outfit=o.outfit||0;return o}
+var world="read";const D=w=>w==="read"?save.done:save.w[w];save=mig(save);
 tier=save.tier||0;save.stats=save.stats||{days:{},mw:{},miss:{}};save.outfit=save.outfit||0;
-const doneCount=()=>save.done.flat().filter(Boolean).length,outfitOpen=i=>i<=Math.floor(doneCount()/3);
-const tierOpen=t=>t===0||save.done[t-1].every(Boolean),misOpen=(t,m)=>tierOpen(t)&&(m===0||!!save.done[t][m-1]);
+const doneCount=()=>save.done.flat().filter(Boolean).length+Object.values(save.w).flat(2).filter(Boolean).length,outfitOpen=i=>i<=Math.floor(doneCount()/3);
+const tierOpen=t=>t===0||save.done[t-1].every(Boolean),misOpen=(t,m,w=world)=>tierOpen(t)&&(m===0||!!D(w)[t][m-1])&&(w!=="read"||m!==5||WORLDS.every(x=>x.id==="read"||!!D(x.id)[t][0])),CAS=()=>world==="read"&&lvl===5&&!warm;
 function store(){localStorage.setItem("mta_save",JSON.stringify(save))}
 var mode="start",lvl=0,si=0,wi=0,ci=0,words=[],muted=false,showKb=true,selIdx=0;
 let props=[],wc=0,am={x:0,y:0,vy:0,tw:0},lastK=0,wordMiss=false;let mario={x:80,tx:80,y:0,vy:0,face:1,anim:0,act:null,actT:0},cam=0,parts=[],coins=[],t=0,ending=0,bowserX=0,bowserGone=0;
@@ -124,35 +596,41 @@ fan:()=>[523,659,784,1047,784,1047,1319].forEach((f,i)=>tone(f,.18,"square",.07,
 // ---------- UI
 const ov=document.getElementById("overlay"),hud=document.getElementById("hud"),sEl=document.getElementById("sentence"),wEl=document.getElementById("word"),kbEl=document.getElementById("kb");
 const ROWS=["qwertyuiop","asdfghjkl","zxcvbnm"],FING={q:0,a:0,z:0,w:1,s:1,x:1,e:2,d:2,c:2,r:3,f:3,v:3,t:3,g:3,b:3,y:4,h:4,n:4,u:4,j:4,m:4,i:2,k:2,o:1,l:1,p:0};
-kbEl.innerHTML=ROWS.map(r=>"<div>"+[...r].map(k=>`<b id="k_${k}" class="f${FING[k]}${"fj".includes(k)?" home":""}">${k}</b>`).join("")+"</div>").join("");
+Object.assign(FING,{"1":0,"2":1,"3":2,"4":3,"5":3,"6":4,"7":4,"8":2,"9":1,"0":0});
+kbEl.innerHTML=`<div id="kbNum">${[..."1234567890"].map(k=>`<b id="k_${k}" class="f${FING[k]}">${k}</b>`).join("")}</div>`+ROWS.map(r=>"<div>"+[...r].map(k=>`<b id="k_${k}" class="f${FING[k]}${"fj".includes(k)?" home":""}">${k}</b>`).join("")+"</div>").join("")+`<div><b id="k_space" class="sp" data-k=" ">space</b></div>`;
 function showStart(){ov.style.justifyContent="";ov.style.paddingTop="";mode="start";hud.classList.add("hidden");ov.classList.remove("hidden");
  ov.innerHTML=`<h1>Princess Amelia's Typing Adventure</h1><div style="font-size:clamp(20px,3vw,32px)">👑 Help Mario rescue Princess Peach! 🍄</div><p class="big"><span class="tk">Tap or press any key to start</span></p><div class="tip">👪 Parent tip: sit with your child, keep fingers on the home row (bumps on F and J). The glowing key on the keyboard shows what to press next. No timers, no wrong answers — just fun!</div>`}
-function gridHTML(){return ST().map((st,i)=>{const lock=!misOpen(tier,i),d=save.done[tier][i];return `<button data-i="${i}" class="${lock?"lock":""} ${i===selIdx?"sel":""}">${lock?"🔒":d?"⭐⭐⭐":"▶️"}<br>${i+1}. ${st.name}</button>`}).join("")}
+function gridHTML(){return wnames(world,tier).map((nm,i)=>{const lock=!misOpen(tier,i),d=D(world)[tier][i];return `<button data-i="${i}" class="${lock?"lock":""} ${i===selIdx?"sel":""}">${lock?"🔒":d?"⭐⭐⭐":world==="read"&&i===5?"🏰":"▶️"}<br>${i+1}. ${nm}</button>`}).join("")}
 function bindGrid(){ov.querySelectorAll("#levels button").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(misOpen(tier,i))startLevel(i)})}
 function setTier(v){const msg=document.getElementById("gmsg"),gr=document.getElementById("gr");
  if(!tierOpen(v)){if(gr)gr.value=tier;if(msg){msg.textContent=`🔒 Finish ${TIERS[v-1].name} to unlock ${TIERS[v].name}!`;msg.classList.remove("shake");void msg.offsetWidth;msg.classList.add("shake")}sfx.boop();return}
- tier=v;save.tier=v;store();selIdx=0;while(selIdx<5&&misOpen(tier,selIdx+1)&&save.done[tier][selIdx])selIdx++;
+ tier=v;save.tier=v;store();selIdx=0;if(mode==="map"){showMap();return}while(selIdx<5&&misOpen(tier,selIdx+1)&&D(world)[tier][selIdx])selIdx++;
  if(msg)msg.textContent=`${TIERS[v].name} missions`;document.getElementById("levels").innerHTML=gridHTML();bindGrid();
  ov.querySelectorAll(".tick").forEach((e,i)=>e.classList.toggle("on",i===v))}
 function showSelect(){ov.style.justifyContent="";ov.style.paddingTop="";mode="select";hud.classList.add("hidden");ov.classList.remove("hidden");if(!tierOpen(tier))tier=0;if(!misOpen(tier,selIdx))selIdx=0;
- ov.innerHTML=`<h1>Pick a Mission</h1><div class="grade"><div class="glabel">Grade level</div><input id="gr" type="range" min="0" max="3" step="1" value="${tier}" aria-label="Grade level">
+ const WW=WORLDS.find(x=>x.id===world);ov.innerHTML=`<h1>${WW.ic} ${WW.n}</h1><div class="grade"><div class="glabel">Grade level</div><input id="gr" type="range" min="0" max="3" step="1" value="${tier}" aria-label="Grade level">
  <div class="ticks">${TIERS.map((T,i)=>`<span class="tick ${i===tier?"on":""}" data-t="${i}">${tierOpen(i)?"":"🔒 "}${T.name}</span>`).join("")}</div><div id="gmsg">${TIERS[tier].name} missions</div></div>
  <div id="levels">${gridHTML()}</div>
- <div class="menu2"><button id="warmBtn">🔥 Warm-up</button><button id="stkBtn">📒 Sticker Book</button><button id="parBtn">👪 Parents</button><button id="reset">Reset progress</button></div>`;
+ <div class="menu2"><button id="mapBtn">🗺️ World Map</button><button id="warmBtn">🔥 Warm-up</button><button id="stkBtn">📒 Sticker Book</button><button id="parBtn">👪 Parents</button></div>`;document.getElementById("mapBtn").onclick=showMap;
  document.getElementById("warmBtn").onclick=startWarm;document.getElementById("stkBtn").onclick=showStickers;document.getElementById("parBtn").onclick=showGate;
  bindGrid();const gr=document.getElementById("gr");gr.addEventListener("input",()=>setTier(+gr.value));gr.addEventListener("keydown",e=>e.stopPropagation());
  ov.querySelectorAll(".tick").forEach(e=>e.onclick=()=>{gr.value=e.dataset.t;setTier(+e.dataset.t)});
- document.getElementById("reset").onclick=()=>{if(confirm("Reset all progress?")){save=blank();tier=0;store();selIdx=0;showSelect()}}}
-function startLevel(i,w){warm=w||null;lvl=i;am={x:80-15*S,y:0,vy:0,tw:0};si=0;wi=0;ci=0;mode="play";ending=0;bowserGone=0;parts=[];coins=[];props=[];fw=[];
+ }
+function startLevel(i,w){warm=w||null;lvl=i;if(!w)curMis=buildMission(world,tier,i);QZ=null;SC={};NL=null;document.getElementById("kbNum").classList.toggle("hidden",MIS().kind!=="math");am={x:80-15*S,y:0,vy:0,tw:0};si=0;wi=0;ci=0;mode="play";ending=0;bowserGone=0;parts=[];coins=[];props=[];fw=[];
  mario={x:80,tx:80,y:0,vy:0,face:1,anim:0,act:null,actT:0,big:false};cam=0;
  const total=MIS().s.reduce((a,s)=>a+s[0].split(" ").length,0);bowserX=80+(total+3)*STEP;
  ov.classList.add("hidden");hud.classList.remove("hidden");loadSentence()}
-function loadSentence(){words=MIS().s[si][0].split(" ");wi=0;ci=0;render();say(words[0])}
-function render(){setTimeout(setGY,0);sEl.innerHTML=words.map((w,i)=>`<span class="${i<wi?"done":i===wi?"cur":""}">${w}</span>`).join(" ");
- const w=words[wi]||"";wEl.innerHTML=[...w].map((c,i)=>i<ci?`<span class="ok">${c}</span>`:i===ci?`<span class="next">${c}</span>`:`<span>${c}</span>`).join("")+(HINT[w.toLowerCase()]?`<span style="font-size:.55em;vertical-align:middle"> ${HINT[w.toLowerCase()]}</span>`:"");
- kbEl.classList.toggle("hidden",!showKb);kbEl.querySelectorAll("b").forEach(b=>b.classList.remove("hi"));const n=(w[ci]||"").toLowerCase();const kb=document.getElementById("k_"+n);if(kb)kb.classList.add("hi");
+const OPT=()=>(MIS().s[si]&&MIS().s[si][2])||{};let hm=0,rev=0;
+function loadSentence(){words=MIS().s[si][0].split(" ");wi=0;ci=0;hm=0;rev=0;const o=OPT();SC={col:SC.col,shape:null};NL=null;if(o.fx)applyFx(o.fx,false);
+ if(o.nl){NL={...o.nl,k:0,t0:t};say(o.sayq)}else if(o.sayw)say(o.sayw);else say(words[0]);render()}
+function replayNL(){const o=OPT();if(o.nl){NL={...o.nl,k:0,t0:t};say(o.sayq)}}
+const needSp=()=>{const w=words[wi]||"";return w&&ci>=w.length&&wi<words.length-1};
+function render(){setTimeout(setGY,0);const o=OPT(),hid=o.hide&&!rev;
+ sEl.innerHTML=o.show?o.show:words.map((w,i)=>`<span class="${i<wi?"done":i===wi?"cur":""}">${w}</span>`).join(" ");
+ const w=words[wi]||"",sp=needSp();wEl.innerHTML=[...w].map((c,i)=>i<ci?`<span class="ok">${c}</span>`:hid?`<span class="${i===ci?"next":""}">_</span>`:i===ci?`<span class="next">${c}</span>`:`<span>${c}</span>`).join("")+(wi<words.length-1?`<span class="${sp?"next spc":"spc"}" title="space">␣</span>`:"")+(!hid&&HINT[w.toLowerCase()]?`<span style="font-size:.55em;vertical-align:middle"> ${HINT[w.toLowerCase()]}</span>`:"");
+ kbEl.classList.toggle("hidden",!showKb);kbEl.querySelectorAll("b").forEach(b=>b.classList.remove("hi"));const n=sp?" ":hid?"":(w[ci]||"").toLowerCase();const kb=document.getElementById(n===" "?"k_space":"k_"+n);if(kb&&n)kb.classList.add("hi");
  document.querySelectorAll(".fg.on").forEach(e=>e.classList.remove("on"));document.getElementById("hL").classList.toggle("hidden",!showHands);document.getElementById("hR").classList.toggle("hidden",!showHands);
- if(n in FING){const hand="qwertasdfgzxcvb".includes(n)?"hL":"hR";const f=document.querySelector(`#${hand} .f${FING[n]}`);if(f)f.classList.add("on")}}
+ if(n===" ")document.querySelectorAll(".fg.th").forEach(e=>e.classList.add("on"));else if(n&&n in FING){const hand="qwertasdfgzxcvb12345".includes(n)?"hL":"hR";const f=document.querySelector(`#${hand} .f${FING[n]}`);if(f)f.classList.add("on")}}
 function shake(){wEl.classList.remove("shake");void wEl.offsetWidth;wEl.classList.add("shake")}
 function doAction(a){const m=mario;m.act=a;m.actT=0;m.ax=m.x;
  if(a==="hop"||a==="run"){m.vy=a==="hop"?-11:-7;m.tx+=a==="run"?STEP*.6:STEP*.3;sfx.jump()}
@@ -205,31 +683,40 @@ let spOk=false;function spUnlock(){if(spOk||!window.speechSynthesis)return;spOk=
 const dkey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 function stat(){const k=dkey(new Date());return save.stats.days[k]||(save.stats.days[k]={keys:0,miss:0,words:0,ms:0})}
 function key(e){au();spUnlock();const k=e.key;
- if(mode==="stickers"||mode==="parents"||mode==="gate"){if(k==="Escape")showSelect();return}
- if(mode==="start"){showSelect();return}
+ if(mode==="stickers"||mode==="parents"||mode==="gate"){if(k==="Escape")showMap();return}
+ if(mode==="start"){showMap();return}
+ if(mode==="quiz"){if(QZ&&"123".includes(k)&&k.length===1&&QZ.list[QZ.i].o[+k-1]!==undefined)answerQ(+k-1);return}
+ if(mode==="review"){if(k==="Enter"||k===" ")startQuiz();return}
+ if(mode==="map"){return}
  if(mode==="select"){let n=selIdx;if(k==="ArrowRight")n++;else if(k==="ArrowLeft")n--;else if(k==="ArrowDown")n+=3;else if(k==="ArrowUp")n-=3;else if(k==="Enter"||k===" "){if(misOpen(tier,selIdx))startLevel(selIdx);return}else return;if(n>=0&&n<6&&misOpen(tier,n))selIdx=n;document.getElementById("levels").innerHTML=gridHTML();bindGrid();return}
- if(mode==="done"){if(ending>90&&(k==="Enter"||k===" ")){if(warm){showSelect();return}if(lvl<5&&misOpen(tier,lvl+1))startLevel(lvl+1);else{if(lvl===5&&tier<3&&tierOpen(tier+1)){tier++;save.tier=tier;store();selIdx=0}showSelect()}}return}
- if(mode!=="play"||k.length!==1||e.ctrlKey||e.metaKey)return;e.preventDefault();if(k===" ")return;
- const w=words[wi],now=Date.now();if(lastK&&now-lastK<10000)stat().ms+=now-lastK;lastK=now;if(k.toLowerCase()===w[ci].toLowerCase()){ci++;stat().keys++;sfx.blip();mario.tx+=STEP/w.length*0.3;
-  if(ci>=w.length){wi++;ci=0;sfx.word();mario.tx=Math.round((mario.tx-80)/STEP+0.7)*STEP+80;wordReact();am.tw=20;stat().words++;if(!wordMiss){const lw=w.toLowerCase();save.stats.mw[lw]=(save.stats.mw[lw]||0)+1}wordMiss=false;store();if(wi<words.length)say(words[wi]);else say(words.join(" "));
-   if(wi>=words.length){doAction(MIS().s[si][1]);si++;if(si>=MIS().s.length){finish();render();return}setTimeout(()=>{if(mode==="play")loadSentence()},700);words=[...words];render();wEl.innerHTML="⭐";return}}
-  render()}else{const ex=w[ci].toLowerCase();stat().miss++;save.stats.miss[ex]=(save.stats.miss[ex]||0)+1;wordMiss=true;sfx.boop();shake()}}
+ if(mode==="done"){if(ending>90&&(k==="Enter"||k===" ")){if(warm){showSelect();return}if(world==="read"&&lvl===4){showMap();return}if(lvl<5&&misOpen(tier,lvl+1))startLevel(lvl+1);else{if(CAS()&&tier<3&&tierOpen(tier+1)){tier++;save.tier=tier;store();selIdx=0}showMap()}}return}
+ if(mode!=="play"||k.length!==1||e.ctrlKey||e.metaKey)return;e.preventDefault();
+ const w=words[wi];if(!w)return;const now=Date.now();if(lastK&&now-lastK<10000)stat().ms+=now-lastK;lastK=now;const sp=needSp(),ex=sp?" ":w[ci].toLowerCase();
+ if(k.toLowerCase()===ex){stat().keys++;if(sp){sfx.blip();wordDone();return}ci++;sfx.blip();mario.tx+=STEP/w.length*0.3;if(ci>=w.length&&wi===words.length-1){wordDone();return}render();return}
+ if(k===" "&&!sp)return;
+ stat().miss++;const ek=sp?"␣":ex;save.stats.miss[ek]=(save.stats.miss[ek]||0)+1;wordMiss=true;sfx.boop();shake();
+ const o=OPT();if(o.hide&&!rev&&!sp){hm++;if(o.nl){replayNL()}else if(o.sayw)say(hm>=2?w.split("").join(", "):w);if(hm>=2){rev=1;render()}}}
+function wordDone(){const w=words[wi];wi++;ci=0;sfx.word();mario.tx=Math.round((mario.tx-80)/STEP+0.7)*STEP+80;wordReact();am.tw=20;stat().words++;if(!wordMiss){const lw=w.toLowerCase();save.stats.mw[lw]=(save.stats.mw[lw]||0)+1}wordMiss=false;store();
+ const o=OPT();if(o.fx&&o.fx.startsWith("n:")){const N=o.fx.slice(2);if(N[wi-1])playNotes(N[wi-1])}
+ if(wi<words.length)say(words[wi]);else if(o.nl)say(o.sayq+" equals "+w);else if(!o.sayw)say(words.join(" "));else say(w);
+ if(wi>=words.length){if(o.fx)applyFx(o.fx,true);if(o.nl&&NL)NL.k=99;doAction(MIS().s[si][1]);si++;if(si>=MIS().s.length){afterTyping();render();return}setTimeout(()=>{if(mode==="play")loadSentence()},o.nl||o.fx&&o.fx.startsWith("n:")?1800:900);words=[...words];render();wEl.innerHTML="⭐";return}
+ render()}
 addEventListener("keydown",e=>{if(e.target.id==="ti")return;key(e)});
 const fake=k=>({key:k,preventDefault(){}});
-kbEl.addEventListener("pointerdown",e=>{const b=e.target.closest("b");if(!b)return;e.preventDefault();key(fake(b.textContent))});
+kbEl.addEventListener("pointerdown",e=>{const b=e.target.closest("b");if(!b)return;e.preventDefault();key(fake(b.dataset.k||b.textContent))});
 ov.addEventListener("pointerup",e=>{if(e.target.closest("button")||e.target.closest(".panel"))return;if(mode==="start")key(fake("x"));else if(mode==="done")key(fake("Enter"))});
 const ti=document.getElementById("ti");ti.addEventListener("input",()=>{for(const c of ti.value)key(fake(c));ti.value=""});
-wEl.addEventListener("pointerdown",()=>{if(mode==="play")say(words[wi]);if(TOUCH&&!showKb)ti.focus()});
-function finish(){mode="done";ending=0;const before=doneCount(),wasDone=save.done[tier][lvl];if(!warm){save.done[tier][lvl]=1;store()}const newOutfit=!warm&&!wasDone&&Math.floor(doneCount()/3)>Math.floor(before/3)&&Math.floor(doneCount()/3)<OUTFITS.length;
+wEl.addEventListener("pointerdown",()=>{if(mode==="play"){const o=OPT();if(o.nl)replayNL();else if(o.sayw)say(o.sayw);else say(words[wi])}if(TOUCH&&!showKb)ti.focus()});
+function finish(){mode="done";ending=0;const before=doneCount(),wasDone=D(world)[tier][lvl];if(!warm){D(world)[tier][lvl]=1;store()}const newOutfit=!warm&&!wasDone&&Math.floor(doneCount()/3)>Math.floor(before/3)&&Math.floor(doneCount()/3)<OUTFITS.length;
  for(let i=0;i<10;i++)parts.push(p(mario.x-6*S,-30,i%2?"✋":"✨","#fff"));sfx.fan();const m=mario;
- if(lvl===5){m.tx=bowserX-60;if(!bowserGone)bowserGone=1}else{m.tx=bowserX+STEP*.5-12*S;m.vy=-15;m.act="leap";m.actT=0}
- const last=lvl===5&&!warm,nextT=last&&tier<3?TIERS[tier+1].name:"";
+ if(CAS()){m.tx=bowserX-60;if(!bowserGone)bowserGone=1}else{m.tx=bowserX+STEP*.5-12*S;m.vy=-15;m.act="leap";m.actT=0}
+ const last=CAS(),nextT=last&&tier<3?TIERS[tier+1].name:"";
  setTimeout(()=>{if(mode!=="done")return;ov.classList.remove("hidden");ov.style.justifyContent="flex-start";ov.style.paddingTop="40px";hud.classList.add("hidden");
- const stk=warm?"":`<div style="font-size:min(6vw,30px)">New sticker: <span style="font-size:1.6em">${STK[tier*6+lvl]}</span>${newOutfit?" &nbsp;👗 New outfit for Amelia!":""}</div>`;
- ov.innerHTML=warm?`<h1>Warm-up done! 💪</h1><div class="tip" style="font-size:22px">Tap or press Enter to go back</div>`:last?`<h1>Peach says: Thank you, Amelia! 💖</h1><div class="big">⭐⭐⭐ ${TIERS[tier].name} hero! ⭐⭐⭐</div>${stk}${nextT?`<div style="font-size:min(6vw,32px)">🔓 ${nextT} missions unlocked!</div>`:`<div style="font-size:min(6vw,32px)">You beat every grade! 🏆</div>`}<div class="tip" style="font-size:22px">Tap or press Enter to continue</div>`:`<h1>Great job, Amelia! ⭐⭐⭐</h1>${stk}<div style="font-size:min(6vw,32px)">${TIERS[tier].name} mission ${lvl+1} done!</div><div class="tip" style="font-size:22px">Tap or press Enter for the next mission</div>`},2200)}
+ const stk=warm?"":`<div style="font-size:min(6vw,30px)">New sticker: <span style="font-size:1.6em">${world==="read"?STK[tier*6+lvl]:WSTK[world][lvl]}</span>${newOutfit?" &nbsp;👗 New outfit for Amelia!":""}</div>`;
+ ov.innerHTML=warm?`<h1>Warm-up done! 💪</h1><div class="tip" style="font-size:22px">Tap or press Enter to go back</div>`:last?`<h1>Peach says: Thank you, Amelia! 💖</h1><div class="big">⭐⭐⭐ ${TIERS[tier].name} hero! ⭐⭐⭐</div>${stk}${nextT?`<div style="font-size:min(6vw,32px)">🔓 ${nextT} missions unlocked!</div>`:`<div style="font-size:min(6vw,32px)">You beat every grade! 🏆</div>`}<div class="tip" style="font-size:22px">Tap or press Enter to continue</div>`:`<h1>Great job, Amelia! ⭐⭐⭐</h1>${stk}<div style="font-size:min(6vw,32px)">${WORLDS.find(x=>x.id===world).n} · ${TIERS[tier].name} mission ${lvl+1} done!</div>${world==="read"&&lvl===4?`<div style="font-size:min(5vw,26px)">🏰 Visit every world to open Bowser's castle!</div>`:""}<div class="tip" style="font-size:22px">Tap or press Enter to continue</div>`},2200)}
 document.getElementById("muteBtn").onclick=e=>{muted=!muted;if(muted&&window.speechSynthesis)speechSynthesis.cancel();e.target.textContent=muted?"🔇":"🔊";e.target.blur()};
 document.getElementById("kbBtn").onclick=e=>{showKb=!showKb;render();if(TOUCH&&!showKb)ti.focus();else{ti.blur();e.target.blur()}};
-document.getElementById("menuBtn").onclick=e=>{e.target.blur();showSelect()};
+document.getElementById("menuBtn").onclick=e=>{e.target.blur();if(window.speechSynthesis)speechSynthesis.cancel();showMap()};
 // ---------- drawing
 function px(map,pal,x,y,flip,sc=1,sy=1){const s=S*sc,sv=s*sy;for(let r=0;r<map.length;r++)for(let c=0;c<map[r].length;c++){const ch=map[r][c];if(ch==="."||!pal[ch])continue;cx.fillStyle=pal[ch];const cc=flip?map[r].length-1-c:c;cx.fillRect(Math.round(x+cc*s),Math.round(y+r*sv),Math.ceil(s),Math.ceil(sv))}}
 const HERO=["...RRRRR....","..RRRRRRRRR.","..HHHSSKS...",".HSHSSSKSSS.",".HSHHSSSKSSS","..HSSSSKKKK.","...SSSSSSS..","..RRBRRR....",".RRRBRRBRRR.","RRRRBBBBRRRR","SSRBYBBYBRSS","SSSBBBBBBSSS","SSBBBBBBBBSS","..BBB..BBB..",".HHH....HHH.","HHHH....HHHH"];
@@ -266,7 +753,7 @@ function drawWorld(){const TH=MIS().theme,th=THEMES[TH],T=FAM[TH]||TH;
  else flag(ox+bowserX+STEP*.5);
  if(T==="castle"){const bx=ox+bowserX+(bowserGone?Math.min(2000,(ending+bowserGone)*6):0);if(bowserGone)bowserGone++;px(BOWSER,BPAL,bx,GY-15*S*1.3,1-1);
   const peachX=ox+bowserX+STEP*1.4;px(PEACH,PPAL,peachX,GY-16*S+(mode==="done"?-Math.abs(Math.sin(t/8))*S*4:0),true)}
- propsUpdate(ox);
+ overlayDraw();propsUpdate(ox);
  // hero
  {const m=mario,ax=ox+am.x,ay=GY-17*S+am.y,flip=am.tw>0?((am.tw>>2)%2===1):false;px(AMELIA,apal(),ax,ay,flip);
   cx.fillStyle="#c08a3a";cx.fillRect(ax+(flip?-2*S:12*S),ay+9*S,S,6*S);cx.fillStyle=(t>>3)%2?"#fff":"#ffe95a";cx.font=`${S*5}px sans-serif`;cx.textAlign="center";cx.fillText("★",ax+(flip?-1.5*S:12.5*S),ay+10*S);
@@ -297,15 +784,15 @@ function titleBg(){cx.fillStyle=grad("#4aa8ff","#bfe6ff");cx.fillRect(0,0,W,H);c
  cx.fillStyle="#3fae49";cx.beginPath();cx.ellipse(W*.2,H*.85,W*.3,H*.25,0,Math.PI,0);cx.fill();cx.fillStyle="#c8743a";cx.fillRect(0,H*.85,W,H);cx.fillStyle="#4cc04a";cx.fillRect(0,H*.85,W,S*2);
  const hx=((t*2)%(W+200))-100;px((t>>3)%2?HERO2:HERO,HPAL,hx,H*.85-16*S,false);px(PEACH,PPAL,W*.82,H*.85-16*S,true);px(AMELIA,apal(),hx+16*S,H*.85-17*S,false)}
 function loop(){t++;if(t%15===0)setGY();
- if(mode!=="play"&&mode!=="done")titleBg();
+ if(mode!=="play"&&mode!=="done"&&mode!=="quiz"&&mode!=="review")titleBg();
  else{const m=mario;actUpdate();m.x+=(m.tx-m.x)*.08;if(!m.hold){m.vy+=.6;m.y+=m.vy;if(m.y>=0){m.y=0;m.vy=0}}
-  if(mode==="done"){ending++;if(lvl<5&&ending>130&&ending%40===0&&ending<300)m.vy=-8}
-  {const tx=m.x-15*S;am.x+=(tx-am.x)*.1;if(m.hold){am.y+=(m.y-am.y)*.2;am.vy=0}else{if(m.vy<-4&&am.y===0)am.vy=m.vy*.95;am.vy+=.6;am.y+=am.vy;if(am.y>=0){am.y=0;am.vy=0}}if(am.tw>0)am.tw--;if(mode==="done"&&lvl===5&&t%12===0)parts.push(p(am.x+6*S,-30,"♥","#ff4f9a"))}
+  if(mode==="done"){ending++;if(!CAS()&&ending>130&&ending%40===0&&ending<300)m.vy=-8}
+  {const tx=m.x-15*S;am.x+=(tx-am.x)*.1;if(m.hold){am.y+=(m.y-am.y)*.2;am.vy=0}else{if(m.vy<-4&&am.y===0)am.vy=m.vy*.95;am.vy+=.6;am.y+=am.vy;if(am.y>=0){am.y=0;am.vy=0}}if(am.tw>0)am.tw--;if(mode==="done"&&CAS()&&t%12===0)parts.push(p(am.x+6*S,-30,"♥","#ff4f9a"))}
   cam+=(m.x-cam)*.1;
   for(const c of coins){c.y+=c.vy;c.vy+=.5;c.life--}coins=coins.filter(c=>c.life>0);
   for(const q of parts){q.x+=q.vx;q.y+=q.vy;q.vy+=.15;q.life--}parts=parts.filter(q=>q.life>0);
   drawWorld();
-  if(mode==="done"){if(lvl===5){fireworks();if(t%10===0)parts.push(p(mario.x+60,-30,"♥","#ff4f9a"))}else if(t%15===0)parts.push(p(mario.x,-40,"★","#ffd800"))}}
+  if(mode==="done"){if(CAS()){fireworks();if(t%10===0)parts.push(p(mario.x+60,-30,"♥","#ff4f9a"))}else if(t%15===0)parts.push(p(mario.x,-40,"★","#ffd800"))}}
  requestAnimationFrame(loop)}
 // debug hook for testing
 // ---------- hands, stickers, parents, warm-up
@@ -313,19 +800,20 @@ let showHands=save.hands!==undefined?save.hands:!(TOUCH&&innerHeight>innerWidth&
 document.getElementById("hL").innerHTML=[[0,52],[1,64],[2,70],[3,62]].map(([f,h])=>`<div class="fg f${f}" style="height:${h*.6}px"></div>`).join("")+`<div class="fg th" style="height:24px"></div>`;
 document.getElementById("hR").innerHTML=`<div class="fg th" style="height:24px"></div>`+[[4,62],[2,70],[1,64],[0,52]].map(([f,h])=>`<div class="fg f${f}" style="height:${h*.6}px"></div>`).join("");
 document.getElementById("handBtn").onclick=e=>{showHands=!showHands;save.hands=showHands;store();render();e.target.blur()};
-function panel(title,html){ov.style.justifyContent="";ov.style.paddingTop="";hud.classList.add("hidden");ov.classList.remove("hidden");ov.innerHTML=`<h1 style="font-size:min(8vw,52px)">${title}</h1><div class="panel">${html}</div><div class="menu2"><button id="backBtn">⬅ Back</button></div>`;document.getElementById("backBtn").onclick=showSelect}
+function panel(title,html){ov.style.justifyContent="";ov.style.paddingTop="";hud.classList.add("hidden");ov.classList.remove("hidden");ov.innerHTML=`<h1 style="font-size:min(8vw,52px)">${title}</h1><div class="panel">${html}</div><div class="menu2"><button id="backBtn">⬅ Back</button></div>`;document.getElementById("backBtn").onclick=showMap}
 function showStickers(){mode="stickers";let h="";TIERS.forEach((T,ti)=>{h+=`<b>${T.name}</b><div class="sgrid">${T.m.map((m,i)=>`<div class="${save.done[ti][i]?"":"no"}" title="${m.name}">${save.done[ti][i]?STK[ti*6+i]:"❔"}</div>`).join("")}</div>`});
  h+=`<b>Amelia's outfits</b> <span style="opacity:.7">(a new one every 3 missions)</span><div class="ofit">${OUTFITS.map((o,i)=>`<button data-o="${i}" class="${i===save.outfit?"on":""}" ${outfitOpen(i)?"":"disabled"}><i style="background:${o.rainbow?"linear-gradient(90deg,#f4a,#fd3,#4d6,#3af)":o.P}"></i>${outfitOpen(i)?o.n:"🔒 "+(i*3)+" missions"}</button>`).join("")}</div>`;
- panel("📒 Sticker Book",h);ov.querySelectorAll(".ofit button").forEach(b=>b.onclick=()=>{const i=+b.dataset.o;if(!outfitOpen(i))return;save.outfit=i;store();showStickers()})}
+ h+=`<b>Subject worlds · ${TIERS[tier].name}</b>`+WORLDS.filter(w=>w.id!=="read").map(w=>`<div class="sgrid">${WSTK[w.id].map((e,i)=>`<div class="${D(w.id)[tier][i]?"":"no"}" title="${w.n}">${D(w.id)[tier][i]?e:"❔"}</div>`).join("")}</div>`).join("");panel("📒 Sticker Book",h);ov.querySelectorAll(".ofit button").forEach(b=>b.onclick=()=>{const i=+b.dataset.o;if(!outfitOpen(i))return;save.outfit=i;store();showStickers()})}
 function showGate(){mode="gate";const opts=[5,6,7,8,9].sort(()=>Math.random()-.5);panel("👪 Grown-ups",`<div style="text-align:center;font-size:22px">What is 3 + 4?<div class="menu2">${opts.map(n=>`<button data-n="${n}">${n}</button>`).join("")}</div></div>`);
- ov.querySelectorAll(".panel button").forEach(b=>b.onclick=()=>{if(+b.dataset.n===7)showParents();else showSelect()})}
+ ov.querySelectorAll(".panel button").forEach(b=>b.onclick=()=>{if(+b.dataset.n===7)showParents();else showMap()})}
 function weekKey(ds){const d=new Date(ds+"T12:00:00");d.setDate(d.getDate()-((d.getDay()+6)%7));return dkey(d)}
 function showParents(){mode="parents";const st=save.stats,wk={};for(const [d,v] of Object.entries(st.days)){const k=weekKey(d);const w=wk[k]||(wk[k]={keys:0,miss:0,words:0,ms:0});for(const f in w)w[f]+=v[f]}
  const rows=Object.keys(wk).sort().reverse().slice(0,8).map(k=>{const w=wk[k],acc=w.keys+w.miss?Math.round(100*w.keys/(w.keys+w.miss)):0,wpm=w.ms>5000?(w.words/(w.ms/60000)).toFixed(1):"–";return `<tr><td>${k}</td><td>${acc}%</td><td>${wpm}</td><td>${w.words}</td><td>${Math.round(w.ms/60000)}</td></tr>`}).join("")||`<tr><td colspan=5>No typing yet</td></tr>`;
  const miss=Object.entries(st.miss).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([l,n])=>`<b>${l.toUpperCase()}</b> (${n})`).join(", ")||"none yet";
  const mast=Object.entries(st.mw).filter(([w,n])=>n>=3).map(([w])=>w).sort();
  panel("👪 Parent Progress",`<table><tr><th>Week of</th><th>Accuracy</th><th>Words/min</th><th>Words</th><th>Minutes</th></tr>${rows}</table>
- <p><b>Missions done:</b> ${doneCount()} / 24 (${TIERS.map((T,i)=>T.name+": "+save.done[i].filter(Boolean).length).join(", ")})</p><p><b>Stickers:</b> ${doneCount()} &nbsp; <b>Outfits:</b> ${Math.min(OUTFITS.length,1+Math.floor(doneCount()/3))}</p>
+ <p><b>Missions done:</b> ${doneCount()} / 144</p><table><tr><th>Subject</th>${TIERS.map(T=>`<th>${T.name}</th>`).join("")}<th>Quiz accuracy</th><th>Quizzes passed</th></tr>${WORLDS.map(w=>{const q=save.qz[w.id];return `<tr><td>${w.ic} ${w.n}</td>${[0,1,2,3].map(i=>`<td>${D(w.id)[i].filter(Boolean).length}/6</td>`).join("")}<td>${q&&q.n?Math.round(100*q.r/q.n)+"% ("+q.r+"/"+q.n+")":"–"}</td><td>${q?q.pass+" of "+q.att:"–"}</td></tr>`}).join("")}</table>
+ <p><b>Recently missed quiz questions:</b></p><ul>${WORLDS.flatMap(w=>((save.qz[w.id]||{}).missed||[]).slice(0,4).map(m=>`<li>${w.ic} ${m}</li>`)).join("")||"<li>none yet 🎉</li>"}</ul><p><b>Stickers:</b> ${doneCount()} &nbsp; <b>Outfits:</b> ${Math.min(OUTFITS.length,1+Math.floor(doneCount()/3))}</p>
  <p><b>Most-missed letters:</b> ${miss}</p><p><b>Mastered words</b> (typed right 3+ times, ${mast.length}): ${mast.join(", ")||"none yet"}</p>
  <p style="opacity:.7">All data stays on this device. Words/min counts active typing time only.</p><button id="rstStats">Reset stats</button>`);
  document.getElementById("rstStats").onclick=()=>{if(confirm("Reset typing stats? (missions and stickers are kept)")){save.stats={days:{},mw:{},miss:{}};store();showParents()}}}
@@ -334,6 +822,6 @@ function startWarm(){const top=Object.entries(save.stats.miss).sort((a,b)=>b[1]-
  let pick=bank.filter(w=>L.some(l=>w.includes(l))).sort(()=>Math.random()-.5);if(pick.length<9)pick=pick.concat(bank.sort(()=>Math.random()-.5)).slice(0,12);
  pick=pick.slice(0,12);const acts=["hop","block","star","stomp"],sn=[];for(let i=0;i<pick.length;i+=3)sn.push([pick.slice(i,i+3).join(" "),acts[sn.length%4]]);
  startLevel(0,{name:"Warm-up: "+L.join(" ").toUpperCase(),theme:"hills",s:sn})}
-window.__mta={startWarm,showStickers,showParents,showGate,startLevel,finish,doAction,showSelect,setTier,markTier(t){save.done[t]=[1,1,1,1,1,1];store()},get state(){return{mode,tier,lvl,si,wi,ci,save}}};
+window.__mta={startWarm,showStickers,showParents,showGate,startLevel,finish,doAction,showSelect,setTier,markTier(t){save.done[t]=[1,1,1,1,1,1];for(const k in save.w)save.w[k][t][0]=1;store()},showMap,startQuiz,answerQ,buildMission,setWorld(w){world=w},get QZ(){return QZ},get state(){return{mode,tier,lvl,si,wi,ci,save,world,words,NL,rev}}};
 showStart();loop();
 </script></body></html>
