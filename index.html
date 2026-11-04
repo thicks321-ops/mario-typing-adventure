@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Princess Amelia's Typing Adventure</title>
+<title>Princess Amelia &amp; Valerie's Typing Adventure</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%91%91%3C/text%3E%3C/svg%3E">
 <style>
 *{box-sizing:border-box}html,body{margin:0;height:100%;background:#222;font-family:"Comic Sans MS","Trebuchet MS",Arial,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent;position:fixed;width:100%;overscroll-behavior:none}
 html,body{height:100dvh}
@@ -16,6 +16,7 @@ html,body{height:100dvh}
 #kb b.sp{width:clamp(180px,32vw,340px)!important;font-size:clamp(12px,1.6vw,18px)!important}.spc{opacity:.35;margin-left:.15em}.spc.next{opacity:1}
 #worlds{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(42vw,190px),1fr));gap:12px;width:min(94vw,820px);margin:10px auto}#worlds button{font-size:clamp(16px,2.4vw,22px);padding:12px 8px;border-radius:18px;border:3px solid #fff;color:#fff;text-shadow:0 2px 3px #0008;cursor:pointer;font-weight:bold}#worlds .wi{font-size:2em;display:block}#worlds button.lock{opacity:.6}
 .qz .qq{font-size:clamp(20px,3.6vw,32px);margin-bottom:14px;cursor:pointer}.qopts{display:flex;flex-direction:column;gap:12px}.qopts button{font-size:clamp(20px,4vw,30px);padding:16px;border-radius:16px;border:3px solid #333;background:#fff;cursor:pointer;min-height:64px}.qopts small{opacity:.5;margin-right:8px}.qopts .good{background:#7ee07e}.qopts .try{background:#ffd27a}#qfb{font-size:24px;min-height:34px;margin-top:10px;text-align:center}
+#pcards{display:flex;gap:20px;flex-wrap:wrap;justify-content:center}#pcards button{width:min(42vw,260px);padding:16px 10px;border-radius:22px;border:4px solid #fff;color:#fff;font-size:clamp(18px,3.4vw,28px);display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;text-shadow:0 2px 3px #0008}#pcards img{width:min(28vw,150px);image-rendering:pixelated;background:#fff8;border-radius:16px;padding:8px}#pcards small{font-size:.6em}.menu2 button.on{outline:3px solid #ffd800}
 #kb b.home{border-bottom:5px solid #333}#kb b.hi{opacity:1;transform:scale(1.25);outline:4px solid #fff;box-shadow:0 0 14px #ff0}
 .f0{background:#ff9aa2}.f1{background:#ffdac1}.f2{background:#e2f0cb}.f3{background:#b5ead7}.f4{background:#c7ceea}
 #top{position:absolute;top:8px;right:10px;display:flex;gap:8px}#top button{font:inherit;font-size:20px;padding:6px 12px;border-radius:12px;border:3px solid #333;background:#fff;cursor:pointer}
@@ -59,33 +60,33 @@ html,body{height:100dvh}
 "use strict";
 const TIERS=[
 {name:"Kindergarten",m:[
- {name:"Go Go Go",theme:"hills",s:[["Amelia can run","run"],["Mario can run too","hop"],["I see a bug","stomp"],["Amelia hits the box","block"],["We go up","climb"],["Go Amelia go","ride"]]},
- {name:"Pipe Hop",theme:"pipes",s:[["Amelia sees a big pipe","hop"],["Get the red cap","grow"],["Mario is big now","hop"],["Amelia hits the box","block"],["A bug can run","stomp"],["Yes Amelia yes","star"]]},
- {name:"Wet Day",theme:"water",s:[["We dip in","swim"],["A fish can hop","fish"],["Amelia gets on the log","ride"],["I see a bug","stomp"],["Mario is not wet","hop"],["Amelia can look up","climb"]]},
- {name:"Dark Den",theme:"cave",s:[["It is dim in here","duck"],["Amelia has a wand","block"],["A bug is in the den","stomp"],["Mario can duck","duck"],["Up up we go","climb"],["Amelia got a star","star"]]},
- {name:"Hot Hot",theme:"lava",s:[["It is hot","hop"],["Amelia can hop","hop"],["Get on the top","ride"],["Mario can toss a ball","fire"],["A bug is mad","stomp"],["Amelia can see Peach","wave"]]},
- {name:"Help Peach",theme:"castle",s:[["Here we go Amelia","run"],["The big king is mad","duck"],["Mario can toss a ball","fire"],["Amelia can jump","hop"],["He ran away","bowser"],["Peach hugs Amelia","peach"],["We did it","peach"]]}]},
+ {name:"Go Go Go",theme:"hills",s:[["{hero} can run","run"],["Mario can run too","hop"],["I see a bug","stomp"],["{hero} hits the box","block"],["We go up","climb"],["Go {hero} go","ride"]]},
+ {name:"Pipe Hop",theme:"pipes",s:[["{hero} sees a big pipe","hop"],["Get the red cap","grow"],["Mario is big now","hop"],["{hero} hits the box","block"],["A bug can run","stomp"],["Yes {hero} yes","star"]]},
+ {name:"Wet Day",theme:"water",s:[["We dip in","swim"],["A fish can hop","fish"],["{hero} gets on the log","ride"],["I see a bug","stomp"],["Mario is not wet","hop"],["{hero} can look up","climb"]]},
+ {name:"Dark Den",theme:"cave",s:[["It is dim in here","duck"],["{hero} has a wand","block"],["A bug is in the den","stomp"],["Mario can duck","duck"],["Up up we go","climb"],["{hero} got a star","star"]]},
+ {name:"Hot Hot",theme:"lava",s:[["It is hot","hop"],["{hero} can hop","hop"],["Get on the top","ride"],["Mario can toss a ball","fire"],["A bug is mad","stomp"],["{hero} can see Peach","wave"]]},
+ {name:"Help Peach",theme:"castle",s:[["Here we go {hero}","run"],["The big king is mad","duck"],["Mario can toss a ball","fire"],["{hero} can jump","hop"],["He ran away","bowser"],["Peach hugs {hero}","peach"],["We did it","peach"]]}]},
 {name:"1st Grade",m:[
- {name:"Grass Trip",theme:"sunset",s:[["Amelia and Mario went on a trip","run"],["A frog sat on the grass","hop"],["Then a bug ran at them","stomp"],["Amelia taps the block with her wand","block"],["She helps Mario up the vine","climb"],["They clap and say thank you frog","wave"]]},
- {name:"Pipe Path",theme:"pipes",s:[["Amelia must jump the pipes","hop"],["A red cap made Mario big","grow"],["Stop that bug","stomp"],["Amelia hits the brick for a coin","block"],["Duck down fast","duck"],["Off they go","ride"]]},
- {name:"Splash",theme:"water",s:[["Fish swim in the pond","fish"],["Amelia jumps in with a splash","swim"],["A crab is on the sand","stomp"],["Then they hop on a raft","ride"],["Amelia gets a star from a shell","star"],["Mario shakes off the wet","hop"]]},
- {name:"Gem Cave",theme:"cave",s:[["This cave is dark and damp","duck"],["Amelia lights it with her wand","star"],["She hits a block and gets a coin","block"],["Bats flap past them","duck"],["Mario and Amelia climb the rope","climb"],["A bug runs at them","stomp"]]},
- {name:"Hot Rocks",theme:"lava",s:[["The rocks are red and hot","hop"],["Amelia jumps from rock to rock","hop"],["Mario tosses a fire ball","fire"],["They ride a block over the mud","ride"],["A bug gets in the way","stomp"],["Amelia says Peach is in there","wave"]]},
- {name:"The King",theme:"castle",s:[["Amelia and Mario step in the fort","run"],["The king has a green shell","duck"],["Mario throws a fire ball","fire"],["Amelia jumps over him","hop"],["The king runs off","bowser"],["Peach is safe at last","peach"],["Thank you Amelia","peach"]]}]},
+ {name:"Grass Trip",theme:"sunset",s:[["{hero} and Mario went on a trip","run"],["A frog sat on the grass","hop"],["Then a bug ran at them","stomp"],["{hero} taps the block with her wand","block"],["She helps Mario up the vine","climb"],["They clap and say thank you frog","wave"]]},
+ {name:"Pipe Path",theme:"pipes",s:[["{hero} must jump the pipes","hop"],["A red cap made Mario big","grow"],["Stop that bug","stomp"],["{hero} hits the brick for a coin","block"],["Duck down fast","duck"],["Off they go","ride"]]},
+ {name:"Splash",theme:"water",s:[["Fish swim in the pond","fish"],["{hero} jumps in with a splash","swim"],["A crab is on the sand","stomp"],["Then they hop on a raft","ride"],["{hero} gets a star from a shell","star"],["Mario shakes off the wet","hop"]]},
+ {name:"Gem Cave",theme:"cave",s:[["This cave is dark and damp","duck"],["{hero} lights it with her wand","star"],["She hits a block and gets a coin","block"],["Bats flap past them","duck"],["Mario and {hero} climb the rope","climb"],["A bug runs at them","stomp"]]},
+ {name:"Hot Rocks",theme:"lava",s:[["The rocks are red and hot","hop"],["{hero} jumps from rock to rock","hop"],["Mario tosses a fire ball","fire"],["They ride a block over the mud","ride"],["A bug gets in the way","stomp"],["{hero} says Peach is in there","wave"]]},
+ {name:"The King",theme:"castle",s:[["{hero} and Mario step in the fort","run"],["The king has a green shell","duck"],["Mario throws a fire ball","fire"],["{hero} jumps over him","hop"],["The king runs off","bowser"],["Peach is safe at last","peach"],["Thank you {hero}","peach"]]}]},
 {name:"2nd Grade",m:[
- {name:"Rainy Meadow",theme:"hills",s:[["Amelia wakes up at sunrise","hop"],["She meets Mario on the road","run"],["A sneaky beetle blocks the way","stomp"],["Amelia waves her wand at a golden block","block"],["A mushroom makes Mario grow","grow"],["They climb a leafy vine","climb"]]},
- {name:"Snowy Peaks",theme:"snow",s:[["Snowflakes float down slowly","duck"],["Amelia slides on the frozen lake","ride"],["Mario leaps over a tall pipe","hop"],["A grumpy beetle waddles near","stomp"],["Mario throws a fireball at the ice","fire"],["Amelia smiles and keeps going","star"]]},
- {name:"Ocean Reef",theme:"water",s:[["The ocean waves are bright blue","swim"],["Amelia dives under the water","swim"],["Seahorses wave hello to Amelia","fish"],["A sleepy crab snores loudly","stomp"],["They ride a wooden boat to shore","ride"],["Amelia finds a shiny coin","block"]]},
- {name:"Crystal Cavern",theme:"cave",s:[["Crystals glow in the cavern","star"],["Mario ducks under low rocks","duck"],["Amelia finds a hidden coin block","block"],["She helps Mario climb a rope ladder","climb"],["A beetle rolls toward them","stomp"],["Amelia feels brave and strong","hop"]]},
- {name:"Desert Sun",theme:"desert",s:[["The desert sand is dry and hot","run"],["Amelia jumps over a cactus","hop"],["They ride a floating carpet","ride"],["A beetle crawls closer","stomp"],["Mario tosses a fireball at a rock","fire"],["Amelia knows Peach is waiting","wave"]]},
- {name:"Bowser Tower",theme:"castle",s:[["Amelia reaches the stone tower","run"],["Bowser roars from the bridge","duck"],["Mario throws fireballs back","fire"],["Amelia leaps over the king","hop"],["Bowser slips and rolls away","bowser"],["Princess Peach thanks Amelia","peach"],["Everyone cheers hooray","peach"]]}]},
+ {name:"Rainy Meadow",theme:"hills",s:[["{hero} wakes up at sunrise","hop"],["She meets Mario on the road","run"],["A sneaky beetle blocks the way","stomp"],["{hero} waves her wand at a golden block","block"],["A mushroom makes Mario grow","grow"],["They climb a leafy vine","climb"]]},
+ {name:"Snowy Peaks",theme:"snow",s:[["Snowflakes float down slowly","duck"],["{hero} slides on the frozen lake","ride"],["Mario leaps over a tall pipe","hop"],["A grumpy beetle waddles near","stomp"],["Mario throws a fireball at the ice","fire"],["{hero} smiles and keeps going","star"]]},
+ {name:"Ocean Reef",theme:"water",s:[["The ocean waves are bright blue","swim"],["{hero} dives under the water","swim"],["Seahorses wave hello to {hero}","fish"],["A sleepy crab snores loudly","stomp"],["They ride a wooden boat to shore","ride"],["{hero} finds a shiny coin","block"]]},
+ {name:"Crystal Cavern",theme:"cave",s:[["Crystals glow in the cavern","star"],["Mario ducks under low rocks","duck"],["{hero} finds a hidden coin block","block"],["She helps Mario climb a rope ladder","climb"],["A beetle rolls toward them","stomp"],["{hero} feels brave and strong","hop"]]},
+ {name:"Desert Sun",theme:"desert",s:[["The desert sand is dry and hot","run"],["{hero} jumps over a cactus","hop"],["They ride a floating carpet","ride"],["A beetle crawls closer","stomp"],["Mario tosses a fireball at a rock","fire"],["{hero} knows Peach is waiting","wave"]]},
+ {name:"Bowser Tower",theme:"castle",s:[["{hero} reaches the stone tower","run"],["Bowser roars from the bridge","duck"],["Mario throws fireballs back","fire"],["{hero} leaps over the king","hop"],["Bowser slips and rolls away","bowser"],["Princess Peach thanks {hero}","peach"],["Everyone cheers hooray","peach"]]}]},
 {name:"3rd Grade",m:[
- {name:"Morning Adventure",theme:"hills",s:[["Princess Amelia packed her backpack for a big adventure","run"],["She and Mario hurried past colorful flowers","hop"],["Suddenly a mushroom monster wobbled toward them","stomp"],["Amelia tapped a mystery block with her magic wand","block"],["Together they climbed an enormous beanstalk","climb"],["Feeling wonderful they traveled onward","ride"]]},
- {name:"Pipeline Puzzle",theme:"pipes",s:[["Gigantic green pipes stretched across the valley","run"],["Amelia carefully jumped from pipe to pipe","hop"],["A magical mushroom made Mario twice as tall","grow"],["They discovered a secret underground tunnel","duck"],["Floating platforms carried them forward","ride"],["Another grumpy beetle tumbled away","stomp"]]},
- {name:"Underwater Kingdom",theme:"water",s:[["Amelia swam beneath the sparkling ocean","swim"],["Friendly dolphins whistled a cheerful melody","fish"],["Jellyfish drifted gently around the coral","swim"],["A lazy crab wandered across their path","stomp"],["Amelia discovered a treasure chest full of coins","block"],["They rode a wooden raft back to the beach","ride"]]},
- {name:"Midnight Forest",theme:"night",s:[["Fireflies twinkled around Amelia in the forest","star"],["Owls hooted quietly from the branches","duck"],["A grumpy beetle interrupted their journey","stomp"],["Mario practiced throwing fireballs at stumps","fire"],["Amelia helped Mario climb a twisted vine","climb"],["The moonlight showed them the way to the castle","run"]]},
- {name:"Volcano Valley",theme:"lava",s:[["Bubbling lava glowed beneath the volcano","hop"],["Amelia balanced on a moving platform","ride"],["Fiery sparks danced through the air","duck"],["She discovered an invincibility star","star"],["Nothing could stop Amelia and Mario now","fire"],["They bravely approached the gloomy fortress","wave"]]},
- {name:"Final Showdown",theme:"castle",s:[["Inside the fortress Bowser was waiting impatiently","run"],["The enormous turtle king stomped his feet","duck"],["Mario launched fireballs while Amelia cheered","fire"],["Amelia leaped over obstacles without stopping","hop"],["Bowser grumbled and retreated far away","bowser"],["Princess Peach thanked Amelia for her courage","peach"],["Everyone celebrated with fireworks and laughter","peach"]]}]}];
+ {name:"Morning Adventure",theme:"hills",s:[["Princess {hero} packed her backpack for a big adventure","run"],["She and Mario hurried past colorful flowers","hop"],["Suddenly a mushroom monster wobbled toward them","stomp"],["{hero} tapped a mystery block with her magic wand","block"],["Together they climbed an enormous beanstalk","climb"],["Feeling wonderful they traveled onward","ride"]]},
+ {name:"Pipeline Puzzle",theme:"pipes",s:[["Gigantic green pipes stretched across the valley","run"],["{hero} carefully jumped from pipe to pipe","hop"],["A magical mushroom made Mario twice as tall","grow"],["They discovered a secret underground tunnel","duck"],["Floating platforms carried them forward","ride"],["Another grumpy beetle tumbled away","stomp"]]},
+ {name:"Underwater Kingdom",theme:"water",s:[["{hero} swam beneath the sparkling ocean","swim"],["Friendly dolphins whistled a cheerful melody","fish"],["Jellyfish drifted gently around the coral","swim"],["A lazy crab wandered across their path","stomp"],["{hero} discovered a treasure chest full of coins","block"],["They rode a wooden raft back to the beach","ride"]]},
+ {name:"Midnight Forest",theme:"night",s:[["Fireflies twinkled around {hero} in the forest","star"],["Owls hooted quietly from the branches","duck"],["A grumpy beetle interrupted their journey","stomp"],["Mario practiced throwing fireballs at stumps","fire"],["{hero} helped Mario climb a twisted vine","climb"],["The moonlight showed them the way to the castle","run"]]},
+ {name:"Volcano Valley",theme:"lava",s:[["Bubbling lava glowed beneath the volcano","hop"],["{hero} balanced on a moving platform","ride"],["Fiery sparks danced through the air","duck"],["She discovered an invincibility star","star"],["Nothing could stop {hero} and Mario now","fire"],["They bravely approached the gloomy fortress","wave"]]},
+ {name:"Final Showdown",theme:"castle",s:[["Inside the fortress Bowser was waiting impatiently","run"],["The enormous turtle king stomped his feet","duck"],["Mario launched fireballs while {hero} cheered","fire"],["{hero} leaped over obstacles without stopping","hop"],["Bowser grumbled and retreated far away","bowser"],["Princess Peach thanked {hero} for her courage","peach"],["Everyone celebrated with fireworks and laughter","peach"]]}]}];
 const STK=["🐞","🍄","🐟","🦇","🔥","👑","🐸","🌿","🦀","💎","🌋","🏰","🌈","❄️","🐬","🔮","🌵","🐢","🦋","🧩","🐙","🦉","🌟","🎆"];
 const OUTFITS=[{n:"Purple Princess",P:"#9b4dff",L:"#d6b4ff"},{n:"Teal Tide",P:"#14b0a0",L:"#9ff0e6"},{n:"Sunny Gold",P:"#f0a818",L:"#fff0a0"},{n:"Ruby Red",P:"#e0304a",L:"#ffb0c0"},{n:"Sky Blue",P:"#3a8aff",L:"#b8d8ff"},{n:"Mint Leaf",P:"#30b860",L:"#b8f5c8"},{n:"Midnight Star",P:"#2a2a8a",L:"#ffd800"},{n:"Snow Queen",P:"#d8ecff",L:"#5ab0ff"},{n:"Rainbow",P:"#ff4f9a",L:"#ffd800",rainbow:1}];
 // ---------- subject worlds content
@@ -456,10 +457,10 @@ art:[
 "A chord is three or more notes played together|What is a chord?|notes played together|one note|a drum|n:CEG",
 "Ode to Joy was written by Beethoven|Who wrote Ode to Joy?|Beethoven|Mozart|Picasso|n:EEFGGFEDCCDEEDD"]]]};
 const SPELL=[
-"cat:The cat naps in the sun|dog:My dog likes to run|sun:The sun is hot|hat:I have a red hat|big:That is a big tree|red:The apple is red|run:I can run fast|up:Look up at the sky|can:I can hop|see:I see a bird|go:We go to the park|mom:Mom gives me a hug|dad:Dad reads a book|bed:I sleep in my bed|pig:The pig is pink|hop:A frog can hop|man:The man has a hat|fun:We have fun|top:The cat is on top|sit:Sit on the mat|we:We like to play|me:Play with me|is:It is a sunny day|it:I like it|at:Look at the moon|and:Mario and Amelia run|the:The bug is small|you:I like you|like:I like cake|play:We play tag",
+"cat:The cat naps in the sun|dog:My dog likes to run|sun:The sun is hot|hat:I have a red hat|big:That is a big tree|red:The apple is red|run:I can run fast|up:Look up at the sky|can:I can hop|see:I see a bird|go:We go to the park|mom:Mom gives me a hug|dad:Dad reads a book|bed:I sleep in my bed|pig:The pig is pink|hop:A frog can hop|man:The man has a hat|fun:We have fun|top:The cat is on top|sit:Sit on the mat|we:We like to play|me:Play with me|is:It is a sunny day|it:I like it|at:Look at the moon|and:Mario and {hero} run|the:The bug is small|you:I like you|like:I like cake|play:We play tag",
 "ship:The ship sails on the sea|fish:A fish can swim|tree:A bird is in the tree|frog:The frog is green|jump:I can jump high|rain:The rain is wet|boat:We ride in a boat|cake:We eat cake at the party|bike:I ride my bike|home:We go home|kite:My kite flies high|snow:The snow is cold|look:Look at the stars|book:I read a book|said:She said hello|have:I have a pet|they:They are my friends|what:What is that|when:When can we go|where:Where is my hat|green:The grass is green|black:The cat is black|stop:Stop at the red light|sleep:I sleep at night|train:The train goes fast|chick:A chick says peep|fast:Mario runs fast|hand:Raise your hand|went:We went to the zoo|wish:I wish on a star",
-"because:I smile because I am happy|friend:Amelia is a good friend|school:We learn at school|again:Let us play again|about:This book is about frogs|light:Turn on the light|night:Owls hoot at night|right:Turn to the right|should:You should brush your teeth|could:She could see the castle|would:Would you like to play|around:We walk around the pond|laugh:Jokes make me laugh|enough:We have enough snacks|people:Many people came|water:Fish swim in water|happy:The puppy is happy|little:A little bug crawls|family:My family eats dinner|mother:My mother sings|father:My father cooks|sister:My sister reads|brother:My brother runs|rabbit:The rabbit hops|garden:Flowers grow in the garden|winter:Winter is cold|summer:Summer is hot|before:Wash hands before you eat|after:We rest after lunch|every:I read every day",
-"beautiful:The sunset is beautiful|different:Every snowflake is different|important:Sleep is important|through:We walked through the forest|thought:I thought about the puzzle|caught:Mario caught the ball|believe:I believe in you|favorite:Blue is my favorite color|together:We work together|probably:It will probably rain|surprise:The party was a surprise|remember:Remember your backpack|minute:Wait one minute|special:Today is a special day|answer:She knows the answer|question:Ask a question|library:We borrow books at the library|weather:The weather is sunny|breakfast:I eat breakfast in the morning|neighbor:Our neighbor has a dog|measure:Use a ruler to measure|nature:We hike in nature|picture:Draw a picture|adventure:Amelia loves an adventure|knowledge:Reading gives us knowledge|early:I woke up early|heard:I heard a bird sing|finally:We finally saved Peach|castle:Bowser lives in a castle|calendar:Look at the calendar"].map(g=>g.split("|").map(x=>x.split(":")));
+"because:I smile because I am happy|friend:{hero} is a good friend|school:We learn at school|again:Let us play again|about:This book is about frogs|light:Turn on the light|night:Owls hoot at night|right:Turn to the right|should:You should brush your teeth|could:She could see the castle|would:Would you like to play|around:We walk around the pond|laugh:Jokes make me laugh|enough:We have enough snacks|people:Many people came|water:Fish swim in water|happy:The puppy is happy|little:A little bug crawls|family:My family eats dinner|mother:My mother sings|father:My father cooks|sister:My sister reads|brother:My brother runs|rabbit:The rabbit hops|garden:Flowers grow in the garden|winter:Winter is cold|summer:Summer is hot|before:Wash hands before you eat|after:We rest after lunch|every:I read every day",
+"beautiful:The sunset is beautiful|different:Every snowflake is different|important:Sleep is important|through:We walked through the forest|thought:I thought about the puzzle|caught:Mario caught the ball|believe:I believe in you|favorite:Blue is my favorite color|together:We work together|probably:It will probably rain|surprise:The party was a surprise|remember:Remember your backpack|minute:Wait one minute|special:Today is a special day|answer:She knows the answer|question:Ask a question|library:We borrow books at the library|weather:The weather is sunny|breakfast:I eat breakfast in the morning|neighbor:Our neighbor has a dog|measure:Use a ruler to measure|nature:We hike in nature|picture:Draw a picture|adventure:{hero} loves an adventure|knowledge:Reading gives us knowledge|early:I woke up early|heard:I heard a bird sing|finally:We finally saved Peach|castle:Bowser lives in a castle|calendar:Look at the calendar"].map(g=>g.split("|").map(x=>x.split(":")));
 const MNAMES=["Count Hop","Number Path","Add It Up","Take Away","Hop Back","Mix It Up"];
 
 // ---------- subject engine
@@ -476,8 +477,8 @@ function mathProb(t,m,k){const r=rng(1000+t*997+m*131+k*17),ri=(a,b)=>a+Math.flo
 function hopsFor(v,d){const out=[],sg=Math.sign(d);let n=Math.abs(d);if(n<=10){for(let i=0;i<n;i++)out.push(v+=sg);return out}
  for(const u of[100,10]){while(n>=u){n-=u;out.push(v+=sg*u)}}if(n)out.push(v+=sg*n);return out}
 const NW=["zero","one","two","three","four","five","six","seven","eight","nine","ten"];
-function readQuiz(mis){const ss=mis.s.map(x=>x[0]);const q=[{q:"Who is helping Mario in this story?",a:"Amelia",o:["Amelia","Bowser","a beetle"]}];
- const skip=["amelia","mario","peach","princess"];const pickW=s=>s.split(" ").filter(w=>!skip.includes(w.toLowerCase())).sort((a,b)=>b.length-a.length)[0];
+function readQuiz(mis){const ss=mis.s.map(x=>x[0]);const q=[{q:"Who is helping Mario in this story?",a:"{hero}",o:["{hero}","Bowser","a beetle"]}];
+ const skip=[HN().toLowerCase(),OTH().n.toLowerCase(),"mario","peach","princess"];const pickW=s=>s.split(" ").filter(w=>!skip.includes(w.toLowerCase())).sort((a,b)=>b.length-a.length)[0];
  const idx=[0,2,4].filter(i=>ss[i]);for(const i of idx){const w=pickW(ss[i]);if(!w)continue;const others=shuf(ss.filter((_,j)=>j!==i).map(pickW).filter(x=>x&&x.toLowerCase()!==w.toLowerCase()));
   const o=[w,...[...new Set(others)].slice(0,2)];q.push({q:`Finish the sentence: "${ss[i].replace(new RegExp("\\b"+w+"\\b"),"____")}"`,a:w,o})}return q}
 function miss1(w){const V="aeiou",out=new Set(),tr=[()=>{for(let i=1;i<w.length;i++)if(V.includes(w[i]))return w.slice(0,i)+V[(V.indexOf(w[i])+1+i%3)%5]+w.slice(i+1)},
@@ -486,7 +487,8 @@ function miss1(w){const V="aeiou",out=new Set(),tr=[()=>{for(let i=1;i<w.length;
  for(const f of tr){const x=f();if(x&&x!==w)out.add(x);if(out.size>=2)break}return[...out]}
 const ACTS=["hop","block","star","ride","climb","wave"];
 function wnames(w,t){return w==="read"?TIERS[t].m.map(m=>m.name):w==="math"?MNAMES:w==="spell"?["Word Bees","Buzzy Words","Honey Words","Spell Hive","Word Garden","Spelling Bee"]:FACTS[w][t].map(m=>m[0])}
-function buildMission(w,t,m){
+function buildMission(w,t,m){return JSON.parse(nm(JSON.stringify(buildMission0(w,t,m))))}
+function buildMission0(w,t,m){
  if(w==="read"){const b=TIERS[t].m[m];return{...b,kind:"read",quiz:readQuiz(b)}}
  if(w==="math"){const ps=[0,1,2,3,4].map(k=>mathProb(t,m,k)),st=t<=1?1:t===2?10:100;
   const s=ps.map(p=>{const vals=[p.a,...(p.op==="+-"?(()=>{const h1=hopsFor(p.a,p.b);return[...h1,...hopsFor(h1[h1.length-1],-p.c)]})():hopsFor(p.a,p.op==="+"?p.b:-p.b))];
@@ -515,7 +517,7 @@ function overlayDraw(){const cxW=W*.7,cyW=GY*.32,R=S*13;
   else if(sh==="zigzag"){for(let i=0;i<=6;i++)cx.lineTo(-R*1.5+i*R/2,i%2?-R*.6:R*.6)}else if(sh==="spiral"){for(let a=0;a<18;a+=.2)cx.lineTo(Math.cos(a)*a*R/18,Math.sin(a)*a*R/18)}
   else if(sh==="dots"){for(let i=0;i<9;i++){cx.moveTo(-R+(i%3)*R+S*2,-R+Math.floor(i/3)*R);cx.arc(-R+(i%3)*R,-R+Math.floor(i/3)*R,S*2,0,7)}}
   if(["line","zigzag","spiral"].includes(sh)){cx.lineWidth=S*1.5;cx.strokeStyle=SC.col&&SC.col!=="rainbow"?SC.col:"#ff4f9a";cx.stroke()}else{cx.fill();cx.stroke()}cx.restore()}
- if(NL){const L=NL,x0=W*.07,x1=W*.93,y=Math.min(GY*.42,GY-26*S),X=v=>x0+(v-L.lo)/(L.hi-L.lo)*(x1-x0);let st=L.st;while((L.hi-L.lo)/st>20)st*=2;
+ if(NL){const L=NL,x0=W*.07,x1=W*.93,y=Math.max(Math.min(GY*.42,GY-26*S),(H>W?92:64)+26*S),X=v=>x0+(v-L.lo)/(L.hi-L.lo)*(x1-x0);let st=L.st;while((L.hi-L.lo)/st>20)st*=2;
   cx.fillStyle="#fffe";cx.fillRect(x0-S*4,y-S*26,x1-x0+S*8,S*36);cx.strokeStyle="#333";cx.lineWidth=S;cx.beginPath();cx.moveTo(x0,y);cx.lineTo(x1,y);cx.stroke();
   cx.fillStyle="#333";cx.font=`bold ${S*(st===1&&L.hi>12?4:5)}px sans-serif`;cx.textAlign="center";for(let v=L.lo;v<=L.hi;v+=st){cx.fillRect(X(v)-S/2,y-S*2,S,S*4);cx.fillText(v,X(v),y+S*8)}
   const dt=t-L.t0,per=Math.max(14,Math.min(36,Math.floor(360/L.vals.length))),k=Math.min(L.vals.length-1,Math.max(0,Math.floor((dt-30)/per)+1)),f=dt<30?0:((dt-30)%per)/per;
@@ -523,7 +525,7 @@ function overlayDraw(){const cxW=W*.7,cyW=GY*.32,R=S*13;
   cx.strokeStyle="#ff4f9a";cx.lineWidth=S*.8;for(let i=1;i<=k;i++){const a=X(L.vals[i-1]),b=X(L.vals[i]);cx.beginPath();cx.moveTo(a,y);cx.quadraticCurveTo((a+b)/2,y-S*14,b,y);cx.stroke()}
   let ax=X(L.vals[k]),ay=y;if(k<L.vals.length-1&&dt>=30){const a=X(L.vals[k]),b=X(L.vals[k+1]);ax=a+(b-a)*f;ay=y-Math.sin(f*Math.PI)*S*10}
   if(k===L.vals.length-1){cx.fillStyle="#ff4f9a";cx.beginPath();cx.arc(X(L.vals[k]),y,S*3,0,7);cx.fill()}
-  const sv=S;S=Math.max(1,Math.round(sv*.55));px(AMELIA,apal(),ax-6*S,ay-17*S,false);S=sv}}
+  const sv=S;S=Math.max(1,Math.round(sv*.55));px(SPR(),apal(),ax-6*S,ay-17*S,false);S=sv}}
 // quiz
 let QZ=null;
 function afterTyping(){if(warm){finish();return}mode="quiz";setTimeout(startQuiz,1300)}
@@ -544,20 +546,29 @@ function endQuiz(){const n=QZ.list.length,need=Math.ceil(n*.75),R=save.qz[world]
 // world map
 function showMap(){ov.style.justifyContent="";ov.style.paddingTop="";mode="map";hud.classList.add("hidden");ov.classList.remove("hidden");if(!tierOpen(tier))tier=0;
  const cas=misOpen(tier,5,"read"),cd=save.done[tier][5];
- ov.innerHTML=`<h1 style="font-size:min(8vw,52px)">🗺️ Amelia's World Map</h1><div class="grade"><div class="glabel">Grade level</div><input id="gr" type="range" min="0" max="3" step="1" value="${tier}" aria-label="Grade level">
+ ov.innerHTML=`<h1 style="font-size:min(8vw,52px)">🗺️ ${HN()}'s World Map</h1><div class="grade"><div class="glabel">Grade level</div><input id="gr" type="range" min="0" max="3" step="1" value="${tier}" aria-label="Grade level">
  <div class="ticks">${TIERS.map((T,i)=>`<span class="tick ${i===tier?"on":""}" data-t="${i}">${tierOpen(i)?"":"🔒 "}${T.name}</span>`).join("")}</div><div id="gmsg">${TIERS[tier].name}</div></div>
  <div id="worlds">${WORLDS.map(w=>{const d=D(w.id)[tier].filter(Boolean).length-(w.id==="read"&&cd?1:0),tot=w.id==="read"?5:6;return `<button data-w="${w.id}" style="background:${w.bg}"><span class="wi">${w.ic}</span>${w.n}<br><small>${"⭐".repeat(d)}${"☆".repeat(tot-d)}</small></button>`}).join("")}
  <button id="castleBtn" class="${cas?"":"lock"}" style="background:#5a5a6a">${cas?"🏰":"🔒"} Rescue Peach!<br><small>${cd?"👑 Peach is safe!":cas?"Bowser's castle is open!":"Reading 1-5 + mission 1 in every world"}</small></button></div>
- <div class="menu2"><button id="stkBtn">📒 Sticker Book</button><button id="parBtn">👪 Parents</button><button id="reset">Reset progress</button></div>`;
+ <div class="menu2"><button id="swBtn">👭 Switch player</button><button id="stkBtn">📒 Sticker Book</button><button id="parBtn">👪 Parents</button><button id="reset">Reset progress</button></div>`;
  ov.querySelectorAll("#worlds button[data-w]").forEach(b=>b.onclick=()=>{world=b.dataset.w;selIdx=0;showSelect()});
- document.getElementById("castleBtn").onclick=()=>{if(misOpen(tier,5,"read")){world="read";startLevel(5)}else{const m=document.getElementById("gmsg");m.textContent="🔒 Finish Reading 1-5 and the first mission in every world!";m.classList.remove("shake");void m.offsetWidth;m.classList.add("shake");sfx.boop()}};
+ document.getElementById("swBtn").onclick=showPlayers;document.getElementById("castleBtn").onclick=()=>{if(misOpen(tier,5,"read")){world="read";startLevel(5)}else{const m=document.getElementById("gmsg");m.textContent="🔒 Finish Reading 1-5 and the first mission in every world!";m.classList.remove("shake");void m.offsetWidth;m.classList.add("shake");sfx.boop()}};
  document.getElementById("stkBtn").onclick=showStickers;document.getElementById("parBtn").onclick=showGate;
  const gr=document.getElementById("gr");gr.addEventListener("input",()=>setTier(+gr.value));gr.addEventListener("keydown",e=>e.stopPropagation());ov.querySelectorAll(".tick").forEach(e=>e.onclick=()=>{gr.value=e.dataset.t;setTier(+e.dataset.t)});
- document.getElementById("reset").onclick=()=>{if(confirm("Reset all progress?")){save=mig(blank());tier=0;store();selIdx=0;showMap()}}}
+ document.getElementById("reset").onclick=()=>{if(confirm("Reset "+HN()+"'s progress?")){save=mig(blank());tier=0;store();selIdx=0;showMap()}}}
 
 let warm=null,curMis=null;
+const PL={amelia:{id:"amelia",n:"Amelia",get spr(){return AMY},dress:"#14b0a0"},valerie:{id:"valerie",n:"Valerie",get spr(){return VAL},dress:"#9b4dff"}};
+const HN=()=>PL[PID].n,OTH=()=>PL[PID==="amelia"?"valerie":"amelia"],SPR=()=>PL[PID].spr,nm=x=>String(x).split("{hero}").join(HN());
+const OF=(id=PID)=>id==="amelia"?[OUTFITS[1],OUTFITS[0],...OUTFITS.slice(2)]:OUTFITS;
+function setPlayer(id){PID=id;save=PS.saves[id];tier=save.tier||0;selIdx=0;world="read";store()}
+function portrait(id){const c=document.createElement("canvas"),k=8,m=PL[id].spr,pl=apal(id);c.width=12*k;c.height=16*k;const g=c.getContext("2d");m.forEach((r,y)=>[...r].forEach((ch,x)=>{if(pl[ch]){g.fillStyle=pl[ch];g.fillRect(x*k,y*k,k,k)}}));return c.toDataURL()}
+function showPlayers(){ov.style.justifyContent="";ov.style.paddingTop="";mode="players";hud.classList.add("hidden");ov.classList.remove("hidden");
+ ov.innerHTML=`<h1 style="font-size:min(9vw,56px)">Who's playing?</h1><div id="pcards">${["amelia","valerie"].map((id,i)=>{const sv=PS.saves[id],d=sv.done.flat().filter(Boolean).length+Object.values(sv.w).flat(2).filter(Boolean).length;return `<button data-p="${id}" style="background:${PL[id].dress}"><img src="${portrait(id)}" alt=""><b>Princess ${PL[id].n}</b><small>${"⭐".repeat(Math.min(5,Math.ceil(d/3)))||"New adventure!"} · press ${i+1}</small></button>`}).join("")}</div>`;
+ ov.querySelectorAll("#pcards button").forEach(b=>b.onclick=()=>pickPlayer(b.dataset.p))}
+function pickPlayer(id){setPlayer(id);say("Hi Princess "+HN()+"!");showMap()}
 var tier=0;const ST=()=>TIERS[tier].m,MIS=()=>warm||curMis;
-const HINT={amelia:"👑",mario:"🧢",peach:"👸",bowser:"🐢"};
+const HINT={"{hero}":"👑",amelia:"👑",valerie:"👑",mario:"🧢",peach:"👸",bowser:"🐢"};
 const THEMES={hills:{sky:["#6ec6ff","#bdeaff"],hill:"#3fae49",hill2:"#7cd36f",ground:"#c8743a",top:"#4cc04a"},
 pipes:{sky:["#5ab4ff","#cdf"],hill:"#2f9a3f",hill2:"#6fc96a",ground:"#b5652f",top:"#3db042"},
 water:{sky:["#7fd0ff","#e0f6ff"],hill:"#4aa0c8",hill2:"#88c8e0",ground:"#c8743a",top:"#4cc04a"},
@@ -575,13 +586,16 @@ const blank=()=>({v:2,tier:0,done:[0,1,2,3].map(()=>[0,0,0,0,0,0])});
 let save=(()=>{let o;try{o=JSON.parse(localStorage.getItem("mta_save")||"null")}catch(e){}
  if(!o)return blank();if(o.v===2&&o.done)return o;const n=blank();if(o.stars)o.stars.forEach((x,i)=>{if(x>0)n.done[0][i]=1});return n})();
 function mig(o){o.w=o.w||{};for(const w of["math","sci","soc","spell","art"])o.w[w]=o.w[w]||[0,1,2,3].map(()=>[0,0,0,0,0,0]);o.qz=o.qz||{};o.stats=o.stats||{days:{},mw:{},miss:{}};o.outfit=o.outfit||0;return o}
-var world="read";const D=w=>w==="read"?save.done:save.w[w];save=mig(save);
+var world="read";const D=w=>w==="read"?save.done:save.w[w];
+let PS=null;try{PS=JSON.parse(localStorage.getItem("mta_players")||"null")}catch(e){}
+if(!PS||!PS.saves)PS={cur:null,saves:{amelia:save}};for(const id of["amelia","valerie"])PS.saves[id]=mig(PS.saves[id]||blank());
+var PID=PS.cur||"amelia";save=PS.saves[PID];
 tier=save.tier||0;save.stats=save.stats||{days:{},mw:{},miss:{}};save.outfit=save.outfit||0;
 const doneCount=()=>save.done.flat().filter(Boolean).length+Object.values(save.w).flat(2).filter(Boolean).length,outfitOpen=i=>i<=Math.floor(doneCount()/3);
 const tierOpen=t=>t===0||save.done[t-1].every(Boolean),misOpen=(t,m,w=world)=>tierOpen(t)&&(m===0||!!D(w)[t][m-1])&&(w!=="read"||m!==5||WORLDS.every(x=>x.id==="read"||!!D(x.id)[t][0])),CAS=()=>world==="read"&&lvl===5&&!warm;
-function store(){localStorage.setItem("mta_save",JSON.stringify(save))}
+function store(){PS.saves[PID]=save;PS.cur=PID;localStorage.setItem("mta_players",JSON.stringify(PS))}
 var mode="start",lvl=0,si=0,wi=0,ci=0,words=[],muted=false,showKb=true,selIdx=0;
-let props=[],wc=0,am={x:0,y:0,vy:0,tw:0},lastK=0,wordMiss=false;let mario={x:80,tx:80,y:0,vy:0,face:1,anim:0,act:null,actT:0},cam=0,parts=[],coins=[],t=0,ending=0,bowserX=0,bowserGone=0;
+let cp={x:0,y:0,vy:0},props=[],wc=0,am={x:0,y:0,vy:0,tw:0},lastK=0,wordMiss=false;let mario={x:80,tx:80,y:0,vy:0,face:1,anim:0,act:null,actT:0},cam=0,parts=[],coins=[],t=0,ending=0,bowserX=0,bowserGone=0;
 const cv=document.getElementById("game"),cx=cv.getContext("2d");let W,H,S,GY;
 const TOUCH=matchMedia("(pointer:coarse)").matches||"ontouchstart" in window;
 function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight;S=Math.max(2,Math.round(Math.min(W,H)/(TOUCH?150:170)));setGY()}
@@ -599,7 +613,7 @@ const ROWS=["qwertyuiop","asdfghjkl","zxcvbnm"],FING={q:0,a:0,z:0,w:1,s:1,x:1,e:
 Object.assign(FING,{"1":0,"2":1,"3":2,"4":3,"5":3,"6":4,"7":4,"8":2,"9":1,"0":0});
 kbEl.innerHTML=`<div id="kbNum">${[..."1234567890"].map(k=>`<b id="k_${k}" class="f${FING[k]}">${k}</b>`).join("")}</div>`+ROWS.map(r=>"<div>"+[...r].map(k=>`<b id="k_${k}" class="f${FING[k]}${"fj".includes(k)?" home":""}">${k}</b>`).join("")+"</div>").join("")+`<div><b id="k_space" class="sp" data-k=" ">space</b></div>`;
 function showStart(){ov.style.justifyContent="";ov.style.paddingTop="";mode="start";hud.classList.add("hidden");ov.classList.remove("hidden");
- ov.innerHTML=`<h1>Princess Amelia's Typing Adventure</h1><div style="font-size:clamp(20px,3vw,32px)">👑 Help Mario rescue Princess Peach! 🍄</div><p class="big"><span class="tk">Tap or press any key to start</span></p><div class="tip">👪 Parent tip: sit with your child, keep fingers on the home row (bumps on F and J). The glowing key on the keyboard shows what to press next. No timers, no wrong answers — just fun!</div>`}
+ ov.innerHTML=`<h1>Princess Amelia &amp; Valerie's Typing Adventure</h1><div style="font-size:clamp(20px,3vw,32px)">👑 Help Mario rescue Princess Peach! 🍄</div><p class="big"><span class="tk">Tap or press any key to start</span></p><div class="tip">👪 Parent tip: sit with your child, keep fingers on the home row (bumps on F and J). The glowing key on the keyboard shows what to press next. No timers, no wrong answers — just fun!</div>`}
 function gridHTML(){return wnames(world,tier).map((nm,i)=>{const lock=!misOpen(tier,i),d=D(world)[tier][i];return `<button data-i="${i}" class="${lock?"lock":""} ${i===selIdx?"sel":""}">${lock?"🔒":d?"⭐⭐⭐":world==="read"&&i===5?"🏰":"▶️"}<br>${i+1}. ${nm}</button>`}).join("")}
 function bindGrid(){ov.querySelectorAll("#levels button").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(misOpen(tier,i))startLevel(i)})}
 function setTier(v){const msg=document.getElementById("gmsg"),gr=document.getElementById("gr");
@@ -616,7 +630,7 @@ function showSelect(){ov.style.justifyContent="";ov.style.paddingTop="";mode="se
  bindGrid();const gr=document.getElementById("gr");gr.addEventListener("input",()=>setTier(+gr.value));gr.addEventListener("keydown",e=>e.stopPropagation());
  ov.querySelectorAll(".tick").forEach(e=>e.onclick=()=>{gr.value=e.dataset.t;setTier(+e.dataset.t)});
  }
-function startLevel(i,w){warm=w||null;lvl=i;if(!w)curMis=buildMission(world,tier,i);QZ=null;SC={};NL=null;document.getElementById("kbNum").classList.toggle("hidden",MIS().kind!=="math");am={x:80-15*S,y:0,vy:0,tw:0};si=0;wi=0;ci=0;mode="play";ending=0;bowserGone=0;parts=[];coins=[];props=[];fw=[];
+function startLevel(i,w){warm=w||null;lvl=i;if(!w)curMis=buildMission(world,tier,i);QZ=null;SC={};NL=null;document.getElementById("kbNum").classList.toggle("hidden",MIS().kind!=="math");am={x:80-15*S,y:0,vy:0,tw:0};cp={x:80-29*S,y:0,vy:0};si=0;wi=0;ci=0;mode="play";ending=0;bowserGone=0;parts=[];coins=[];props=[];fw=[];
  mario={x:80,tx:80,y:0,vy:0,face:1,anim:0,act:null,actT:0,big:false};cam=0;
  const total=MIS().s.reduce((a,s)=>a+s[0].split(" ").length,0);bowserX=80+(total+3)*STEP;
  ov.classList.add("hidden");hud.classList.remove("hidden");loadSentence()}
@@ -678,13 +692,14 @@ function goomba(x,y,flat){const h=flat?S*4:S*12,w=S*14,bob=flat?0:Math.sin(t/4)*
  cx.fillStyle="#3a2010";cx.fillRect(x-w*.45,y-S*2+bob,w*.35,S*2);cx.fillRect(x+w*.1,y-S*2-bob,w*.35,S*2)}
 function mushroom(x,y){const w=S*12;cx.fillStyle="#f5e6c8";cx.fillRect(x-w*.3,y-S*7,w*.6,S*7);cx.fillStyle="#e52521";cx.beginPath();cx.ellipse(x,y-S*7,w/2,S*6,0,Math.PI,0);cx.fill();cx.fillStyle="#fff";cx.beginPath();cx.arc(x-S*3,y-S*10,S*1.6,0,7);cx.arc(x+S*3,y-S*9,S*1.4,0,7);cx.fill();cx.fillStyle="#222";cx.fillRect(x-S*2,y-S*5,S,S*2);cx.fillRect(x+S,y-S*5,S,S*2)}
 function p(x,y,ch,col){return{x,y,vx:(Math.random()-.5)*6,vy:-Math.random()*6-2,life:60+Math.random()*30,ch,col}}
-function say(txt){if(muted||!window.speechSynthesis||!txt)return;try{const u=new SpeechSynthesisUtterance(txt);u.rate=.8;u.pitch=1.15;u.lang="en-US";speechSynthesis.speak(u)}catch(e){}}
+function say(txt){if(muted||!window.speechSynthesis||!txt)return;txt=nm(txt);try{const u=new SpeechSynthesisUtterance(txt);u.rate=.8;u.pitch=1.15;u.lang="en-US";speechSynthesis.speak(u)}catch(e){}}
 let spOk=false;function spUnlock(){if(spOk||!window.speechSynthesis)return;spOk=true;try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u)}catch(e){}}
 const dkey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 function stat(){const k=dkey(new Date());return save.stats.days[k]||(save.stats.days[k]={keys:0,miss:0,words:0,ms:0})}
 function key(e){au();spUnlock();const k=e.key;
  if(mode==="stickers"||mode==="parents"||mode==="gate"){if(k==="Escape")showMap();return}
- if(mode==="start"){showMap();return}
+ if(mode==="start"){showPlayers();return}
+ if(mode==="players"){if(k==="1")pickPlayer("amelia");if(k==="2")pickPlayer("valerie");return}
  if(mode==="quiz"){if(QZ&&"123".includes(k)&&k.length===1&&QZ.list[QZ.i].o[+k-1]!==undefined)answerQ(+k-1);return}
  if(mode==="review"){if(k==="Enter"||k===" ")startQuiz();return}
  if(mode==="map"){return}
@@ -712,8 +727,8 @@ function finish(){mode="done";ending=0;const before=doneCount(),wasDone=D(world)
  if(CAS()){m.tx=bowserX-60;if(!bowserGone)bowserGone=1}else{m.tx=bowserX+STEP*.5-12*S;m.vy=-15;m.act="leap";m.actT=0}
  const last=CAS(),nextT=last&&tier<3?TIERS[tier+1].name:"";
  setTimeout(()=>{if(mode!=="done")return;ov.classList.remove("hidden");ov.style.justifyContent="flex-start";ov.style.paddingTop="40px";hud.classList.add("hidden");
- const stk=warm?"":`<div style="font-size:min(6vw,30px)">New sticker: <span style="font-size:1.6em">${world==="read"?STK[tier*6+lvl]:WSTK[world][lvl]}</span>${newOutfit?" &nbsp;👗 New outfit for Amelia!":""}</div>`;
- ov.innerHTML=warm?`<h1>Warm-up done! 💪</h1><div class="tip" style="font-size:22px">Tap or press Enter to go back</div>`:last?`<h1>Peach says: Thank you, Amelia! 💖</h1><div class="big">⭐⭐⭐ ${TIERS[tier].name} hero! ⭐⭐⭐</div>${stk}${nextT?`<div style="font-size:min(6vw,32px)">🔓 ${nextT} missions unlocked!</div>`:`<div style="font-size:min(6vw,32px)">You beat every grade! 🏆</div>`}<div class="tip" style="font-size:22px">Tap or press Enter to continue</div>`:`<h1>Great job, Amelia! ⭐⭐⭐</h1>${stk}<div style="font-size:min(6vw,32px)">${WORLDS.find(x=>x.id===world).n} · ${TIERS[tier].name} mission ${lvl+1} done!</div>${world==="read"&&lvl===4?`<div style="font-size:min(5vw,26px)">🏰 Visit every world to open Bowser's castle!</div>`:""}<div class="tip" style="font-size:22px">Tap or press Enter to continue</div>`},2200)}
+ const stk=warm?"":`<div style="font-size:min(6vw,30px)">New sticker: <span style="font-size:1.6em">${world==="read"?STK[tier*6+lvl]:WSTK[world][lvl]}</span>${newOutfit?" &nbsp;👗 New outfit for ${HN()}!":""}</div>`;
+ ov.innerHTML=warm?`<h1>Warm-up done! 💪</h1><div class="tip" style="font-size:22px">Tap or press Enter to go back</div>`:last?`<h1>Peach says: Thank you, ${HN()}! 💖</h1><div class="big">⭐⭐⭐ ${TIERS[tier].name} hero! ⭐⭐⭐</div>${stk}${nextT?`<div style="font-size:min(6vw,32px)">🔓 ${nextT} missions unlocked!</div>`:`<div style="font-size:min(6vw,32px)">You beat every grade! 🏆</div>`}<div class="tip" style="font-size:22px">Tap or press Enter to continue</div>`:`<h1>Great job, ${HN()}! ⭐⭐⭐</h1>${stk}<div style="font-size:min(6vw,32px)">${WORLDS.find(x=>x.id===world).n} · ${TIERS[tier].name} mission ${lvl+1} done!</div>${world==="read"&&lvl===4?`<div style="font-size:min(5vw,26px)">🏰 Visit every world to open Bowser's castle!</div>`:""}<div class="tip" style="font-size:22px">Tap or press Enter to continue</div>`},2200)}
 document.getElementById("muteBtn").onclick=e=>{muted=!muted;if(muted&&window.speechSynthesis)speechSynthesis.cancel();e.target.textContent=muted?"🔇":"🔊";e.target.blur()};
 document.getElementById("kbBtn").onclick=e=>{showKb=!showKb;render();if(TOUCH&&!showKb)ti.focus();else{ti.blur();e.target.blur()}};
 document.getElementById("menuBtn").onclick=e=>{e.target.blur();if(window.speechSynthesis)speechSynthesis.cancel();showMap()};
@@ -724,8 +739,9 @@ const HERO2=["...RRRRR....","..RRRRRRRRR.","..HHHSSKS...",".HSHSSSKSSS.",".HSHHS
 const HPAL={R:"#e52521",H:"#6b3a12",S:"#ffc69a",K:"#2a1a0a",B:"#2a56d8",Y:"#ffd800"};
 const PEACH=["....YYYY....","...YOYYOY...","..YYYYYYYY..","..YSSKSKSY..","..YSSSSSSY..","..YYSSSSYY..","...YPPPPY...","..PPPWWPPP..",".SPPPPPPPPS.",".S.PPPPPP.S.","...PPPPPPP..","..PPPPPPPP..","..PPWPPWPP..",".PPPPPPPPPP.",".PPPPPPPPPP.","PPPPPPPPPPPP"];
 const PPAL={Y:"#ffd23a",O:"#40c0ff",S:"#ffd6b8",K:"#333",P:"#ff7ac0",W:"#fff"};
-const AMELIA=["...Y.Y.Y....","...YYYYY....","..HHHHHHH...",".HHSSSSSHH..",".HSKSSKSSH..",".HSSSSSSSH..",".HHSSMSSHH..","..HPPPPPH...",".SPPWPPPPS..","S.PPPPPPP.S.","..PPPPPPP...",".PPPPPPPPP..",".PPLPPPLPP..","PPPPPPPPPPP.","..SS...SS...","..KK...KK..."];
-function apal(){const o=OUTFITS[save.outfit]||OUTFITS[0];let P=o.P,L=o.L;if(o.rainbow){const c=["#ff4f9a","#ff9a3a","#ffd23a","#4fd06a","#3ab0ff","#9b4dff"];P=c[(t>>3)%6];L=c[((t>>3)+2)%6]}return{Y:"#ffd23a",H:"#8a4a20",S:"#ffd6b8",K:"#3a2a2a",M:"#ff7a9a",P,W:"#fff",L}}
+const AMY=["....TGT.....","...TTTTT....","..BCBCBCB...",".BCSSSSSCB..",".CSKSSKSSC..","BBSSSSSSSBB.","CBCSSMSSCBC.","BC.PPPPP.CB.","CBSPPWPPSBC.","B.SPPPPPS.B.","..PPPPPPP...",".PPPPPPPPP..",".PPLPPPLPP..","PPPPPPPPPPP.","..SS...SS...","..KK...KK..."];
+const VAL=["...Y.Y.Y....","...YYYYY....","..HHHHHHH...",".HHSSSSSHH..",".HSKSSKSSH..",".HSSSSSSSH..",".HHSSMSSHH..","..HPPPPPH...",".SPPWPPPPS..","S.PPPPPPP.S.","..PPPPPPP...",".PPPPPPPPP..",".PPLPPPLPP..","PPPPPPPPPPP.","..SS...SS...","..KK...KK..."];
+function apal(id=PID){const sv=PS.saves[id]||{},o=OF(id)[sv.outfit||0]||OF(id)[0];let P=o.P,L=o.L;if(o.rainbow){const c=["#ff4f9a","#ff9a3a","#ffd23a","#4fd06a","#3ab0ff","#9b4dff"];P=c[(t>>3)%6];L=c[((t>>3)+2)%6]}return{B:"#ffe066",C:"#d99a1a",T:"#eef0ff",G:"#ff4f9a",Y:"#ffd23a",H:"#8a4a20",S:"#ffd6b8",K:"#3a2a2a",M:"#ff7a9a",P,W:"#fff",L}}
 const BOWSER=["......OO.OO......","....RRRRRR.......","...GGGGGGGG......","..GGWKGGGGGG.....","..GGGGGGGGGGOO...","..YYYYGGGGGGGGO..","...YWYWGGGGGGGGO.","....YYY.GTGTGTGO.",".....GGGGTGTGTGT.","....YGGYYGGGGGGG.","...YYGYYYYGGGGG..","...YYYYYYYYGGG...","....YYYYYYYGG....","....GGG...GGG....","...WGGG...GGGW..."];
 const BPAL={O:"#fff3c0",R:"#ff6a1a",G:"#3aa83a",W:"#fff",K:"#222",Y:"#ffe08a",T:"#fff"};
 function grad(c1,c2){const g=cx.createLinearGradient(0,0,0,H);g.addColorStop(0,c1);g.addColorStop(1,c2);return g}
@@ -755,7 +771,7 @@ function drawWorld(){const TH=MIS().theme,th=THEMES[TH],T=FAM[TH]||TH;
   const peachX=ox+bowserX+STEP*1.4;px(PEACH,PPAL,peachX,GY-16*S+(mode==="done"?-Math.abs(Math.sin(t/8))*S*4:0),true)}
  overlayDraw();propsUpdate(ox);
  // hero
- {const m=mario,ax=ox+am.x,ay=GY-17*S+am.y,flip=am.tw>0?((am.tw>>2)%2===1):false;px(AMELIA,apal(),ax,ay,flip);
+ {const m=mario,ax=ox+am.x,ay=GY-17*S+am.y,flip=am.tw>0?((am.tw>>2)%2===1):false;{const c=OTH().id,cx0=ox+cp.x,cy0=GY-17*S+cp.y;px(PL[c].spr,apal(c),cx0,cy0,(t>>4)%9===0)}px(SPR(),apal(),ax,ay,flip);
   cx.fillStyle="#c08a3a";cx.fillRect(ax+(flip?-2*S:12*S),ay+9*S,S,6*S);cx.fillStyle=(t>>3)%2?"#fff":"#ffe95a";cx.font=`${S*5}px sans-serif`;cx.textAlign="center";cx.fillText("★",ax+(flip?-1.5*S:12.5*S),ay+10*S);
   if(m.act==="climb"&&m.actT<85&&m.actT>15&&t%6===0)parts.push(p(am.x+12*S,am.y-10*S,"✦","#e6a8ff"))}
  const m=mario,sc=m.big?1.35:1,sy=m.duck?.6:1,hx=ox+m.x,hy=GY-16*S*sc*sy+m.y;const running=Math.abs(m.tx-m.x)>1;
@@ -782,12 +798,12 @@ function fireworks(){if(t%18===0){const fx=W*(.15+Math.random()*.7),fy=H*(.1+Mat
 let fw=[];
 function titleBg(){cx.fillStyle=grad("#4aa8ff","#bfe6ff");cx.fillRect(0,0,W,H);cx.fillStyle="#fff";for(let i=0;i<6;i++)cloud(((i*300+t*.5)%(W+300))-150,50+(i%3)*60);
  cx.fillStyle="#3fae49";cx.beginPath();cx.ellipse(W*.2,H*.85,W*.3,H*.25,0,Math.PI,0);cx.fill();cx.fillStyle="#c8743a";cx.fillRect(0,H*.85,W,H);cx.fillStyle="#4cc04a";cx.fillRect(0,H*.85,W,S*2);
- const hx=((t*2)%(W+200))-100;px((t>>3)%2?HERO2:HERO,HPAL,hx,H*.85-16*S,false);px(PEACH,PPAL,W*.82,H*.85-16*S,true);px(AMELIA,apal(),hx+16*S,H*.85-17*S,false)}
+ const hx=((t*2)%(W+200))-100;px((t>>3)%2?HERO2:HERO,HPAL,hx,H*.85-16*S,false);px(PEACH,PPAL,W*.82,H*.85-16*S,true);px(AMY,apal("amelia"),hx+16*S,H*.85-17*S,false);px(VAL,apal("valerie"),hx+30*S,H*.85-17*S,false)}
 function loop(){t++;if(t%15===0)setGY();
  if(mode!=="play"&&mode!=="done"&&mode!=="quiz"&&mode!=="review")titleBg();
  else{const m=mario;actUpdate();m.x+=(m.tx-m.x)*.08;if(!m.hold){m.vy+=.6;m.y+=m.vy;if(m.y>=0){m.y=0;m.vy=0}}
   if(mode==="done"){ending++;if(!CAS()&&ending>130&&ending%40===0&&ending<300)m.vy=-8}
-  {const tx=m.x-15*S;am.x+=(tx-am.x)*.1;if(m.hold){am.y+=(m.y-am.y)*.2;am.vy=0}else{if(m.vy<-4&&am.y===0)am.vy=m.vy*.95;am.vy+=.6;am.y+=am.vy;if(am.y>=0){am.y=0;am.vy=0}}if(am.tw>0)am.tw--;if(mode==="done"&&CAS()&&t%12===0)parts.push(p(am.x+6*S,-30,"♥","#ff4f9a"))}
+  {cp.x+=(am.x-14*S-cp.x)*.09;if(am.vy<-4&&cp.y===0)cp.vy=am.vy*.9;cp.vy+=.6;cp.y+=cp.vy;if(cp.y>=0){cp.y=0;cp.vy=0}const tx=m.x-15*S;am.x+=(tx-am.x)*.1;if(m.hold){am.y+=(m.y-am.y)*.2;am.vy=0}else{if(m.vy<-4&&am.y===0)am.vy=m.vy*.95;am.vy+=.6;am.y+=am.vy;if(am.y>=0){am.y=0;am.vy=0}}if(am.tw>0)am.tw--;if(mode==="done"&&CAS()&&t%12===0)parts.push(p(am.x+6*S,-30,"♥","#ff4f9a"))}
   cam+=(m.x-cam)*.1;
   for(const c of coins){c.y+=c.vy;c.vy+=.5;c.life--}coins=coins.filter(c=>c.life>0);
   for(const q of parts){q.x+=q.vx;q.y+=q.vy;q.vy+=.15;q.life--}parts=parts.filter(q=>q.life>0);
@@ -802,16 +818,19 @@ document.getElementById("hR").innerHTML=`<div class="fg th" style="height:24px">
 document.getElementById("handBtn").onclick=e=>{showHands=!showHands;save.hands=showHands;store();render();e.target.blur()};
 function panel(title,html){ov.style.justifyContent="";ov.style.paddingTop="";hud.classList.add("hidden");ov.classList.remove("hidden");ov.innerHTML=`<h1 style="font-size:min(8vw,52px)">${title}</h1><div class="panel">${html}</div><div class="menu2"><button id="backBtn">⬅ Back</button></div>`;document.getElementById("backBtn").onclick=showMap}
 function showStickers(){mode="stickers";let h="";TIERS.forEach((T,ti)=>{h+=`<b>${T.name}</b><div class="sgrid">${T.m.map((m,i)=>`<div class="${save.done[ti][i]?"":"no"}" title="${m.name}">${save.done[ti][i]?STK[ti*6+i]:"❔"}</div>`).join("")}</div>`});
- h+=`<b>Amelia's outfits</b> <span style="opacity:.7">(a new one every 3 missions)</span><div class="ofit">${OUTFITS.map((o,i)=>`<button data-o="${i}" class="${i===save.outfit?"on":""}" ${outfitOpen(i)?"":"disabled"}><i style="background:${o.rainbow?"linear-gradient(90deg,#f4a,#fd3,#4d6,#3af)":o.P}"></i>${outfitOpen(i)?o.n:"🔒 "+(i*3)+" missions"}</button>`).join("")}</div>`;
+ h+=`<b>${HN()}'s outfits</b> <span style="opacity:.7">(a new one every 3 missions)</span><div class="ofit">${OF().map((o,i)=>`<button data-o="${i}" class="${i===save.outfit?"on":""}" ${outfitOpen(i)?"":"disabled"}><i style="background:${o.rainbow?"linear-gradient(90deg,#f4a,#fd3,#4d6,#3af)":o.P}"></i>${outfitOpen(i)?o.n:"🔒 "+(i*3)+" missions"}</button>`).join("")}</div>`;
  h+=`<b>Subject worlds · ${TIERS[tier].name}</b>`+WORLDS.filter(w=>w.id!=="read").map(w=>`<div class="sgrid">${WSTK[w.id].map((e,i)=>`<div class="${D(w.id)[tier][i]?"":"no"}" title="${w.n}">${D(w.id)[tier][i]?e:"❔"}</div>`).join("")}</div>`).join("");panel("📒 Sticker Book",h);ov.querySelectorAll(".ofit button").forEach(b=>b.onclick=()=>{const i=+b.dataset.o;if(!outfitOpen(i))return;save.outfit=i;store();showStickers()})}
 function showGate(){mode="gate";const opts=[5,6,7,8,9].sort(()=>Math.random()-.5);panel("👪 Grown-ups",`<div style="text-align:center;font-size:22px">What is 3 + 4?<div class="menu2">${opts.map(n=>`<button data-n="${n}">${n}</button>`).join("")}</div></div>`);
  ov.querySelectorAll(".panel button").forEach(b=>b.onclick=()=>{if(+b.dataset.n===7)showParents();else showMap()})}
 function weekKey(ds){const d=new Date(ds+"T12:00:00");d.setDate(d.getDate()-((d.getDay()+6)%7));return dkey(d)}
-function showParents(){mode="parents";const st=save.stats,wk={};for(const [d,v] of Object.entries(st.days)){const k=weekKey(d);const w=wk[k]||(wk[k]={keys:0,miss:0,words:0,ms:0});for(const f in w)w[f]+=v[f]}
+function showParents(v){v=v||PID;const keep=save;save=PS.saves[v];try{showParents0(v)}finally{save=keep}
+ const pt=document.createElement("div");pt.className="menu2";pt.innerHTML=["amelia","valerie"].map(id=>`<button data-pv="${id}" class="${id===v?"on":""}">${id===v?"👉 ":""}${PL[id].n}</button>`).join("");ov.querySelector(".panel").prepend(pt);pt.querySelectorAll("button").forEach(b=>b.onclick=()=>showParents(b.dataset.pv));
+ const rb=document.getElementById("rstStats");rb.onclick=()=>{if(confirm("Reset "+PL[v].n+"'s typing stats? (missions and stickers are kept)")){PS.saves[v].stats={days:{},mw:{},miss:{}};store();showParents(v)}}}
+function showParents0(v){mode="parents";const st=save.stats,wk={};for(const [d,v] of Object.entries(st.days)){const k=weekKey(d);const w=wk[k]||(wk[k]={keys:0,miss:0,words:0,ms:0});for(const f in w)w[f]+=v[f]}
  const rows=Object.keys(wk).sort().reverse().slice(0,8).map(k=>{const w=wk[k],acc=w.keys+w.miss?Math.round(100*w.keys/(w.keys+w.miss)):0,wpm=w.ms>5000?(w.words/(w.ms/60000)).toFixed(1):"–";return `<tr><td>${k}</td><td>${acc}%</td><td>${wpm}</td><td>${w.words}</td><td>${Math.round(w.ms/60000)}</td></tr>`}).join("")||`<tr><td colspan=5>No typing yet</td></tr>`;
  const miss=Object.entries(st.miss).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([l,n])=>`<b>${l.toUpperCase()}</b> (${n})`).join(", ")||"none yet";
  const mast=Object.entries(st.mw).filter(([w,n])=>n>=3).map(([w])=>w).sort();
- panel("👪 Parent Progress",`<table><tr><th>Week of</th><th>Accuracy</th><th>Words/min</th><th>Words</th><th>Minutes</th></tr>${rows}</table>
+ panel("👪 Parent Progress · "+PL[v].n,`<table><tr><th>Week of</th><th>Accuracy</th><th>Words/min</th><th>Words</th><th>Minutes</th></tr>${rows}</table>
  <p><b>Missions done:</b> ${doneCount()} / 144</p><table><tr><th>Subject</th>${TIERS.map(T=>`<th>${T.name}</th>`).join("")}<th>Quiz accuracy</th><th>Quizzes passed</th></tr>${WORLDS.map(w=>{const q=save.qz[w.id];return `<tr><td>${w.ic} ${w.n}</td>${[0,1,2,3].map(i=>`<td>${D(w.id)[i].filter(Boolean).length}/6</td>`).join("")}<td>${q&&q.n?Math.round(100*q.r/q.n)+"% ("+q.r+"/"+q.n+")":"–"}</td><td>${q?q.pass+" of "+q.att:"–"}</td></tr>`}).join("")}</table>
  <p><b>Recently missed quiz questions:</b></p><ul>${WORLDS.flatMap(w=>((save.qz[w.id]||{}).missed||[]).slice(0,4).map(m=>`<li>${w.ic} ${m}</li>`)).join("")||"<li>none yet 🎉</li>"}</ul><p><b>Stickers:</b> ${doneCount()} &nbsp; <b>Outfits:</b> ${Math.min(OUTFITS.length,1+Math.floor(doneCount()/3))}</p>
  <p><b>Most-missed letters:</b> ${miss}</p><p><b>Mastered words</b> (typed right 3+ times, ${mast.length}): ${mast.join(", ")||"none yet"}</p>
@@ -821,7 +840,7 @@ function startWarm(){const top=Object.entries(save.stats.miss).sort((a,b)=>b[1]-
  const bank=[...new Set(TIERS[tier].m.flatMap(m=>m.s.flatMap(x=>x[0].toLowerCase().split(" "))))].filter(w=>!HINT[w]&&w.length<=(tier<2?5:8));
  let pick=bank.filter(w=>L.some(l=>w.includes(l))).sort(()=>Math.random()-.5);if(pick.length<9)pick=pick.concat(bank.sort(()=>Math.random()-.5)).slice(0,12);
  pick=pick.slice(0,12);const acts=["hop","block","star","stomp"],sn=[];for(let i=0;i<pick.length;i+=3)sn.push([pick.slice(i,i+3).join(" "),acts[sn.length%4]]);
- startLevel(0,{name:"Warm-up: "+L.join(" ").toUpperCase(),theme:"hills",s:sn})}
-window.__mta={startWarm,showStickers,showParents,showGate,startLevel,finish,doAction,showSelect,setTier,markTier(t){save.done[t]=[1,1,1,1,1,1];for(const k in save.w)save.w[k][t][0]=1;store()},showMap,startQuiz,answerQ,buildMission,setWorld(w){world=w},get QZ(){return QZ},get state(){return{mode,tier,lvl,si,wi,ci,save,world,words,NL,rev}}};
+ sn.forEach(x=>x[0]=nm(x[0]));startLevel(0,{name:"Warm-up: "+L.join(" ").toUpperCase(),theme:"hills",s:sn})}
+window.__mta={startWarm,showStickers,showParents,showGate,startLevel,finish,doAction,showSelect,setTier,markTier(t){save.done[t]=[1,1,1,1,1,1];for(const k in save.w)save.w[k][t][0]=1;store()},showMap,startQuiz,answerQ,buildMission,setWorld(w){world=w},get QZ(){return QZ},pickPlayer,showPlayers,get PS(){return PS},get state(){return{PID,mode,tier,lvl,si,wi,ci,save,world,words,NL,rev}}};
 showStart();loop();
 </script></body></html>
