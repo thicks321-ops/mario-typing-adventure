@@ -465,7 +465,7 @@ const MNAMES=["Count Hop","Number Path","Add It Up","Take Away","Hop Back","Mix 
 
 // ---------- subject engine
 const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-function rng(s){s=s%2147483647||7;return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
+function rng(s){let a=(s*2654435761)>>>0;return()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 function mathProb(t,m,k){const r=rng(1000+t*997+m*131+k*17),ri=(a,b)=>a+Math.floor(r()*(b-a+1));
  const op=m<=2?"+":m<=4?"-":(k%2?"-":"+");let a,b,c=0;
  if(t===0){const mx=m===5?10:5;if(op==="+"){a=ri(0,mx-1);b=ri(1,mx-a)}else{a=ri(2,mx);b=ri(1,a)}}
@@ -477,8 +477,10 @@ function mathProb(t,m,k){const r=rng(1000+t*997+m*131+k*17),ri=(a,b)=>a+Math.flo
 function hopsFor(v,d){const out=[],sg=Math.sign(d);let n=Math.abs(d);if(n<=10){for(let i=0;i<n;i++)out.push(v+=sg);return out}
  for(const u of[100,10]){while(n>=u){n-=u;out.push(v+=sg*u)}}if(n)out.push(v+=sg*n);return out}
 const NW=["zero","one","two","three","four","five","six","seven","eight","nine","ten"];
-function readQuiz(mis){const ss=mis.s.map(x=>x[0]);const q=[{q:"Who is helping Mario in this story?",a:"{hero}",o:["{hero}","Bowser","a beetle"]}];
- const skip=[HN().toLowerCase(),OTH().n.toLowerCase(),"mario","peach","princess"];const pickW=s=>s.split(" ").filter(w=>!skip.includes(w.toLowerCase())).sort((a,b)=>b.length-a.length)[0];
+function readQuiz(mis,t,m){const ss=mis.s.map(x=>x[0]);const q=[];
+ const hi=ss.length>3?3:1,right=ss[hi],STOPW=["{hero}","mario","peach","princess","the","and","can","a","is","it","in","on","her","she","they","them","then","we","i","up","he","him","of","to","at","with","from","for","his","an","are","was"],cw=x=>x.toLowerCase().split(" ").filter(z=>!STOPW.includes(z)),story=new Set(ss.flatMap(cw)),pool=TIERS[t].m.filter((_,j)=>j!==m).map(o=>o.s[hi]&&o.s[hi][0]).filter(x=>x&&!ss.includes(x)),clean=pool.filter(x=>!cw(x).some(z=>story.has(z))),fake=shuf(clean.length>=2?clean:pool);
+ if(fake.length>=2)q.push({q:"Which one happened in this story?",a:right,o:[right,...[...new Set(fake)].slice(0,2)]});
+ const skip=["{hero}",HN().toLowerCase(),OTH().n.toLowerCase(),"mario","peach","princess"];const pickW=s=>s.split(" ").filter(w=>!skip.includes(w.toLowerCase())).sort((a,b)=>b.length-a.length)[0];
  const idx=[0,2,4].filter(i=>ss[i]);for(const i of idx){const w=pickW(ss[i]);if(!w)continue;const others=shuf(ss.filter((_,j)=>j!==i).map(pickW).filter(x=>x&&x.toLowerCase()!==w.toLowerCase()));
   const o=[w,...[...new Set(others)].slice(0,2)];q.push({q:`Finish the sentence: "${ss[i].replace(new RegExp("\\b"+w+"\\b"),"____")}"`,a:w,o})}return q}
 function miss1(w){const V="aeiou",out=new Set(),tr=[()=>{for(let i=1;i<w.length;i++)if(V.includes(w[i]))return w.slice(0,i)+V[(V.indexOf(w[i])+1+i%3)%5]+w.slice(i+1)},
@@ -489,8 +491,8 @@ const ACTS=["hop","block","star","ride","climb","wave"];
 function wnames(w,t){return w==="read"?TIERS[t].m.map(m=>m.name):w==="math"?MNAMES:w==="spell"?["Word Bees","Buzzy Words","Honey Words","Spell Hive","Word Garden","Spelling Bee"]:FACTS[w][t].map(m=>m[0])}
 function buildMission(w,t,m){return JSON.parse(nm(JSON.stringify(buildMission0(w,t,m))))}
 function buildMission0(w,t,m){
- if(w==="read"){const b=TIERS[t].m[m];return{...b,kind:"read",quiz:readQuiz(b)}}
- if(w==="math"){const ps=[0,1,2,3,4].map(k=>mathProb(t,m,k)),st=t<=1?1:t===2?10:100;
+ if(w==="read"){const b=TIERS[t].m[m];return{...b,kind:"read",quiz:readQuiz(b,t,m)}}
+ if(w==="math"){const seen=new Set(),ps=[0,1,2,3,4].map(k=>{let p,j=0;do{p=mathProb(t,m,k+j*7);j++}while(seen.has(p.a+p.op+p.b+"|"+p.c)&&j<12);seen.add(p.a+p.op+p.b+"|"+p.c);return p}),st=t<=1?1:t===2?10:100;
   const s=ps.map(p=>{const vals=[p.a,...(p.op==="+-"?(()=>{const h1=hopsFor(p.a,p.b);return[...h1,...hopsFor(h1[h1.length-1],-p.c)]})():hopsFor(p.a,p.op==="+"?p.b:-p.b))];
    let lo=Math.min(...vals),hi=Math.max(...vals);if(t<=1){lo=0;hi=t===0?10:20}else{lo=Math.floor(lo/st)*st;hi=Math.ceil(hi/st)*st;if(hi-lo<st*2)hi=lo+st*2}
    const show=p.op==="+-"?`${p.a} + ${p.b} - ${p.c} = ?`:`${p.a} ${p.op} ${p.b} = ?`,sw=show.replace("+","plus").replace("-","minus").replace("+","plus").replace("= ?","");
@@ -528,27 +530,32 @@ function overlayDraw(){const cxW=W*.7,cyW=GY*.32,R=S*13;
   const sv=S;S=Math.max(1,Math.round(sv*.55));px(SPR(),apal(),ax-6*S,ay-17*S,false);S=sv}}
 // quiz
 let QZ=null;
-function afterTyping(){if(warm){finish();return}mode="quiz";setTimeout(startQuiz,1300)}
+function afterTyping(){finish()}
 function startQuiz(){const M=MIS();QZ={list:shuf(M.quiz).map(q=>({...q,o:shuf(q.o)})),i:0,right:0,missed:[]};mode="quiz";showQ()}
 function showQ(){const q=QZ.list[QZ.i];hud.classList.add("hidden");ov.classList.remove("hidden");ov.style.justifyContent="";ov.style.paddingTop="";
- ov.innerHTML=`<h1 style="font-size:min(8vw,46px)">⭐ Quick Check! ${QZ.i+1} / ${QZ.list.length}</h1><div class="panel qz"><div class="qq">${q.q}</div><div class="qopts">${q.o.map((o,j)=>`<button data-j="${j}"><small>${j+1}</small> ${o}</button>`).join("")}</div><div id="qfb"></div></div><div class="tip">Tap an answer or press 1, 2 or 3 · tap the question to hear it</div>`;
+ ov.innerHTML=`<h1 style="font-size:min(8vw,46px)">⭐ Quick Check! ${QZ.i+1} / ${QZ.list.length}</h1><div class="panel qz"><div class="qq">${q.q}</div><div class="qopts">${q.o.map((o,j)=>`<button data-j="${j}"><small>${j+1}</small> ${o}</button>`).join("")}</div><div id="qfb"></div></div><div class="tip">Tap an answer or press 1, 2 or 3 · tap the question to hear it again</div>`;
  ov.querySelectorAll(".qopts button").forEach(b=>b.onclick=()=>answerQ(+b.dataset.j));ov.querySelector(".qq").onclick=()=>sayQ(q);sayQ(q)}
-function sayQ(q){if(window.speechSynthesis)speechSynthesis.cancel();say((q.sayq||q.q.replace(/[^\w\s?,'+=-]/g," ").replace("+"," plus ").replace(/ - /g," minus ").replace("= ?","equals what?").replace("____","blank"))+" "+q.o.join(", or "))}
+function sayQ(q){if(window.speechSynthesis)speechSynthesis.cancel();say((q.sayq||q.q.replace(/[^\w\s?,'+=-]/g," ").replace("+"," plus ").replace(/ - /g," minus ").replace("= ?","equals what?").replace("____","blank")),"peach")}
 function answerQ(j){if(!QZ||QZ.lock)return;const q=QZ.list[QZ.i],ok=q.o[j]===q.a;QZ.lock=1;const bs=ov.querySelectorAll(".qopts button");
  const R=save.qz[world]||(save.qz[world]={r:0,n:0,att:0,pass:0,missed:[]});R.n++;
- if(ok){QZ.right++;R.r++;sfx.coin();bs[j].classList.add("good");document.getElementById("qfb").textContent="🎉 Yes! Great job!";say("Yes!");am.tw=20}
- else{QZ.missed.push(q);R.missed.unshift(`${q.q} → ${q.a}`);R.missed=R.missed.slice(0,12);bs[j].classList.add("try");bs[q.o.indexOf(q.a)].classList.add("good");document.getElementById("qfb").textContent=`💜 Good try! It is: ${q.a}`;say("Good try! It is "+q.a)}
+ if(ok){QZ.right++;R.r++;sfx.coin();bs[j].classList.add("good");document.getElementById("qfb").textContent="🎉 Yes! Great job!";say("Yes!","peach");am.tw=20}
+ else{QZ.missed.push(q);R.missed.unshift(`${q.q} → ${q.a}`);R.missed=R.missed.slice(0,12);bs[j].classList.add("try");bs[q.o.indexOf(q.a)].classList.add("good");document.getElementById("qfb").textContent=`💜 Good try! It is: ${q.a}`;say("Good try!","peach")}
  store();setTimeout(()=>{QZ.lock=0;QZ.i++;if(QZ.i<QZ.list.length)showQ();else endQuiz()},ok?1300:2600)}
-function endQuiz(){const n=QZ.list.length,need=Math.ceil(n*.75),R=save.qz[world];R.att++;
- if(QZ.right>=need){R.pass++;store();QZ=null;mode="play";finish();return}store();mode="review";
- ov.innerHTML=`<h1 style="font-size:min(8vw,46px)">Let's review together! 💜</h1><div class="panel"><p>You got <b>${QZ.right}</b> of ${n}. You need ${need} to earn the star — you can do it!</p>${QZ.missed.map(q=>`<p>❓ ${q.q}<br>✅ <b>${q.a}</b></p>`).join("")}</div><div class="menu2"><button id="retryQ">🔁 Try again</button><button id="replayM">▶️ Play the mission again</button></div>`;
- say("Let's review. "+QZ.missed.map(q=>q.a).join(". "));document.getElementById("retryQ").onclick=startQuiz;document.getElementById("replayM").onclick=()=>startLevel(lvl)}
+const BST=(w,tt,m)=>((save.bonus||{})[w]||[])[tt]?.[m]||0,BSUM=w=>(save.bonus[w]||[]).flat().reduce((a,b)=>a+b,0);
+function bonusFor(r,n){const need=Math.ceil(n*.75);return r>=n?3:r>=need?2:r>=Math.ceil(n/2)?1:0}
+function endQuiz(){const n=QZ.list.length,need=Math.ceil(n*.75),R=save.qz[world];R.att++;const got=bonusFor(QZ.right,n),prev=BST(world,tier,lvl);
+ if(QZ.right>=need)R.pass++;if(got>prev)save.bonus[world][tier][lvl]=got;store();const best=Math.max(got,prev);mode="bonusdone";
+ hud.classList.add("hidden");ov.classList.remove("hidden");ov.style.justifyContent="";ov.style.paddingTop="";
+ ov.innerHTML=`<h1 style="font-size:min(8vw,46px)">${got?`You earned ${"🌟".repeat(got)}!`:"Good try! 💜"}</h1><div class="panel"><p style="font-size:min(5vw,24px);text-align:center">${HN()} remembered <b>${QZ.right}</b> of ${n}.<br>${got?`<b>+${got} bonus star${got>1?"s":""}</b> from the remembering test!`:"No bonus stars this time. Your mission stars are safe! ⭐⭐⭐"}${best>got?`<br>Your best is still ${"🌟".repeat(best)}`:""}</p>${QZ.missed.map(q=>`<p>❓ ${q.q}<br>✅ <b>${q.a}</b></p>`).join("")}<p style="opacity:.7;text-align:center">Bonus stars: all ${n} right = 🌟🌟🌟 · ${need}+ right = 🌟🌟 · ${Math.ceil(n/2)}+ right = 🌟</p></div><div class="menu2">${best<3?`<button id="retryQ" style="font-size:min(5vw,24px)">🔁 Try again for more 🌟</button>`:""}<button id="contQ" style="font-size:min(5vw,24px);background:#ffe066">Keep going ▶</button></div>`;
+ say(got?`Wonderful, ${HN()}! You earned ${got} bonus star${got>1?"s":""}!`:`Good try, ${HN()}! Your mission is still done.`,"peach");
+ const rq=document.getElementById("retryQ");if(rq)rq.onclick=startQuiz;document.getElementById("contQ").onclick=goNext;QZ=null}
+function goNext(){if(window.speechSynthesis)speechSynthesis.cancel();if(warm){showSelect();return}if(world==="read"&&lvl===4){showMap();return}if(lvl<5&&misOpen(tier,lvl+1))startLevel(lvl+1);else{if(CAS()&&tier<3&&tierOpen(tier+1)){tier++;save.tier=tier;store();selIdx=0}showMap()}}
 // world map
 function showMap(){ov.style.justifyContent="";ov.style.paddingTop="";mode="map";hud.classList.add("hidden");ov.classList.remove("hidden");if(!tierOpen(tier))tier=0;
  const cas=misOpen(tier,5,"read"),cd=save.done[tier][5];
  ov.innerHTML=`<h1 style="font-size:min(8vw,52px)">🗺️ ${HN()}'s World Map</h1><div class="grade"><div class="glabel">Grade level</div><input id="gr" type="range" min="0" max="3" step="1" value="${tier}" aria-label="Grade level">
  <div class="ticks">${TIERS.map((T,i)=>`<span class="tick ${i===tier?"on":""}" data-t="${i}">${tierOpen(i)?"":"🔒 "}${T.name}</span>`).join("")}</div><div id="gmsg">${TIERS[tier].name}</div></div>
- <div id="worlds">${WORLDS.map(w=>{const d=D(w.id)[tier].filter(Boolean).length-(w.id==="read"&&cd?1:0),tot=w.id==="read"?5:6;return `<button data-w="${w.id}" style="background:${w.bg}"><span class="wi">${w.ic}</span>${w.n}<br><small>${"⭐".repeat(d)}${"☆".repeat(tot-d)}</small></button>`}).join("")}
+ <div id="worlds">${WORLDS.map(w=>{const d=D(w.id)[tier].filter(Boolean).length-(w.id==="read"&&cd?1:0),tot=w.id==="read"?5:6;return `<button data-w="${w.id}" style="background:${w.bg}"><span class="wi">${w.ic}</span>${w.n}<br><small>${"⭐".repeat(d)}${"☆".repeat(tot-d)}</small>${(()=>{const b=save.bonus[w.id][tier].reduce((a,c)=>a+c,0);return b?`<br><small>🌟 ${b} bonus</small>`:""})()}</button>`}).join("")}
  <button id="castleBtn" class="${cas?"":"lock"}" style="background:#5a5a6a">${cas?"🏰":"🔒"} Rescue Peach!<br><small>${cd?"👑 Peach is safe!":cas?"Bowser's castle is open!":"Reading 1-5 + mission 1 in every world"}</small></button></div>
  <div class="menu2"><button id="swBtn">👭 Switch player</button><button id="stkBtn">📒 Sticker Book</button><button id="parBtn">👪 Parents</button><button id="reset">Reset progress</button></div>`;
  ov.querySelectorAll("#worlds button[data-w]").forEach(b=>b.onclick=()=>{world=b.dataset.w;selIdx=0;showSelect()});
@@ -566,7 +573,7 @@ function portrait(id){const c=document.createElement("canvas"),k=8,m=PL[id].spr,
 function showPlayers(){ov.style.justifyContent="";ov.style.paddingTop="";mode="players";hud.classList.add("hidden");ov.classList.remove("hidden");
  ov.innerHTML=`<h1 style="font-size:min(9vw,56px)">Who's playing?</h1><div id="pcards">${["amelia","valerie"].map((id,i)=>{const sv=PS.saves[id],d=sv.done.flat().filter(Boolean).length+Object.values(sv.w).flat(2).filter(Boolean).length;return `<button data-p="${id}" style="background:${PL[id].dress}"><img src="${portrait(id)}" alt=""><b>Princess ${PL[id].n}</b><small>${"⭐".repeat(Math.min(5,Math.ceil(d/3)))||"New adventure!"} · press ${i+1}</small></button>`}).join("")}</div>`;
  ov.querySelectorAll("#pcards button").forEach(b=>b.onclick=()=>pickPlayer(b.dataset.p))}
-function pickPlayer(id){setPlayer(id);say("Hi Princess "+HN()+"!");showMap()}
+function pickPlayer(id){setPlayer(id);say("Hi Princess "+HN()+"!","peach");showMap()}
 var tier=0;const ST=()=>TIERS[tier].m,MIS=()=>warm||curMis;
 const HINT={"{hero}":"👑",amelia:"👑",valerie:"👑",mario:"🧢",peach:"👸",bowser:"🐢"};
 const THEMES={hills:{sky:["#6ec6ff","#bdeaff"],hill:"#3fae49",hill2:"#7cd36f",ground:"#c8743a",top:"#4cc04a"},
@@ -585,7 +592,7 @@ const STEP=110;
 const blank=()=>({v:2,tier:0,done:[0,1,2,3].map(()=>[0,0,0,0,0,0])});
 let save=(()=>{let o;try{o=JSON.parse(localStorage.getItem("mta_save")||"null")}catch(e){}
  if(!o)return blank();if(o.v===2&&o.done)return o;const n=blank();if(o.stars)o.stars.forEach((x,i)=>{if(x>0)n.done[0][i]=1});return n})();
-function mig(o){o.w=o.w||{};for(const w of["math","sci","soc","spell","art"])o.w[w]=o.w[w]||[0,1,2,3].map(()=>[0,0,0,0,0,0]);o.qz=o.qz||{};o.stats=o.stats||{days:{},mw:{},miss:{}};o.outfit=o.outfit||0;return o}
+function mig(o){o.w=o.w||{};for(const w of["math","sci","soc","spell","art"])o.w[w]=o.w[w]||[0,1,2,3].map(()=>[0,0,0,0,0,0]);o.qz=o.qz||{};o.bonus=o.bonus||{};for(const w of["read","math","sci","soc","spell","art"])o.bonus[w]=o.bonus[w]||[0,1,2,3].map(()=>[0,0,0,0,0,0]);o.stats=o.stats||{days:{},mw:{},miss:{}};o.outfit=o.outfit||0;return o}
 var world="read";const D=w=>w==="read"?save.done:save.w[w];
 let PS=null;try{PS=JSON.parse(localStorage.getItem("mta_players")||"null")}catch(e){}
 if(!PS||!PS.saves)PS={cur:null,saves:{amelia:save}};for(const id of["amelia","valerie"])PS.saves[id]=mig(PS.saves[id]||blank());
@@ -614,7 +621,7 @@ Object.assign(FING,{"1":0,"2":1,"3":2,"4":3,"5":3,"6":4,"7":4,"8":2,"9":1,"0":0}
 kbEl.innerHTML=`<div id="kbNum">${[..."1234567890"].map(k=>`<b id="k_${k}" class="f${FING[k]}">${k}</b>`).join("")}</div>`+ROWS.map(r=>"<div>"+[...r].map(k=>`<b id="k_${k}" class="f${FING[k]}${"fj".includes(k)?" home":""}">${k}</b>`).join("")+"</div>").join("")+`<div><b id="k_space" class="sp" data-k=" ">space</b></div>`;
 function showStart(){ov.style.justifyContent="";ov.style.paddingTop="";mode="start";hud.classList.add("hidden");ov.classList.remove("hidden");
  ov.innerHTML=`<h1>Princess Amelia &amp; Valerie's Typing Adventure</h1><div style="font-size:clamp(20px,3vw,32px)">👑 Help Mario rescue Princess Peach! 🍄</div><p class="big"><span class="tk">Tap or press any key to start</span></p><div class="tip">👪 Parent tip: sit with your child, keep fingers on the home row (bumps on F and J). The glowing key on the keyboard shows what to press next. No timers, no wrong answers — just fun!</div>`}
-function gridHTML(){return wnames(world,tier).map((nm,i)=>{const lock=!misOpen(tier,i),d=D(world)[tier][i];return `<button data-i="${i}" class="${lock?"lock":""} ${i===selIdx?"sel":""}">${lock?"🔒":d?"⭐⭐⭐":world==="read"&&i===5?"🏰":"▶️"}<br>${i+1}. ${nm}</button>`}).join("")}
+function gridHTML(){return wnames(world,tier).map((nm,i)=>{const lock=!misOpen(tier,i),d=D(world)[tier][i];return `<button data-i="${i}" class="${lock?"lock":""} ${i===selIdx?"sel":""}">${lock?"🔒":d?"⭐⭐⭐":world==="read"&&i===5?"🏰":"▶️"}<br>${i+1}. ${nm}${d?`<br><small>${BST(world,tier,i)?"🌟".repeat(BST(world,tier,i)):"🌟 bonus test"}</small>`:""}</button>`}).join("")}
 function bindGrid(){ov.querySelectorAll("#levels button").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(misOpen(tier,i))startLevel(i)})}
 function setTier(v){const msg=document.getElementById("gmsg"),gr=document.getElementById("gr");
  if(!tierOpen(v)){if(gr)gr.value=tier;if(msg){msg.textContent=`🔒 Finish ${TIERS[v-1].name} to unlock ${TIERS[v].name}!`;msg.classList.remove("shake");void msg.offsetWidth;msg.classList.add("shake")}sfx.boop();return}
@@ -633,7 +640,7 @@ function showSelect(){ov.style.justifyContent="";ov.style.paddingTop="";mode="se
 function startLevel(i,w){warm=w||null;lvl=i;if(!w)curMis=buildMission(world,tier,i);QZ=null;SC={};NL=null;document.getElementById("kbNum").classList.toggle("hidden",MIS().kind!=="math");am={x:80-15*S,y:0,vy:0,tw:0};cp={x:80-29*S,y:0,vy:0};si=0;wi=0;ci=0;mode="play";ending=0;bowserGone=0;parts=[];coins=[];props=[];fw=[];
  mario={x:80,tx:80,y:0,vy:0,face:1,anim:0,act:null,actT:0,big:false};cam=0;
  const total=MIS().s.reduce((a,s)=>a+s[0].split(" ").length,0);bowserX=80+(total+3)*STEP;
- ov.classList.add("hidden");hud.classList.remove("hidden");loadSentence()}
+ ov.classList.add("hidden");hud.classList.remove("hidden");if(!w)say(`${MIS().name}! Let's go, ${HN()}!`,"peach");loadSentence()}
 const OPT=()=>(MIS().s[si]&&MIS().s[si][2])||{};let hm=0,rev=0;
 function loadSentence(){words=MIS().s[si][0].split(" ");wi=0;ci=0;hm=0;rev=0;const o=OPT();SC={col:SC.col,shape:null};NL=null;if(o.fx)applyFx(o.fx,false);
  if(o.nl){NL={...o.nl,k:0,t0:t};say(o.sayq)}else if(o.sayw)say(o.sayw);else say(words[0]);render()}
@@ -692,7 +699,18 @@ function goomba(x,y,flat){const h=flat?S*4:S*12,w=S*14,bob=flat?0:Math.sin(t/4)*
  cx.fillStyle="#3a2010";cx.fillRect(x-w*.45,y-S*2+bob,w*.35,S*2);cx.fillRect(x+w*.1,y-S*2-bob,w*.35,S*2)}
 function mushroom(x,y){const w=S*12;cx.fillStyle="#f5e6c8";cx.fillRect(x-w*.3,y-S*7,w*.6,S*7);cx.fillStyle="#e52521";cx.beginPath();cx.ellipse(x,y-S*7,w/2,S*6,0,Math.PI,0);cx.fill();cx.fillStyle="#fff";cx.beginPath();cx.arc(x-S*3,y-S*10,S*1.6,0,7);cx.arc(x+S*3,y-S*9,S*1.4,0,7);cx.fill();cx.fillStyle="#222";cx.fillRect(x-S*2,y-S*5,S,S*2);cx.fillRect(x+S,y-S*5,S,S*2)}
 function p(x,y,ch,col){return{x,y,vx:(Math.random()-.5)*6,vy:-Math.random()*6-2,life:60+Math.random()*30,ch,col}}
-function say(txt){if(muted||!window.speechSynthesis||!txt)return;txt=nm(txt);try{const u=new SpeechSynthesisUtterance(txt);u.rate=.8;u.pitch=1.15;u.lang="en-US";speechSynthesis.speak(u)}catch(e){}}
+// character voices: Peach = story/praise/quiz (warm, slower), Mario = coaching/target words (bright, quicker). Styled system voices only, no audio clips.
+let VOX=[],VPK=null;function loadVox(){try{VOX=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));VPK=null}catch(e){}}
+if(window.speechSynthesis){loadVox();try{speechSynthesis.addEventListener("voiceschanged",loadVox)}catch(e){speechSynthesis.onvoiceschanged=loadVox}}
+const FEMV=/female|samantha|victoria|karen|moira|tessa|zira|susan|aria|jenny|serena|allison|ava\b|fiona|kate|libby|sonia|natasha|catherine|joanna|salli|kimberly|google us english|google uk english female/i,
+ MALV=/\bmale|daniel|alex\b|fred|david|mark\b|guy\b|ryan|aaron|oliver|thomas|rishi|tom\b|arthur|eddy|reed|matthew|joey|justin|google uk english male/i;
+function pickVox(){if(!VOX.length)loadVox();if(VPK&&VPK.n===VOX.length)return VPK;const us=v=>/en[-_]US/i.test(v.lang)?0:1,srt=a=>a.sort((x,y)=>us(x)-us(y));
+ const fem=srt(VOX.filter(v=>FEMV.test(v.name))),mal=srt(VOX.filter(v=>MALV.test(v.name)&&!/female/i.test(v.name)));
+ const peach=fem[0]||srt([...VOX])[0]||null,mario=mal[0]||VOX.find(v=>v!==peach&&!FEMV.test(v.name))||peach;return VPK={n:VOX.length,peach,mario}}
+const VSET={two:{mario:{rate:.98,pitch:1.35},peach:{rate:.84,pitch:1.22}},one:{mario:{rate:1.02,pitch:1.45},peach:{rate:.8,pitch:1.1}}};
+const VLOG=[];
+function say(txt,role="mario"){if(muted||!window.speechSynthesis||!txt)return;txt=nm(txt);role=role==="peach"?"peach":"mario";try{const u=new SpeechSynthesisUtterance(txt),V=pickVox(),v=V[role],c=VSET[V.mario&&V.peach&&V.mario!==V.peach?"two":"one"][role];
+ if(v){u.voice=v;u.lang=v.lang}else u.lang="en-US";u.rate=c.rate;u.pitch=c.pitch;VLOG.push({role,text:txt,rate:c.rate,pitch:c.pitch,voice:v?v.name:null});if(VLOG.length>80)VLOG.shift();speechSynthesis.speak(u)}catch(e){}}
 let spOk=false;function spUnlock(){if(spOk||!window.speechSynthesis)return;spOk=true;try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u)}catch(e){}}
 const dkey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 function stat(){const k=dkey(new Date());return save.stats.days[k]||(save.stats.days[k]={keys:0,miss:0,words:0,ms:0})}
@@ -701,10 +719,10 @@ function key(e){au();spUnlock();const k=e.key;
  if(mode==="start"){showPlayers();return}
  if(mode==="players"){if(k==="1")pickPlayer("amelia");if(k==="2")pickPlayer("valerie");return}
  if(mode==="quiz"){if(QZ&&"123".includes(k)&&k.length===1&&QZ.list[QZ.i].o[+k-1]!==undefined)answerQ(+k-1);return}
- if(mode==="review"){if(k==="Enter"||k===" ")startQuiz();return}
+ if(mode==="review"||mode==="bonusdone"){if(k==="Enter"||k===" ")goNext();return}
  if(mode==="map"){return}
  if(mode==="select"){let n=selIdx;if(k==="ArrowRight")n++;else if(k==="ArrowLeft")n--;else if(k==="ArrowDown")n+=3;else if(k==="ArrowUp")n-=3;else if(k==="Enter"||k===" "){if(misOpen(tier,selIdx))startLevel(selIdx);return}else return;if(n>=0&&n<6&&misOpen(tier,n))selIdx=n;document.getElementById("levels").innerHTML=gridHTML();bindGrid();return}
- if(mode==="done"){if(ending>90&&(k==="Enter"||k===" ")){if(warm){showSelect();return}if(world==="read"&&lvl===4){showMap();return}if(lvl<5&&misOpen(tier,lvl+1))startLevel(lvl+1);else{if(CAS()&&tier<3&&tierOpen(tier+1)){tier++;save.tier=tier;store();selIdx=0}showMap()}}return}
+ if(mode==="done"){if(ending>90&&(k==="Enter"||k===" "))goNext();else if(!warm&&ending>90&&(k==="b"||k==="B"||k==="1"))startQuiz();return}
  if(mode!=="play"||k.length!==1||e.ctrlKey||e.metaKey)return;e.preventDefault();
  const w=words[wi];if(!w)return;const now=Date.now();if(lastK&&now-lastK<10000)stat().ms+=now-lastK;lastK=now;const sp=needSp(),ex=sp?" ":w[ci].toLowerCase();
  if(k.toLowerCase()===ex){stat().keys++;if(sp){sfx.blip();wordDone();return}ci++;sfx.blip();mario.tx+=STEP/w.length*0.3;if(ci>=w.length&&wi===words.length-1){wordDone();return}render();return}
@@ -713,7 +731,7 @@ function key(e){au();spUnlock();const k=e.key;
  const o=OPT();if(o.hide&&!rev&&!sp){hm++;if(o.nl){replayNL()}else if(o.sayw)say(hm>=2?w.split("").join(", "):w);if(hm>=2){rev=1;render()}}}
 function wordDone(){const w=words[wi];wi++;ci=0;sfx.word();mario.tx=Math.round((mario.tx-80)/STEP+0.7)*STEP+80;wordReact();am.tw=20;stat().words++;if(!wordMiss){const lw=w.toLowerCase();save.stats.mw[lw]=(save.stats.mw[lw]||0)+1}wordMiss=false;store();
  const o=OPT();if(o.fx&&o.fx.startsWith("n:")){const N=o.fx.slice(2);if(N[wi-1])playNotes(N[wi-1])}
- if(wi<words.length)say(words[wi]);else if(o.nl)say(o.sayq+" equals "+w);else if(!o.sayw)say(words.join(" "));else say(w);
+ if(wi<words.length)say(words[wi]);else if(o.nl)say(o.sayq+" equals "+w);else if(!o.sayw)say(words.join(" "),"peach");else say(w);
  if(wi>=words.length){if(o.fx)applyFx(o.fx,true);if(o.nl&&NL)NL.k=99;doAction(MIS().s[si][1]);si++;if(si>=MIS().s.length){afterTyping();render();return}setTimeout(()=>{if(mode==="play")loadSentence()},o.nl||o.fx&&o.fx.startsWith("n:")?1800:900);words=[...words];render();wEl.innerHTML="⭐";return}
  render()}
 addEventListener("keydown",e=>{if(e.target.id==="ti")return;key(e)});
@@ -728,7 +746,12 @@ function finish(){mode="done";ending=0;const before=doneCount(),wasDone=D(world)
  const last=CAS(),nextT=last&&tier<3?TIERS[tier+1].name:"";
  setTimeout(()=>{if(mode!=="done")return;ov.classList.remove("hidden");ov.style.justifyContent="flex-start";ov.style.paddingTop="40px";hud.classList.add("hidden");
  const stk=warm?"":`<div style="font-size:min(6vw,30px)">New sticker: <span style="font-size:1.6em">${world==="read"?STK[tier*6+lvl]:WSTK[world][lvl]}</span>${newOutfit?" &nbsp;👗 New outfit for ${HN()}!":""}</div>`;
- ov.innerHTML=warm?`<h1>Warm-up done! 💪</h1><div class="tip" style="font-size:22px">Tap or press Enter to go back</div>`:last?`<h1>Peach says: Thank you, ${HN()}! 💖</h1><div class="big">⭐⭐⭐ ${TIERS[tier].name} hero! ⭐⭐⭐</div>${stk}${nextT?`<div style="font-size:min(6vw,32px)">🔓 ${nextT} missions unlocked!</div>`:`<div style="font-size:min(6vw,32px)">You beat every grade! 🏆</div>`}<div class="tip" style="font-size:22px">Tap or press Enter to continue</div>`:`<h1>Great job, ${HN()}! ⭐⭐⭐</h1>${stk}<div style="font-size:min(6vw,32px)">${WORLDS.find(x=>x.id===world).n} · ${TIERS[tier].name} mission ${lvl+1} done!</div>${world==="read"&&lvl===4?`<div style="font-size:min(5vw,26px)">🏰 Visit every world to open Bowser's castle!</div>`:""}<div class="tip" style="font-size:22px">Tap or press Enter to continue</div>`},2200)}
+ ov.innerHTML=warm?`<h1>Warm-up done! 💪</h1><div class="tip" style="font-size:22px">Tap or press Enter to go back</div>`:last?`<h1>Peach says: Thank you, ${HN()}! 💖</h1><div class="big">⭐⭐⭐ ${TIERS[tier].name} hero! ⭐⭐⭐</div>${stk}${nextT?`<div style="font-size:min(6vw,32px)">🔓 ${nextT} missions unlocked!</div>`:`<div style="font-size:min(6vw,32px)">You beat every grade! 🏆</div>`}${bonusOffer()}`:`<h1>Great job, ${HN()}! ⭐⭐⭐</h1>${stk}<div style="font-size:min(6vw,32px)">${WORLDS.find(x=>x.id===world).n} · ${TIERS[tier].name} mission ${lvl+1} done!</div>${world==="read"&&lvl===4?`<div style="font-size:min(5vw,26px)">🏰 Visit every world to open Bowser's castle!</div>`:""}${bonusOffer()}`;
+ if(!warm){const bg=document.getElementById("bqGo"),bn=document.getElementById("bqNo");if(bg)bg.onclick=startQuiz;if(bn)bn.onclick=goNext;
+  const b=BST(world,tier,lvl);say(last?`Thank you, ${HN()}! You saved me!`:`Great job, ${HN()}!`,"peach");say(b>=3?`You already have all 3 bonus stars here.`:`Want to try the remembering test for bonus stars?`,"peach")}},2200)}
+function bonusOffer(){const b=BST(world,tier,lvl),n=MIS().quiz.length;return `<div class="panel" style="text-align:center;margin-top:10px;width:min(94vw,560px)"><div style="font-size:min(5.4vw,26px)">🌟 Remembering test for bonus stars ${b?`<br><small>Best so far: ${"🌟".repeat(b)}${"☆".repeat(3-b)}</small>`:""}</div>
+ <div style="font-size:min(4vw,18px);opacity:.8;margin:4px 0 8px">${HN()}, can you remember what you learned? Get all ${n} right for 🌟🌟🌟. Your mission is already saved!</div>
+ <div class="menu2"><button id="bqGo" style="font-size:min(5vw,24px);background:#ffe066">🌟 Try it for bonus stars!</button><button id="bqNo" style="font-size:min(5vw,24px)">Maybe later ▶</button></div></div>`}
 document.getElementById("muteBtn").onclick=e=>{muted=!muted;if(muted&&window.speechSynthesis)speechSynthesis.cancel();e.target.textContent=muted?"🔇":"🔊";e.target.blur()};
 document.getElementById("kbBtn").onclick=e=>{showKb=!showKb;render();if(TOUCH&&!showKb)ti.focus();else{ti.blur();e.target.blur()}};
 document.getElementById("menuBtn").onclick=e=>{e.target.blur();if(window.speechSynthesis)speechSynthesis.cancel();showMap()};
@@ -800,7 +823,7 @@ function titleBg(){cx.fillStyle=grad("#4aa8ff","#bfe6ff");cx.fillRect(0,0,W,H);c
  cx.fillStyle="#3fae49";cx.beginPath();cx.ellipse(W*.2,H*.85,W*.3,H*.25,0,Math.PI,0);cx.fill();cx.fillStyle="#c8743a";cx.fillRect(0,H*.85,W,H);cx.fillStyle="#4cc04a";cx.fillRect(0,H*.85,W,S*2);
  const hx=((t*2)%(W+200))-100;px((t>>3)%2?HERO2:HERO,HPAL,hx,H*.85-16*S,false);px(PEACH,PPAL,W*.82,H*.85-16*S,true);px(AMY,apal("amelia"),hx+16*S,H*.85-17*S,false);px(VAL,apal("valerie"),hx+30*S,H*.85-17*S,false)}
 function loop(){t++;if(t%15===0)setGY();
- if(mode!=="play"&&mode!=="done"&&mode!=="quiz"&&mode!=="review")titleBg();
+ if(mode!=="play"&&mode!=="done"&&mode!=="quiz"&&mode!=="review"&&mode!=="bonusdone")titleBg();
  else{const m=mario;actUpdate();m.x+=(m.tx-m.x)*.08;if(!m.hold){m.vy+=.6;m.y+=m.vy;if(m.y>=0){m.y=0;m.vy=0}}
   if(mode==="done"){ending++;if(!CAS()&&ending>130&&ending%40===0&&ending<300)m.vy=-8}
   {cp.x+=(am.x-14*S-cp.x)*.09;if(am.vy<-4&&cp.y===0)cp.vy=am.vy*.9;cp.vy+=.6;cp.y+=cp.vy;if(cp.y>=0){cp.y=0;cp.vy=0}const tx=m.x-15*S;am.x+=(tx-am.x)*.1;if(m.hold){am.y+=(m.y-am.y)*.2;am.vy=0}else{if(m.vy<-4&&am.y===0)am.vy=m.vy*.95;am.vy+=.6;am.y+=am.vy;if(am.y>=0){am.y=0;am.vy=0}}if(am.tw>0)am.tw--;if(mode==="done"&&CAS()&&t%12===0)parts.push(p(am.x+6*S,-30,"♥","#ff4f9a"))}
@@ -831,8 +854,8 @@ function showParents0(v){mode="parents";const st=save.stats,wk={};for(const [d,v
  const miss=Object.entries(st.miss).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([l,n])=>`<b>${l.toUpperCase()}</b> (${n})`).join(", ")||"none yet";
  const mast=Object.entries(st.mw).filter(([w,n])=>n>=3).map(([w])=>w).sort();
  panel("👪 Parent Progress · "+PL[v].n,`<table><tr><th>Week of</th><th>Accuracy</th><th>Words/min</th><th>Words</th><th>Minutes</th></tr>${rows}</table>
- <p><b>Missions done:</b> ${doneCount()} / 144</p><table><tr><th>Subject</th>${TIERS.map(T=>`<th>${T.name}</th>`).join("")}<th>Quiz accuracy</th><th>Quizzes passed</th></tr>${WORLDS.map(w=>{const q=save.qz[w.id];return `<tr><td>${w.ic} ${w.n}</td>${[0,1,2,3].map(i=>`<td>${D(w.id)[i].filter(Boolean).length}/6</td>`).join("")}<td>${q&&q.n?Math.round(100*q.r/q.n)+"% ("+q.r+"/"+q.n+")":"–"}</td><td>${q?q.pass+" of "+q.att:"–"}</td></tr>`}).join("")}</table>
- <p><b>Recently missed quiz questions:</b></p><ul>${WORLDS.flatMap(w=>((save.qz[w.id]||{}).missed||[]).slice(0,4).map(m=>`<li>${w.ic} ${m}</li>`)).join("")||"<li>none yet 🎉</li>"}</ul><p><b>Stickers:</b> ${doneCount()} &nbsp; <b>Outfits:</b> ${Math.min(OUTFITS.length,1+Math.floor(doneCount()/3))}</p>
+ <p><b>Missions done:</b> ${doneCount()} / 144</p><table><tr><th>Subject</th>${TIERS.map(T=>`<th>${T.name}</th>`).join("")}<th>Quiz accuracy</th><th>Quizzes passed</th><th>🌟 Bonus stars<br><small>(remembering tests)</small></th></tr>${WORLDS.map(w=>{const q=save.qz[w.id];return `<tr><td>${w.ic} ${w.n}</td>${[0,1,2,3].map(i=>`<td>${D(w.id)[i].filter(Boolean).length}/6</td>`).join("")}<td>${q&&q.n?Math.round(100*q.r/q.n)+"% ("+q.r+"/"+q.n+")":"–"}</td><td>${q?q.pass+" of "+q.att:"–"}</td><td>${BSUM(w.id)} / 72</td></tr>`}).join("")}</table><p style="opacity:.75">Remembering tests are optional: a mission counts as done when the typing is finished. Bonus 🌟: all right = 3, passing (3 of 4 / 4 of 5) = 2, half right = 1.</p>
+ <p><b>Recently missed quiz questions:</b></p><ul>${WORLDS.flatMap(w=>((save.qz[w.id]||{}).missed||[]).slice(0,4).map(m=>`<li>${w.ic} ${m}</li>`)).join("")||"<li>none yet 🎉</li>"}</ul><p><b>Bonus stars:</b> 🌟 ${WORLDS.reduce((a,w)=>a+BSUM(w.id),0)} &nbsp; <b>Stickers:</b> ${doneCount()} &nbsp; <b>Outfits:</b> ${Math.min(OUTFITS.length,1+Math.floor(doneCount()/3))}</p>
  <p><b>Most-missed letters:</b> ${miss}</p><p><b>Mastered words</b> (typed right 3+ times, ${mast.length}): ${mast.join(", ")||"none yet"}</p>
  <p style="opacity:.7">All data stays on this device. Words/min counts active typing time only.</p><button id="rstStats">Reset stats</button>`);
  document.getElementById("rstStats").onclick=()=>{if(confirm("Reset typing stats? (missions and stickers are kept)")){save.stats={days:{},mw:{},miss:{}};store();showParents()}}}
@@ -841,6 +864,6 @@ function startWarm(){const top=Object.entries(save.stats.miss).sort((a,b)=>b[1]-
  let pick=bank.filter(w=>L.some(l=>w.includes(l))).sort(()=>Math.random()-.5);if(pick.length<9)pick=pick.concat(bank.sort(()=>Math.random()-.5)).slice(0,12);
  pick=pick.slice(0,12);const acts=["hop","block","star","stomp"],sn=[];for(let i=0;i<pick.length;i+=3)sn.push([pick.slice(i,i+3).join(" "),acts[sn.length%4]]);
  sn.forEach(x=>x[0]=nm(x[0]));startLevel(0,{name:"Warm-up: "+L.join(" ").toUpperCase(),theme:"hills",s:sn})}
-window.__mta={startWarm,showStickers,showParents,showGate,startLevel,finish,doAction,showSelect,setTier,markTier(t){save.done[t]=[1,1,1,1,1,1];for(const k in save.w)save.w[k][t][0]=1;store()},showMap,startQuiz,answerQ,buildMission,setWorld(w){world=w},get QZ(){return QZ},pickPlayer,showPlayers,get PS(){return PS},get state(){return{PID,mode,tier,lvl,si,wi,ci,save,world,words,NL,rev}}};
+window.__mta={startWarm,showStickers,showParents,showGate,startLevel,finish,doAction,showSelect,setTier,markTier(t){save.done[t]=[1,1,1,1,1,1];for(const k in save.w)save.w[k][t][0]=1;store()},showMap,startQuiz,answerQ,buildMission,setWorld(w){world=w},get QZ(){return QZ},goNext,VLOG,pickVox,mathProb,pickPlayer,showPlayers,get PS(){return PS},get state(){return{PID,mode,tier,lvl,si,wi,ci,save,world,words,NL,rev}}};
 showStart();loop();
 </script></body></html>
