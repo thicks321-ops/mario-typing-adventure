@@ -717,11 +717,13 @@ if(window.speechSynthesis){loadVox();try{speechSynthesis.addEventListener("voice
 const FEMV=/female|samantha|victoria|karen|moira|tessa|zira|susan|aria|jenny|serena|allison|ava\b|fiona|kate|libby|sonia|natasha|catherine|joanna|salli|kimberly|google us english|google uk english female/i,
  MALV=/\bmale|daniel|alex\b|fred|david|mark\b|guy\b|ryan|aaron|oliver|thomas|rishi|tom\b|arthur|eddy|reed|matthew|joey|justin|google uk english male/i;
 function pickVox(){if(!VOX.length)loadVox();if(VPK&&VPK.n===VOX.length)return VPK;const us=v=>/en[-_]US/i.test(v.lang)?0:1,srt=a=>a.sort((x,y)=>us(x)-us(y));
- const MRANK=["guy","aaron","alex","tom","ryan","eric","rishi","oliver","daniel","google uk english male","davis","jason","tony","mark","david","thomas","arthur","fred"],mr=v=>{const n=v.name.toLowerCase(),i=MRANK.findIndex(k=>n.includes(k));return(i<0?MRANK.length:i)*2+us(v)};
- const fem=srt(VOX.filter(v=>FEMV.test(v.name))),mal=VOX.filter(v=>MALV.test(v.name)&&!/female/i.test(v.name)).sort((x,y)=>mr(x)-mr(y));
- const peach=fem[0]||srt([...VOX])[0]||null,mario=mal[0]||VOX.find(v=>v!==peach&&!FEMV.test(v.name))||peach;return VPK={n:VOX.length,peach,mario}}
-// Mario: bright, bouncy cartoon-plumber energy (original styling only: no clips, no accent, no catchphrases). Peach unchanged.
-const VSET={two:{mario:{rate:1.12,pitch:1.45},peach:{rate:.84,pitch:1.22}},one:{mario:{rate:1.15,pitch:1.55},peach:{rate:.8,pitch:1.1}}};
+ const NOV=/junior|princess|bubbles|bells|whisper|bahh|boing|cellos|deranged|hysterical|organ|trinoids|zarvox|albert|bad news|good news|superstar|wobble|jester|grandma|grandpa|child|kid/i,
+  MRANK=["guy","aaron","alex","tom","ryan","eric","daniel","google us english male","davis","jason","tony","mark","david","thomas","oliver","rishi","arthur","fred"],PRANK=["samantha","zira","google us english","aria","jenny","ava","allison","susan","joanna","salli","kimberly","victoria","karen","serena","moira","tessa","fiona","kate","libby","sonia"],
+  rk=L=>v=>{const n=v.name.toLowerCase(),i=L.findIndex(k=>n.includes(k));return(i<0?L.length:i)*2+us(v)},isM=v=>MALV.test(v.name)&&!/female/i.test(v.name),OK=VOX.filter(v=>!NOV.test(v.name));
+ const fem=OK.filter(v=>FEMV.test(v.name)&&!isM(v)).sort((x,y)=>rk(PRANK)(x)-rk(PRANK)(y)),mal=OK.filter(isM).sort((x,y)=>rk(MRANK)(x)-rk(MRANK)(y));
+ const peach=fem[0]||srt([...OK])[0]||VOX[0]||null,mario=mal[0]||OK.find(v=>v!==peach&&!FEMV.test(v.name))||peach;return VPK={n:VOX.length,peach,mario}}
+// Movie-style restyle (original settings only: no clips, no accent, no catchphrases). Mario: warm, earnest, medium-low. Peach: clear, confident, medium-high.
+const VSET={two:{mario:{rate:.96,pitch:.92},peach:{rate:.94,pitch:1.15}},one:{mario:{rate:.94,pitch:.88},peach:{rate:.92,pitch:1.18}}};
 const VLOG=[];
 function say(txt,role="mario"){if(muted||!window.speechSynthesis||!txt)return;txt=nm(txt);role=role==="peach"?"peach":"mario";try{const u=new SpeechSynthesisUtterance(txt),V=pickVox(),v=V[role],c=VSET[V.mario&&V.peach&&V.mario!==V.peach?"two":"one"][role];
  if(v){u.voice=v;u.lang=v.lang}else u.lang="en-US";u.rate=c.rate;u.pitch=c.pitch;VLOG.push({role,text:txt,rate:c.rate,pitch:c.pitch,voice:v?v.name:null});if(VLOG.length>80)VLOG.shift();speechSynthesis.speak(u)}catch(e){}}
