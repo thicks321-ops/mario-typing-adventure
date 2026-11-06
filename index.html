@@ -519,14 +519,18 @@ function overlayDraw(){const cxW=W*.7,cyW=GY*.32,R=S*13;
   else if(sh==="zigzag"){for(let i=0;i<=6;i++)cx.lineTo(-R*1.5+i*R/2,i%2?-R*.6:R*.6)}else if(sh==="spiral"){for(let a=0;a<18;a+=.2)cx.lineTo(Math.cos(a)*a*R/18,Math.sin(a)*a*R/18)}
   else if(sh==="dots"){for(let i=0;i<9;i++){cx.moveTo(-R+(i%3)*R+S*2,-R+Math.floor(i/3)*R);cx.arc(-R+(i%3)*R,-R+Math.floor(i/3)*R,S*2,0,7)}}
   if(["line","zigzag","spiral"].includes(sh)){cx.lineWidth=S*1.5;cx.strokeStyle=SC.col&&SC.col!=="rainbow"?SC.col:"#ff4f9a";cx.stroke()}else{cx.fill();cx.stroke()}cx.restore()}
- if(NL){const L=NL,x0=W*.07,x1=W*.93,y=Math.max(Math.min(GY*.42,GY-26*S),(H>W?92:64)+26*S),X=v=>x0+(v-L.lo)/(L.hi-L.lo)*(x1-x0);let st=L.st;while((L.hi-L.lo)/st>20)st*=2;
+}
+// number line drawn on top of the characters so every number stays readable
+function drawNL(){ if(NL){const L=NL,x0=W*.07,x1=W*.93,y=Math.max(Math.min(GY*.42,GY-26*S),(H>W?92:64)+26*S),X=v=>x0+(v-L.lo)/(L.hi-L.lo)*(x1-x0);let st=L.st;while((L.hi-L.lo)/st>20)st*=2;
   cx.fillStyle="#fffe";cx.fillRect(x0-S*4,y-S*26,x1-x0+S*8,S*36);cx.strokeStyle="#333";cx.lineWidth=S;cx.beginPath();cx.moveTo(x0,y);cx.lineTo(x1,y);cx.stroke();
   cx.fillStyle="#333";cx.font=`bold ${S*(st===1&&L.hi>12?4:5)}px sans-serif`;cx.textAlign="center";for(let v=L.lo;v<=L.hi;v+=st){cx.fillRect(X(v)-S/2,y-S*2,S,S*4);cx.fillText(v,X(v),y+S*8)}
-  const dt=t-L.t0,per=Math.max(14,Math.min(36,Math.floor(360/L.vals.length))),k=Math.min(L.vals.length-1,Math.max(0,Math.floor((dt-30)/per)+1)),f=dt<30?0:((dt-30)%per)/per;
-  if(k>L.k){L.k=k;sfx.jump();if(L.vals.length<=12)say(String(L.vals[k]));if(k===L.vals.length-1)say(String(L.vals[k]))}
-  cx.strokeStyle="#ff4f9a";cx.lineWidth=S*.8;for(let i=1;i<=k;i++){const a=X(L.vals[i-1]),b=X(L.vals[i]);cx.beginPath();cx.moveTo(a,y);cx.quadraticCurveTo((a+b)/2,y-S*14,b,y);cx.stroke()}
-  let ax=X(L.vals[k]),ay=y;if(k<L.vals.length-1&&dt>=30){const a=X(L.vals[k]),b=X(L.vals[k+1]);ax=a+(b-a)*f;ay=y-Math.sin(f*Math.PI)*S*10}
-  if(k===L.vals.length-1){cx.fillStyle="#ff4f9a";cx.beginPath();cx.arc(X(L.vals[k]),y,S*3,0,7);cx.fill()}
+  // tap-to-count: each tap/click moves exactly one hop (L.k); no automatic hopping
+  const last=L.vals.length-1,k=Math.min(L.k,last),f=L.ht==null?1:Math.min(1,(t-L.ht)/14);
+  cx.fillStyle="#2a56d8";cx.beginPath();cx.arc(X(L.vals[0]),y,S*2,0,7);cx.fill();
+  cx.strokeStyle="#ff4f9a";cx.lineWidth=S*.8;for(let i=1;i<=k;i++){const a=X(L.vals[i-1]),b=X(L.vals[i]),e=i===k?f:1;cx.beginPath();cx.moveTo(a,y);cx.quadraticCurveTo(a+(b-a)*e/2,y-S*14*Math.min(1,e*2),a+(b-a)*e,y-(e<1?Math.sin(e*Math.PI)*S*10:0));cx.stroke()}
+  let ax=X(L.vals[k]),ay=y;if(k>0&&f<1){const a=X(L.vals[k-1]),b=X(L.vals[k]);ax=a+(b-a)*f;ay=y-Math.sin(f*Math.PI)*S*10}
+  if(k<last){cx.fillStyle="#d81b60";cx.font=`bold ${S*5}px sans-serif`;cx.textAlign="center";cx.fillText(`👆 Tap to count! ${L.vals[1]>L.vals[0]?"➡️":"⬅️"} (${k}/${last})`,(x0+x1)/2,y-S*17+Math.sin(t/8)*S)}
+  if(k===last){cx.fillStyle="#ff4f9a";cx.beginPath();cx.arc(X(L.vals[k]),y,S*3,0,7);cx.fill()}
   const sv=S;S=Math.max(1,Math.round(sv*.55));px(SPR(),apal(),ax-6*S,ay-17*S,false);S=sv}}
 // quiz
 let QZ=null;
@@ -647,8 +651,8 @@ function startLevel(i,w){warm=w||null;lvl=i;if(!w)curMis=buildMission(world,tier
  ov.classList.add("hidden");hud.classList.remove("hidden");if(!w)say(`${MIS().name}! Let's go, ${HN()}!`,"peach");loadSentence()}
 const OPT=()=>(MIS().s[si]&&MIS().s[si][2])||{};let hm=0,rev=0;
 function loadSentence(){words=MIS().s[si][0].split(" ");wi=0;ci=0;hm=0;rev=0;const o=OPT();SC={col:SC.col,shape:null};NL=null;if(o.fx)applyFx(o.fx,false);
- if(o.nl){NL={...o.nl,k:0,t0:t};say(o.sayq)}else if(o.sayw)say(o.sayw);else say(words[0]);render()}
-function replayNL(){const o=OPT();if(o.nl){NL={...o.nl,k:0,t0:t};say(o.sayq)}}
+ if(o.nl){NL={...o.nl,k:0,t0:t,ht:null};say(o.sayq);if(si===0)say("Tap the screen to count the hops!")}else if(o.sayw)say(o.sayw);else say(words[0]);render()}
+function replayNL(){const o=OPT();if(o.nl){NL={...o.nl,k:0,t0:t,ht:null};say(o.sayq)}}
 const needSp=()=>{const w=words[wi]||"";return w&&ci>=w.length&&wi<words.length-1};
 function render(){setTimeout(setGY,0);const o=OPT(),hid=o.hide&&!rev;
  sEl.innerHTML=o.show?o.show:words.map((w,i)=>`<span class="${i<wi?"done":i===wi?"cur":""}">${w}</span>`).join(" ");
@@ -734,18 +738,20 @@ function key(e){au();spUnlock();const k=e.key;
  if(k.toLowerCase()===ex){stat().keys++;if(sp){sfx.blip();wordDone();return}ci++;sfx.blip();mario.tx+=STEP/w.length*0.3;if(ci>=w.length&&wi===words.length-1){wordDone();return}render();return}
  if(k===" "&&!sp)return;
  stat().miss++;const ek=sp?"␣":ex;save.stats.miss[ek]=(save.stats.miss[ek]||0)+1;wordMiss=true;sfx.boop();shake();
- const o=OPT();if(o.hide&&!rev&&!sp){hm++;if(o.nl){replayNL()}else if(o.sayw)say(hm>=2?w.split("").join(", "):w);if(hm>=2){rev=1;render()}}}
+ const o=OPT();if(o.hide&&!rev&&!sp){hm++;if(o.nl){say(o.sayq)}else if(o.sayw)say(hm>=2?w.split("").join(", "):w);if(hm>=2){rev=1;render()}}}
 function wordDone(){const w=words[wi];wi++;ci=0;sfx.word();mario.tx=Math.round((mario.tx-80)/STEP+0.7)*STEP+80;wordReact();am.tw=20;stat().words++;if(!wordMiss){const lw=w.toLowerCase();save.stats.mw[lw]=(save.stats.mw[lw]||0)+1}wordMiss=false;store();
  const o=OPT();if(o.fx&&o.fx.startsWith("n:")){const N=o.fx.slice(2);if(N[wi-1])playNotes(N[wi-1])}
  if(wi<words.length)say(words[wi]);else if(o.nl)say(o.sayq+" equals "+w);else if(!o.sayw)say(words.join(" "),"peach");else say(w);
- if(wi>=words.length){if(o.fx)applyFx(o.fx,true);if(o.nl&&NL)NL.k=99;doAction(MIS().s[si][1]);si++;if(si>=MIS().s.length){afterTyping();render();return}setTimeout(()=>{if(mode==="play")loadSentence()},o.nl||o.fx&&o.fx.startsWith("n:")?1800:900);words=[...words];render();wEl.innerHTML="⭐";return}
+ if(wi>=words.length){if(o.fx)applyFx(o.fx,true);if(o.nl&&NL&&NL.k<NL.vals.length-1){NL.k=NL.vals.length-1;NL.ht=t};doAction(MIS().s[si][1]);si++;if(si>=MIS().s.length){afterTyping();render();return}setTimeout(()=>{if(mode==="play")loadSentence()},o.nl||o.fx&&o.fx.startsWith("n:")?1800:900);words=[...words];render();wEl.innerHTML="⭐";return}
  render()}
 addEventListener("keydown",e=>{if(e.target.id==="ti")return;key(e)});
 const fake=k=>({key:k,preventDefault(){}});
 kbEl.addEventListener("pointerdown",e=>{const b=e.target.closest("b");if(!b)return;e.preventDefault();key(fake(b.dataset.k||b.textContent))});
 ov.addEventListener("pointerup",e=>{if(e.target.closest("button")||e.target.closest(".panel"))return;if(mode==="start")key(fake("x"));else if(mode==="done")key(fake("Enter"))});
 const ti=document.getElementById("ti");ti.addEventListener("input",()=>{for(const c of ti.value)key(fake(c));ti.value=""});
-wEl.addEventListener("pointerdown",()=>{if(mode==="play"){const o=OPT();if(o.nl)replayNL();else if(o.sayw)say(o.sayw);else say(words[wi])}if(TOUCH&&!showKb)ti.focus()});
+function nlTap(){if(mode!=="play"||!NL)return false;const last=NL.vals.length-1;if(NL.k>=last)return false;au();NL.k++;NL.ht=t;sfx.jump();if(window.speechSynthesis)speechSynthesis.cancel();say(String(NL.vals[NL.k]));return true}
+cv.addEventListener("pointerdown",e=>{if(nlTap())e.preventDefault()});
+wEl.addEventListener("pointerdown",()=>{if(mode==="play"){const o=OPT();if(o.nl)say(o.sayq);else if(o.sayw)say(o.sayw);else say(words[wi])}if(TOUCH&&!showKb)ti.focus()});
 function finish(){mode="done";ending=0;const before=doneCount(),wasDone=D(world)[tier][lvl];if(!warm){D(world)[tier][lvl]=1;store()}const newOutfit=!warm&&!wasDone&&Math.floor(doneCount()/3)>Math.floor(before/3)&&Math.floor(doneCount()/3)<OUTFITS.length;
  for(let i=0;i<10;i++)parts.push(p(mario.x-6*S,-30,i%2?"✋":"✨","#fff"));sfx.fan();const m=mario;
  if(CAS()){m.tx=bowserX-60;if(!bowserGone)bowserGone=1}else{m.tx=bowserX+STEP*.5-12*S;m.vy=-15;m.act="leap";m.actT=0}
@@ -811,7 +817,7 @@ function drawWorld(){const TH=MIS().theme,th=THEMES[TH],T=FAM[TH]||TH;
  for(const c of coins){if(c.fish){fish(ox+c.x,GY+c.y)}else coin(ox+c.x,GY-16*S+c.y)}
  cx.textAlign="center";for(const q of parts){cx.fillStyle=q.col;cx.font=`${S*7}px sans-serif`;cx.fillText(q.ch,ox+q.x,GY-16*S+q.y)}
  // level title
- cx.fillStyle="#fffd";cx.font=`bold ${S*6}px sans-serif`;cx.textAlign="left";cx.fillText(warm?MIS().name:`${TIERS[tier].name} · ${lvl+1}: ${MIS().name}`,14,S*9);
+ drawNL();cx.fillStyle="#fffd";cx.font=`bold ${S*6}px sans-serif`;cx.textAlign="left";cx.fillText(warm?MIS().name:`${TIERS[tier].name} · ${lvl+1}: ${MIS().name}`,14,S*9);
  const tot=MIS().s.length;cx.fillText("⭐".repeat(Math.min(si,tot)),14,S*17)}
 function cactus(x){cx.fillStyle="#3a9a3a";cx.fillRect(x,GY-S*24,S*5,S*24);cx.fillRect(x-S*5,GY-S*16,S*5,S*3);cx.fillRect(x-S*5,GY-S*21,S*3,S*6);cx.fillRect(x+S*5,GY-S*13,S*5,S*3);cx.fillRect(x+S*8,GY-S*19,S*3,S*7)}
 function tree(x){cx.fillStyle="#4a2a1a";cx.fillRect(x,GY-S*20,S*4,S*20);cx.fillStyle="#1f6a3a";cx.beginPath();cx.arc(x+S*2,GY-S*26,S*10,0,7);cx.fill();if((t>>4)%2){cx.fillStyle="#ffff80";cx.fillRect(x+S*8,GY-S*30,S,S)}}
@@ -870,6 +876,6 @@ function startWarm(){const top=Object.entries(save.stats.miss).sort((a,b)=>b[1]-
  let pick=bank.filter(w=>L.some(l=>w.includes(l))).sort(()=>Math.random()-.5);if(pick.length<9)pick=pick.concat(bank.sort(()=>Math.random()-.5)).slice(0,12);
  pick=pick.slice(0,12);const acts=["hop","block","star","stomp"],sn=[];for(let i=0;i<pick.length;i+=3)sn.push([pick.slice(i,i+3).join(" "),acts[sn.length%4]]);
  sn.forEach(x=>x[0]=nm(x[0]));startLevel(0,{name:"Warm-up: "+L.join(" ").toUpperCase(),theme:"hills",s:sn})}
-window.__mta={startWarm,showStickers,showParents,showGate,startLevel,finish,doAction,showSelect,setTier,markTier(t){save.done[t]=[1,1,1,1,1,1];for(const k in save.w)save.w[k][t][0]=1;store()},showMap,startQuiz,answerQ,buildMission,setWorld(w){world=w},get QZ(){return QZ},launch,canPlay,replayLocked,goNext,VLOG,pickVox,mathProb,pickPlayer,showPlayers,get PS(){return PS},get state(){return{PID,mode,tier,lvl,si,wi,ci,save,world,words,NL,rev}}};
+window.__mta={startWarm,showStickers,showParents,showGate,startLevel,finish,doAction,showSelect,setTier,markTier(t){save.done[t]=[1,1,1,1,1,1];for(const k in save.w)save.w[k][t][0]=1;store()},showMap,startQuiz,answerQ,buildMission,setWorld(w){world=w},get QZ(){return QZ},nlTap,launch,canPlay,replayLocked,goNext,VLOG,pickVox,mathProb,pickPlayer,showPlayers,get PS(){return PS},get state(){return{PID,mode,tier,lvl,si,wi,ci,save,world,words,NL,rev}}};
 showStart();loop();
 </script></body></html>
