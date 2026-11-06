@@ -561,13 +561,13 @@ function goNext(){if(window.speechSynthesis)speechSynthesis.cancel();if(warm){sh
 // world map
 function showMap(){ov.style.justifyContent="";ov.style.paddingTop="";mode="map";hud.classList.add("hidden");ov.classList.remove("hidden");if(!tierOpen(tier))tier=0;
  const cas=misOpen(tier,5,"read")||canPlay(tier,5,"read"),cd=save.done[tier][5];
- ov.innerHTML=`<h1 style="font-size:min(8vw,52px)">🗺️ ${HN()}'s World Map</h1><div class="grade"><div class="glabel">Grade level</div><input id="gr" type="range" min="0" max="3" step="1" value="${tier}" aria-label="Grade level">
+ if(window.speechSynthesis&&!PMAP)say(`Pick a world, ${HN()}!`,"peach");PMAP=0;ov.innerHTML=`<h1 style="font-size:min(8vw,52px)">🗺️ ${HN()}'s World Map</h1><div class="grade"><div class="glabel">Grade level</div><input id="gr" type="range" min="0" max="3" step="1" value="${tier}" aria-label="Grade level">
  <div class="ticks">${TIERS.map((T,i)=>`<span class="tick ${i===tier?"on":""}" data-t="${i}">${tierOpen(i)?"":"🔒 "}${T.name}</span>`).join("")}</div><div id="gmsg">${TIERS[tier].name}</div></div>
  <div id="worlds">${WORLDS.map(w=>{const d=D(w.id)[tier].filter(Boolean).length-(w.id==="read"&&cd?1:0),tot=w.id==="read"?5:6;return `<button data-w="${w.id}" style="background:${w.bg}"><span class="wi">${w.ic}</span>${w.n}<br><small>${"⭐".repeat(d)}${"☆".repeat(tot-d)}</small>${(()=>{const b=save.bonus[w.id][tier].reduce((a,c)=>a+c,0);return b?`<br><small>🌟 ${b} bonus</small>`:""})()}</button>`}).join("")}
  <button id="castleBtn" class="${cas?"":"lock"}" style="background:#5a5a6a">${cas?"🏰":"🔒"} Rescue Peach!<br><small>${cd?"👑 Peach is safe!":cas?"Bowser's castle is open!":"Reading 1-5 + mission 1 in every world"}</small></button></div>
  <div class="menu2"><button id="swBtn">👭 Switch player</button><button id="stkBtn">📒 Sticker Book</button><button id="parBtn">👪 Parents</button></div>`;
  ov.querySelectorAll("#worlds button[data-w]").forEach(b=>b.onclick=()=>{world=b.dataset.w;selIdx=0;showSelect()});
- document.getElementById("swBtn").onclick=showPlayers;document.getElementById("castleBtn").onclick=()=>{if(canPlay(tier,5,"read")){world="read";startLevel(5)}else if(misOpen(tier,5,"read")){world="read";showSelect();lockNote()}else{const m=document.getElementById("gmsg");m.textContent="🔒 Finish Reading 1-5 and the first mission in every world!";m.classList.remove("shake");void m.offsetWidth;m.classList.add("shake");sfx.boop()}};
+ document.getElementById("swBtn").onclick=showPlayers;document.getElementById("castleBtn").onclick=()=>{if(canPlay(tier,5,"read")){world="read";startLevel(5)}else if(misOpen(tier,5,"read")){world="read";showSelect();lockNote()}else{const m=document.getElementById("gmsg");m.textContent="🔒 Finish Reading 1-5 and the first mission in every world!";say("Finish Reading one to five and the first mission in every world to open the castle!","peach");m.classList.remove("shake");void m.offsetWidth;m.classList.add("shake");sfx.boop()}};
  document.getElementById("stkBtn").onclick=showStickers;document.getElementById("parBtn").onclick=showGate;
  const gr=document.getElementById("gr");gr.addEventListener("input",()=>setTier(+gr.value));gr.addEventListener("keydown",e=>e.stopPropagation());ov.querySelectorAll(".tick").forEach(e=>e.onclick=()=>{gr.value=e.dataset.t;setTier(+e.dataset.t)});}
 
@@ -578,7 +578,7 @@ const OF=(id=PID)=>id==="amelia"?[OUTFITS[1],OUTFITS[0],...OUTFITS.slice(2)]:OUT
 function setPlayer(id){PID=id;save=PS.saves[id];tier=save.tier||0;selIdx=0;world="read";store()}
 function portrait(id){const c=document.createElement("canvas"),k=8,m=PL[id].spr,pl=apal(id);c.width=12*k;c.height=16*k;const g=c.getContext("2d");m.forEach((r,y)=>[...r].forEach((ch,x)=>{if(pl[ch]){g.fillStyle=pl[ch];g.fillRect(x*k,y*k,k,k)}}));return c.toDataURL()}
 function showPlayers(){ov.style.justifyContent="";ov.style.paddingTop="";mode="players";hud.classList.add("hidden");ov.classList.remove("hidden");
- ov.innerHTML=`<h1 style="font-size:min(9vw,56px)">Who's playing?</h1><div id="pcards">${["amelia","valerie"].map((id,i)=>{const sv=PS.saves[id],d=sv.done.flat().filter(Boolean).length+Object.values(sv.w).flat(2).filter(Boolean).length;return `<button data-p="${id}" style="background:${PL[id].dress}"><img src="${portrait(id)}" alt=""><b>Princess ${PL[id].n}</b><small>${"⭐".repeat(Math.min(5,Math.ceil(d/3)))||"New adventure!"} · press ${i+1}</small></button>`}).join("")}</div>`;
+ say("Who's playing today?","peach");ov.innerHTML=`<h1 style="font-size:min(9vw,56px)">Who's playing?</h1><div id="pcards">${["amelia","valerie"].map((id,i)=>{const sv=PS.saves[id],d=sv.done.flat().filter(Boolean).length+Object.values(sv.w).flat(2).filter(Boolean).length;return `<button data-p="${id}" style="background:${PL[id].dress}"><img src="${portrait(id)}" alt=""><b>Princess ${PL[id].n}</b><small>${"⭐".repeat(Math.min(5,Math.ceil(d/3)))||"New adventure!"} · press ${i+1}</small></button>`}).join("")}</div>`;
  ov.querySelectorAll("#pcards button").forEach(b=>b.onclick=()=>pickPlayer(b.dataset.p))}
 function pickPlayer(id){setPlayer(id);say("Hi Princess "+HN()+"!","peach");showMap()}
 var tier=0;const ST=()=>TIERS[tier].m,MIS=()=>warm||curMis;
@@ -612,7 +612,7 @@ const chapDone=(t,w=world)=>D(w)[t].every(Boolean),replayLocked=(t,m,w=world)=>!
 function lockNote(){const m=document.getElementById("gmsg"),txt=`✅ You finished that one! Finish the rest of this world to play it again.`;if(m){m.textContent=txt;m.classList.remove("shake");void m.offsetWidth;m.classList.add("shake")}sfx.boop();say(`You finished that one, ${HN()}! Finish the rest of this world to play it again.`,"peach")}
 function launch(i){if(canPlay(tier,i))startLevel(i);else if(replayLocked(tier,i))lockNote();else sfx.boop()}
 function store(){PS.saves[PID]=save;PS.cur=PID;localStorage.setItem("mta_players",JSON.stringify(PS))}
-var mode="start",lvl=0,si=0,wi=0,ci=0,words=[],muted=false,showKb=true,selIdx=0;
+var PMAP=0,mode="start",lvl=0,si=0,wi=0,ci=0,words=[],muted=false,showKb=true,selIdx=0;
 let cp={x:0,y:0,vy:0},props=[],wc=0,am={x:0,y:0,vy:0,tw:0},lastK=0,wordMiss=false;let mario={x:80,tx:80,y:0,vy:0,face:1,anim:0,act:null,actT:0},cam=0,parts=[],coins=[],t=0,ending=0,bowserX=0,bowserGone=0;
 const cv=document.getElementById("game"),cx=cv.getContext("2d");let W,H,S,GY;
 const TOUCH=matchMedia("(pointer:coarse)").matches||"ontouchstart" in window;
@@ -636,12 +636,12 @@ function showStart(){ov.style.justifyContent="";ov.style.paddingTop="";mode="sta
 function gridHTML(){const cd=chapDone(tier);return wnames(world,tier).map((nm,i)=>{const d=D(world)[tier][i],lock=!misOpen(tier,i)&&!(d&&cd),rl=d&&!cd;return `<button data-i="${i}" class="${lock?"lock":rl?"donelock":d?"again":""} ${i===selIdx?"sel":""}">${lock?"🔒":d?"✅ ⭐⭐⭐":world==="read"&&i===5?"🏰":"▶️"}<br>${i+1}. ${nm}${d?`<br><small>${BST(world,tier,i)?"🌟".repeat(BST(world,tier,i)):"🌟 bonus test"}</small><br><small class="rp">${rl?"Done! Replay after the rest 🔒":"🔁 Play again!"}</small>`:""}</button>`}).join("")+(cd?`<div class="chap">🎉 Chapter complete! Every mission can be played again.</div>`:"")}
 function bindGrid(){ov.querySelectorAll("#levels button").forEach(b=>b.onclick=()=>launch(+b.dataset.i))}
 function setTier(v){const msg=document.getElementById("gmsg"),gr=document.getElementById("gr");
- if(!tierOpen(v)){if(gr)gr.value=tier;if(msg){msg.textContent=`🔒 Finish ${TIERS[v-1].name} to unlock ${TIERS[v].name}!`;msg.classList.remove("shake");void msg.offsetWidth;msg.classList.add("shake")}sfx.boop();return}
+ if(!tierOpen(v)){if(gr)gr.value=tier;if(msg){msg.textContent=`🔒 Finish ${TIERS[v-1].name} to unlock ${TIERS[v].name}!`;say(`Finish ${TIERS[v-1].name} to unlock ${TIERS[v].name}!`,"peach");msg.classList.remove("shake");void msg.offsetWidth;msg.classList.add("shake")}sfx.boop();return}
  tier=v;save.tier=v;store();selIdx=0;if(mode==="map"){showMap();return}{const f=firstTodo(tier);if(f>0&&misOpen(tier,f))selIdx=f}
  if(msg)msg.textContent=`${TIERS[v].name} missions`;document.getElementById("levels").innerHTML=gridHTML();bindGrid();
  ov.querySelectorAll(".tick").forEach((e,i)=>e.classList.toggle("on",i===v))}
 function showSelect(){ov.style.justifyContent="";ov.style.paddingTop="";mode="select";hud.classList.add("hidden");ov.classList.remove("hidden");if(!tierOpen(tier))tier=0;if(!misOpen(tier,selIdx))selIdx=0;if(replayLocked(tier,selIdx)){const f=firstTodo(tier);if(f>=0&&misOpen(tier,f))selIdx=f}
- const WW=WORLDS.find(x=>x.id===world);ov.innerHTML=`<h1>${WW.ic} ${WW.n}</h1><div class="grade"><div class="glabel">Grade level</div><input id="gr" type="range" min="0" max="3" step="1" value="${tier}" aria-label="Grade level">
+ const WW=WORLDS.find(x=>x.id===world);say(chapDone(tier)?`${WW.n}! Chapter complete. You can play any mission again.`:`${WW.n}! Pick your next mission.`,"peach");ov.innerHTML=`<h1>${WW.ic} ${WW.n}</h1><div class="grade"><div class="glabel">Grade level</div><input id="gr" type="range" min="0" max="3" step="1" value="${tier}" aria-label="Grade level">
  <div class="ticks">${TIERS.map((T,i)=>`<span class="tick ${i===tier?"on":""}" data-t="${i}">${tierOpen(i)?"":"🔒 "}${T.name}</span>`).join("")}</div><div id="gmsg">${TIERS[tier].name} missions</div></div>
  <div id="levels">${gridHTML()}</div>
  <div class="menu2"><button id="mapBtn">🗺️ World Map</button><button id="warmBtn">🔥 Warm-up</button><button id="stkBtn">📒 Sticker Book</button><button id="parBtn">👪 Parents</button></div>`;document.getElementById("mapBtn").onclick=showMap;
@@ -652,10 +652,10 @@ function showSelect(){ov.style.justifyContent="";ov.style.paddingTop="";mode="se
 function startLevel(i,w){warm=w||null;lvl=i;if(!w)curMis=buildMission(world,tier,i);QZ=null;SC={};NL=null;document.getElementById("kbNum").classList.toggle("hidden",MIS().kind!=="math");am={x:80-15*S,y:0,vy:0,tw:0};cp={x:80-29*S,y:0,vy:0};si=0;wi=0;ci=0;mode="play";ending=0;bowserGone=0;parts=[];coins=[];props=[];fw=[];
  mario={x:80,tx:80,y:0,vy:0,face:1,anim:0,act:null,actT:0,big:false};cam=0;
  const total=MIS().s.reduce((a,s)=>a+s[0].split(" ").length,0);bowserX=80+(total+3)*STEP;
- ov.classList.add("hidden");hud.classList.remove("hidden");if(!w)say(`${MIS().name}! Let's go, ${HN()}!`,"peach");loadSentence()}
+ ov.classList.add("hidden");hud.classList.remove("hidden");if(!w)say(`${MIS().name}! Let's go, ${HN()}!`,"peach");say(MIS().kind==="math"?"Alright, let's count!":"Alright, you got this!");loadSentence()}
 const OPT=()=>(MIS().s[si]&&MIS().s[si][2])||{};let hm=0,rev=0;
 function loadSentence(){words=MIS().s[si][0].split(" ");wi=0;ci=0;hm=0;rev=0;const o=OPT();SC={col:SC.col,shape:null};NL=null;if(o.fx)applyFx(o.fx,false);
- if(o.nl){NL={...o.nl,k:0,t0:t,ht:null};say(o.sayq);if(si===0)say("Tap the screen to count the hops!")}else if(o.sayw)say(o.sayw);else say(words[0]);render()}
+ if(o.nl){NL={...o.nl,k:0,t0:t,ht:null};say(o.sayq);if(si===0)say("Tap the screen to count the hops!","peach")}else if(o.sayw)say(o.sayw);else say(words[0]);render()}
 function replayNL(){const o=OPT();if(o.nl){NL={...o.nl,k:0,t0:t,ht:null};say(o.sayq)}}
 const needSp=()=>{const w=words[wi]||"";return w&&ci>=w.length&&wi<words.length-1};
 function render(){setTimeout(setGY,0);const o=OPT(),hid=o.hide&&!rev;
@@ -711,23 +711,26 @@ function goomba(x,y,flat){const h=flat?S*4:S*12,w=S*14,bob=flat?0:Math.sin(t/4)*
  cx.fillStyle="#3a2010";cx.fillRect(x-w*.45,y-S*2+bob,w*.35,S*2);cx.fillRect(x+w*.1,y-S*2-bob,w*.35,S*2)}
 function mushroom(x,y){const w=S*12;cx.fillStyle="#f5e6c8";cx.fillRect(x-w*.3,y-S*7,w*.6,S*7);cx.fillStyle="#e52521";cx.beginPath();cx.ellipse(x,y-S*7,w/2,S*6,0,Math.PI,0);cx.fill();cx.fillStyle="#fff";cx.beginPath();cx.arc(x-S*3,y-S*10,S*1.6,0,7);cx.arc(x+S*3,y-S*9,S*1.4,0,7);cx.fill();cx.fillStyle="#222";cx.fillRect(x-S*2,y-S*5,S,S*2);cx.fillRect(x+S,y-S*5,S,S*2)}
 function p(x,y,ch,col){return{x,y,vx:(Math.random()-.5)*6,vy:-Math.random()*6-2,life:60+Math.random()*30,ch,col}}
-// character voices: Peach = story/praise/quiz (warm, slower), Mario = coaching/target words (bright, quicker). Styled system voices only, no audio clips.
-let VOX=[],VPK=null;function loadVox(){try{VOX=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));VPK=null}catch(e){}}
+// ONLY two speakers exist: Peach (lobby, menus, instructions, story, quizzes, praise) and Mario (in-mission coaching: target word/letter, spelling word, math problem, hop counts).
+// Styled system voices only, no audio clips. Nothing is spoken until both voices are chosen (no browser-default voice ever).
+let VOX=[],VPK=null,SQ=[];function loadVox(){try{VOX=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));VPK=null}catch(e){}if(VOX.length&&SQ.length){const now=Date.now(),q=SQ.filter(x=>now-x[2]<4000).slice(-3);SQ=[];q.forEach(x=>speakAs(x[0],x[1]))}}
 if(window.speechSynthesis){loadVox();try{speechSynthesis.addEventListener("voiceschanged",loadVox)}catch(e){speechSynthesis.onvoiceschanged=loadVox}}
 const FEMV=/female|samantha|victoria|karen|moira|tessa|zira|susan|aria|jenny|serena|allison|ava\b|fiona|kate|libby|sonia|natasha|catherine|joanna|salli|kimberly|google us english|google uk english female/i,
- MALV=/\bmale|daniel|alex\b|fred|david|mark\b|guy\b|ryan|aaron|oliver|thomas|rishi|tom\b|arthur|eddy|reed|matthew|joey|justin|google uk english male/i;
+ MALV=/\bmale|daniel|alex\b|fred|david|mark\b|guy\b|ryan|aaron|oliver|thomas|rishi|tom\b|arthur|eddy|reed|matthew|joey|justin|eric\b|davis|jason|tony|andrew|brian|christopher|roger|steffan|google uk english male/i;
 function pickVox(){if(!VOX.length)loadVox();if(VPK&&VPK.n===VOX.length)return VPK;const us=v=>/en[-_]US/i.test(v.lang)?0:1,srt=a=>a.sort((x,y)=>us(x)-us(y));
  const NOV=/junior|princess|bubbles|bells|whisper|bahh|boing|cellos|deranged|hysterical|organ|trinoids|zarvox|albert|bad news|good news|superstar|wobble|jester|grandma|grandpa|child|kid/i,
-  MRANK=["guy","aaron","alex","tom","ryan","eric","daniel","google us english male","davis","jason","tony","mark","david","thomas","oliver","rishi","arthur","fred"],PRANK=["samantha","zira","google us english","aria","jenny","ava","allison","susan","joanna","salli","kimberly","victoria","karen","serena","moira","tessa","fiona","kate","libby","sonia"],
-  rk=L=>v=>{const n=v.name.toLowerCase(),i=L.findIndex(k=>n.includes(k));return(i<0?L.length:i)*2+us(v)},isM=v=>MALV.test(v.name)&&!/female/i.test(v.name),OK=VOX.filter(v=>!NOV.test(v.name));
+  MRANK=["guy","aaron","eric","tom","davis","jason","tony","andrew","brian","christopher","roger","steffan","alex","google us english male","mark","david","daniel","ryan","thomas","oliver","rishi","arthur","fred"],PRANK=["samantha","zira","google us english","aria","jenny","ava","allison","susan","joanna","salli","kimberly","victoria","karen","serena","moira","tessa","fiona","kate","libby","sonia"],
+  rk=L=>v=>{const n=v.name.toLowerCase(),i=L.findIndex(k=>n.includes(k));return us(v)*1000+(i<0?L.length:i)},isM=v=>MALV.test(v.name)&&!/female/i.test(v.name),OK=VOX.filter(v=>!NOV.test(v.name));
  const fem=OK.filter(v=>FEMV.test(v.name)&&!isM(v)).sort((x,y)=>rk(PRANK)(x)-rk(PRANK)(y)),mal=OK.filter(isM).sort((x,y)=>rk(MRANK)(x)-rk(MRANK)(y));
  const peach=fem[0]||srt([...OK])[0]||VOX[0]||null,mario=mal[0]||OK.find(v=>v!==peach&&!FEMV.test(v.name))||peach;return VPK={n:VOX.length,peach,mario}}
-// Movie-style restyle (original settings only: no clips, no accent, no catchphrases). Mario: warm, earnest, medium-low. Peach: clear, confident, medium-high.
-const VSET={two:{mario:{rate:.96,pitch:.92},peach:{rate:.94,pitch:1.15}},one:{mario:{rate:.94,pitch:.88},peach:{rate:.92,pitch:1.18}}};
+// Mario: friendly Brooklyn/NYC guy - snappy, conversational, medium-low and warm (no accent faking; learning words spoken plainly).
+// Peach: clear, confident, medium-high lobby/teacher voice.
+const VSET={two:{mario:{rate:1.05,pitch:.94},peach:{rate:.94,pitch:1.15}},one:{mario:{rate:1.06,pitch:.9},peach:{rate:.92,pitch:1.18}}};
 const VLOG=[];
-function say(txt,role="mario"){if(muted||!window.speechSynthesis||!txt)return;txt=nm(txt);role=role==="peach"?"peach":"mario";try{const u=new SpeechSynthesisUtterance(txt),V=pickVox(),v=V[role],c=VSET[V.mario&&V.peach&&V.mario!==V.peach?"two":"one"][role];
- if(v){u.voice=v;u.lang=v.lang}else u.lang="en-US";u.rate=c.rate;u.pitch=c.pitch;VLOG.push({role,text:txt,rate:c.rate,pitch:c.pitch,voice:v?v.name:null});if(VLOG.length>80)VLOG.shift();speechSynthesis.speak(u)}catch(e){}}
-let spOk=false;function spUnlock(){if(spOk||!window.speechSynthesis)return;spOk=true;try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u)}catch(e){}}
+function speakAs(txt,role){const V=pickVox(),v=V[role];if(!v||!V.mario||!V.peach){SQ.push([txt,role,Date.now()]);if(SQ.length>6)SQ.shift();return false}
+ const c=VSET[V.mario!==V.peach?"two":"one"][role];try{const u=new SpeechSynthesisUtterance(txt);u.voice=v;u.lang=v.lang;u.rate=c.rate;u.pitch=c.pitch;speechSynthesis.speak(u);VLOG.push({role,text:txt,rate:c.rate,pitch:c.pitch,voice:v.name});if(VLOG.length>80)VLOG.shift();return true}catch(e){return false}}
+function say(txt,role="mario"){if(muted||!window.speechSynthesis||!txt)return;txt=nm(txt);role=role==="peach"?"peach":"mario";speakAs(txt,role)}
+let spOk=false;function spUnlock(){if(spOk||!window.speechSynthesis)return;const V=pickVox();if(!V.peach)return;spOk=true;try{const u=new SpeechSynthesisUtterance(" ");u.voice=V.peach;u.lang=V.peach.lang;u.volume=0;speechSynthesis.speak(u)}catch(e){}}
 const dkey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 function stat(){const k=dkey(new Date());return save.stats.days[k]||(save.stats.days[k]={keys:0,miss:0,words:0,ms:0})}
 function key(e){au();spUnlock();const k=e.key;
@@ -743,7 +746,7 @@ function key(e){au();spUnlock();const k=e.key;
  const w=words[wi];if(!w)return;const now=Date.now();if(lastK&&now-lastK<10000)stat().ms+=now-lastK;lastK=now;const sp=needSp(),ex=sp?" ":w[ci].toLowerCase();
  if(k.toLowerCase()===ex){stat().keys++;if(sp){sfx.blip();wordDone();return}ci++;sfx.blip();mario.tx+=STEP/w.length*0.3;if(ci>=w.length&&wi===words.length-1){wordDone();return}render();return}
  if(k===" "&&!sp)return;
- stat().miss++;const ek=sp?"␣":ex;save.stats.miss[ek]=(save.stats.miss[ek]||0)+1;wordMiss=true;sfx.boop();shake();
+ stat().miss++;const ek=sp?"␣":ex;if(sp&&Date.now()-(window.__spR||0)>5000){window.__spR=Date.now();say("Press the space bar with your thumb!","peach")}save.stats.miss[ek]=(save.stats.miss[ek]||0)+1;wordMiss=true;sfx.boop();shake();
  const o=OPT();if(o.hide&&!rev&&!sp){hm++;if(o.nl){say(o.sayq)}else if(o.sayw)say(hm>=2?w.split("").join(", "):w);if(hm>=2){rev=1;render()}}}
 function wordDone(){const w=words[wi];wi++;ci=0;sfx.word();mario.tx=Math.round((mario.tx-80)/STEP+0.7)*STEP+80;wordReact();am.tw=20;stat().words++;if(!wordMiss){const lw=w.toLowerCase();save.stats.mw[lw]=(save.stats.mw[lw]||0)+1}wordMiss=false;store();
  const o=OPT();if(o.fx&&o.fx.startsWith("n:")){const N=o.fx.slice(2);if(N[wi-1])playNotes(N[wi-1])}
