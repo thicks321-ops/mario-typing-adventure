@@ -26,7 +26,7 @@ html,body{height:100dvh}
 #overlay .tip{font-size:18px;margin-top:24px;max-width:700px;background:#0007;padding:8px 14px;border-radius:10px;text-shadow:none}
 #levels{display:grid;grid-template-columns:repeat(3,minmax(140px,220px));gap:16px;margin:10px}
 #levels button{font:inherit;font-size:22px;padding:14px;border-radius:18px;border:4px solid #333;background:#fff;color:#333;cursor:pointer;text-shadow:none}
-#levels button.lock{background:#999;cursor:default}#levels button.sel{outline:6px solid #ffd800}
+#levels button.lock{background:#999;cursor:default}#levels button.donelock{background:#dff3df;color:#557;border-style:dashed;cursor:default}#levels button.again{background:#fff3b0}#levels .rp{font-size:.62em;display:block;line-height:1.1}.chap{grid-column:1/-1;font-size:min(4.6vw,20px);background:#fff3b0;color:#333;text-shadow:none;border-radius:14px;padding:6px 10px}#levels button.sel{outline:6px solid #ffd800}
 .hidden{display:none!important}
 #kbrow{display:flex;align-items:flex-end;gap:10px}.hand{display:flex;align-items:flex-end;gap:3px;padding:6px 6px 0;background:#ffe0c8;border-radius:22px 22px 10px 10px;border:2px solid #0004;margin-bottom:2px}
 .fg{width:clamp(9px,1.4vw,16px);border-radius:8px 8px 3px 3px;border:2px solid #0005;transition:transform .15s}.fg.th{background:#e8c4a8}.fg.on{transform:translateY(-10px) scale(1.2);box-shadow:0 0 10px 3px #ff0;border-color:#000}
@@ -549,17 +549,17 @@ function endQuiz(){const n=QZ.list.length,need=Math.ceil(n*.75),R=save.qz[world]
  ov.innerHTML=`<h1 style="font-size:min(8vw,46px)">${got?`You earned ${"🌟".repeat(got)}!`:"Good try! 💜"}</h1><div class="panel"><p style="font-size:min(5vw,24px);text-align:center">${HN()} remembered <b>${QZ.right}</b> of ${n}.<br>${got?`<b>+${got} bonus star${got>1?"s":""}</b> from the remembering test!`:"No bonus stars this time. Your mission stars are safe! ⭐⭐⭐"}${best>got?`<br>Your best is still ${"🌟".repeat(best)}`:""}</p>${QZ.missed.map(q=>`<p>❓ ${q.q}<br>✅ <b>${q.a}</b></p>`).join("")}<p style="opacity:.7;text-align:center">Bonus stars: all ${n} right = 🌟🌟🌟 · ${need}+ right = 🌟🌟 · ${Math.ceil(n/2)}+ right = 🌟</p></div><div class="menu2">${best<3?`<button id="retryQ" style="font-size:min(5vw,24px)">🔁 Try again for more 🌟</button>`:""}<button id="contQ" style="font-size:min(5vw,24px);background:#ffe066">Keep going ▶</button></div>`;
  say(got?`Wonderful, ${HN()}! You earned ${got} bonus star${got>1?"s":""}!`:`Good try, ${HN()}! Your mission is still done.`,"peach");
  const rq=document.getElementById("retryQ");if(rq)rq.onclick=startQuiz;document.getElementById("contQ").onclick=goNext;QZ=null}
-function goNext(){if(window.speechSynthesis)speechSynthesis.cancel();if(warm){showSelect();return}if(world==="read"&&lvl===4){showMap();return}if(lvl<5&&misOpen(tier,lvl+1))startLevel(lvl+1);else{if(CAS()&&tier<3&&tierOpen(tier+1)){tier++;save.tier=tier;store();selIdx=0}showMap()}}
+function goNext(){if(window.speechSynthesis)speechSynthesis.cancel();if(warm){showSelect();return}if(world==="read"&&lvl===4&&!chapDone(tier)){showMap();return}const nx=chapDone(tier)?(lvl<5?lvl+1:-1):firstTodo(tier);if(nx>=0&&canPlay(tier,nx))startLevel(nx);else{if(CAS()&&tier<3&&tierOpen(tier+1)){tier++;save.tier=tier;store();selIdx=0}showMap()}}
 // world map
 function showMap(){ov.style.justifyContent="";ov.style.paddingTop="";mode="map";hud.classList.add("hidden");ov.classList.remove("hidden");if(!tierOpen(tier))tier=0;
- const cas=misOpen(tier,5,"read"),cd=save.done[tier][5];
+ const cas=misOpen(tier,5,"read")||canPlay(tier,5,"read"),cd=save.done[tier][5];
  ov.innerHTML=`<h1 style="font-size:min(8vw,52px)">🗺️ ${HN()}'s World Map</h1><div class="grade"><div class="glabel">Grade level</div><input id="gr" type="range" min="0" max="3" step="1" value="${tier}" aria-label="Grade level">
  <div class="ticks">${TIERS.map((T,i)=>`<span class="tick ${i===tier?"on":""}" data-t="${i}">${tierOpen(i)?"":"🔒 "}${T.name}</span>`).join("")}</div><div id="gmsg">${TIERS[tier].name}</div></div>
  <div id="worlds">${WORLDS.map(w=>{const d=D(w.id)[tier].filter(Boolean).length-(w.id==="read"&&cd?1:0),tot=w.id==="read"?5:6;return `<button data-w="${w.id}" style="background:${w.bg}"><span class="wi">${w.ic}</span>${w.n}<br><small>${"⭐".repeat(d)}${"☆".repeat(tot-d)}</small>${(()=>{const b=save.bonus[w.id][tier].reduce((a,c)=>a+c,0);return b?`<br><small>🌟 ${b} bonus</small>`:""})()}</button>`}).join("")}
  <button id="castleBtn" class="${cas?"":"lock"}" style="background:#5a5a6a">${cas?"🏰":"🔒"} Rescue Peach!<br><small>${cd?"👑 Peach is safe!":cas?"Bowser's castle is open!":"Reading 1-5 + mission 1 in every world"}</small></button></div>
  <div class="menu2"><button id="swBtn">👭 Switch player</button><button id="stkBtn">📒 Sticker Book</button><button id="parBtn">👪 Parents</button><button id="reset">Reset progress</button></div>`;
  ov.querySelectorAll("#worlds button[data-w]").forEach(b=>b.onclick=()=>{world=b.dataset.w;selIdx=0;showSelect()});
- document.getElementById("swBtn").onclick=showPlayers;document.getElementById("castleBtn").onclick=()=>{if(misOpen(tier,5,"read")){world="read";startLevel(5)}else{const m=document.getElementById("gmsg");m.textContent="🔒 Finish Reading 1-5 and the first mission in every world!";m.classList.remove("shake");void m.offsetWidth;m.classList.add("shake");sfx.boop()}};
+ document.getElementById("swBtn").onclick=showPlayers;document.getElementById("castleBtn").onclick=()=>{if(canPlay(tier,5,"read")){world="read";startLevel(5)}else if(misOpen(tier,5,"read")){world="read";showSelect();lockNote()}else{const m=document.getElementById("gmsg");m.textContent="🔒 Finish Reading 1-5 and the first mission in every world!";m.classList.remove("shake");void m.offsetWidth;m.classList.add("shake");sfx.boop()}};
  document.getElementById("stkBtn").onclick=showStickers;document.getElementById("parBtn").onclick=showGate;
  const gr=document.getElementById("gr");gr.addEventListener("input",()=>setTier(+gr.value));gr.addEventListener("keydown",e=>e.stopPropagation());ov.querySelectorAll(".tick").forEach(e=>e.onclick=()=>{gr.value=e.dataset.t;setTier(+e.dataset.t)});
  document.getElementById("reset").onclick=()=>{if(confirm("Reset "+HN()+"'s progress?")){save=mig(blank());tier=0;store();selIdx=0;showMap()}}}
@@ -600,6 +600,10 @@ var PID=PS.cur||"amelia";save=PS.saves[PID];
 tier=save.tier||0;save.stats=save.stats||{days:{},mw:{},miss:{}};save.outfit=save.outfit||0;
 const doneCount=()=>save.done.flat().filter(Boolean).length+Object.values(save.w).flat(2).filter(Boolean).length,outfitOpen=i=>i<=Math.floor(doneCount()/3);
 const tierOpen=t=>t===0||save.done[t-1].every(Boolean),misOpen=(t,m,w=world)=>tierOpen(t)&&(m===0||!!D(w)[t][m-1])&&(w!=="read"||m!==5||WORLDS.every(x=>x.id==="read"||!!D(x.id)[t][0])),CAS=()=>world==="read"&&lvl===5&&!warm;
+// replay lock: a finished mission can only be replayed once its whole chapter (world + grade, all 6) is finished
+const chapDone=(t,w=world)=>D(w)[t].every(Boolean),replayLocked=(t,m,w=world)=>!!D(w)[t][m]&&!chapDone(t,w),canPlay=(t,m,w=world)=>tierOpen(t)&&(chapDone(t,w)||misOpen(t,m,w)&&!replayLocked(t,m,w)),firstTodo=(t,w=world)=>D(w)[t].findIndex(x=>!x);
+function lockNote(){const m=document.getElementById("gmsg"),txt=`✅ You finished that one! Finish the rest of this world to play it again.`;if(m){m.textContent=txt;m.classList.remove("shake");void m.offsetWidth;m.classList.add("shake")}sfx.boop();say(`You finished that one, ${HN()}! Finish the rest of this world to play it again.`,"peach")}
+function launch(i){if(canPlay(tier,i))startLevel(i);else if(replayLocked(tier,i))lockNote();else sfx.boop()}
 function store(){PS.saves[PID]=save;PS.cur=PID;localStorage.setItem("mta_players",JSON.stringify(PS))}
 var mode="start",lvl=0,si=0,wi=0,ci=0,words=[],muted=false,showKb=true,selIdx=0;
 let cp={x:0,y:0,vy:0},props=[],wc=0,am={x:0,y:0,vy:0,tw:0},lastK=0,wordMiss=false;let mario={x:80,tx:80,y:0,vy:0,face:1,anim:0,act:null,actT:0},cam=0,parts=[],coins=[],t=0,ending=0,bowserX=0,bowserGone=0;
@@ -621,14 +625,14 @@ Object.assign(FING,{"1":0,"2":1,"3":2,"4":3,"5":3,"6":4,"7":4,"8":2,"9":1,"0":0}
 kbEl.innerHTML=`<div id="kbNum">${[..."1234567890"].map(k=>`<b id="k_${k}" class="f${FING[k]}">${k}</b>`).join("")}</div>`+ROWS.map(r=>"<div>"+[...r].map(k=>`<b id="k_${k}" class="f${FING[k]}${"fj".includes(k)?" home":""}">${k}</b>`).join("")+"</div>").join("")+`<div><b id="k_space" class="sp" data-k=" ">space</b></div>`;
 function showStart(){ov.style.justifyContent="";ov.style.paddingTop="";mode="start";hud.classList.add("hidden");ov.classList.remove("hidden");
  ov.innerHTML=`<h1>Princess Amelia &amp; Valerie's Typing Adventure</h1><div style="font-size:clamp(20px,3vw,32px)">👑 Help Mario rescue Princess Peach! 🍄</div><p class="big"><span class="tk">Tap or press any key to start</span></p><div class="tip">👪 Parent tip: sit with your child, keep fingers on the home row (bumps on F and J). The glowing key on the keyboard shows what to press next. No timers, no wrong answers — just fun!</div>`}
-function gridHTML(){return wnames(world,tier).map((nm,i)=>{const lock=!misOpen(tier,i),d=D(world)[tier][i];return `<button data-i="${i}" class="${lock?"lock":""} ${i===selIdx?"sel":""}">${lock?"🔒":d?"⭐⭐⭐":world==="read"&&i===5?"🏰":"▶️"}<br>${i+1}. ${nm}${d?`<br><small>${BST(world,tier,i)?"🌟".repeat(BST(world,tier,i)):"🌟 bonus test"}</small>`:""}</button>`}).join("")}
-function bindGrid(){ov.querySelectorAll("#levels button").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(misOpen(tier,i))startLevel(i)})}
+function gridHTML(){const cd=chapDone(tier);return wnames(world,tier).map((nm,i)=>{const d=D(world)[tier][i],lock=!misOpen(tier,i)&&!(d&&cd),rl=d&&!cd;return `<button data-i="${i}" class="${lock?"lock":rl?"donelock":d?"again":""} ${i===selIdx?"sel":""}">${lock?"🔒":d?"✅ ⭐⭐⭐":world==="read"&&i===5?"🏰":"▶️"}<br>${i+1}. ${nm}${d?`<br><small>${BST(world,tier,i)?"🌟".repeat(BST(world,tier,i)):"🌟 bonus test"}</small><br><small class="rp">${rl?"Done! Replay after the rest 🔒":"🔁 Play again!"}</small>`:""}</button>`}).join("")+(cd?`<div class="chap">🎉 Chapter complete! Every mission can be played again.</div>`:"")}
+function bindGrid(){ov.querySelectorAll("#levels button").forEach(b=>b.onclick=()=>launch(+b.dataset.i))}
 function setTier(v){const msg=document.getElementById("gmsg"),gr=document.getElementById("gr");
  if(!tierOpen(v)){if(gr)gr.value=tier;if(msg){msg.textContent=`🔒 Finish ${TIERS[v-1].name} to unlock ${TIERS[v].name}!`;msg.classList.remove("shake");void msg.offsetWidth;msg.classList.add("shake")}sfx.boop();return}
- tier=v;save.tier=v;store();selIdx=0;if(mode==="map"){showMap();return}while(selIdx<5&&misOpen(tier,selIdx+1)&&D(world)[tier][selIdx])selIdx++;
+ tier=v;save.tier=v;store();selIdx=0;if(mode==="map"){showMap();return}{const f=firstTodo(tier);if(f>0&&misOpen(tier,f))selIdx=f}
  if(msg)msg.textContent=`${TIERS[v].name} missions`;document.getElementById("levels").innerHTML=gridHTML();bindGrid();
  ov.querySelectorAll(".tick").forEach((e,i)=>e.classList.toggle("on",i===v))}
-function showSelect(){ov.style.justifyContent="";ov.style.paddingTop="";mode="select";hud.classList.add("hidden");ov.classList.remove("hidden");if(!tierOpen(tier))tier=0;if(!misOpen(tier,selIdx))selIdx=0;
+function showSelect(){ov.style.justifyContent="";ov.style.paddingTop="";mode="select";hud.classList.add("hidden");ov.classList.remove("hidden");if(!tierOpen(tier))tier=0;if(!misOpen(tier,selIdx))selIdx=0;if(replayLocked(tier,selIdx)){const f=firstTodo(tier);if(f>=0&&misOpen(tier,f))selIdx=f}
  const WW=WORLDS.find(x=>x.id===world);ov.innerHTML=`<h1>${WW.ic} ${WW.n}</h1><div class="grade"><div class="glabel">Grade level</div><input id="gr" type="range" min="0" max="3" step="1" value="${tier}" aria-label="Grade level">
  <div class="ticks">${TIERS.map((T,i)=>`<span class="tick ${i===tier?"on":""}" data-t="${i}">${tierOpen(i)?"":"🔒 "}${T.name}</span>`).join("")}</div><div id="gmsg">${TIERS[tier].name} missions</div></div>
  <div id="levels">${gridHTML()}</div>
@@ -721,7 +725,7 @@ function key(e){au();spUnlock();const k=e.key;
  if(mode==="quiz"){if(QZ&&"123".includes(k)&&k.length===1&&QZ.list[QZ.i].o[+k-1]!==undefined)answerQ(+k-1);return}
  if(mode==="review"||mode==="bonusdone"){if(k==="Enter"||k===" ")goNext();return}
  if(mode==="map"){return}
- if(mode==="select"){let n=selIdx;if(k==="ArrowRight")n++;else if(k==="ArrowLeft")n--;else if(k==="ArrowDown")n+=3;else if(k==="ArrowUp")n-=3;else if(k==="Enter"||k===" "){if(misOpen(tier,selIdx))startLevel(selIdx);return}else return;if(n>=0&&n<6&&misOpen(tier,n))selIdx=n;document.getElementById("levels").innerHTML=gridHTML();bindGrid();return}
+ if(mode==="select"){let n=selIdx;if(k==="ArrowRight")n++;else if(k==="ArrowLeft")n--;else if(k==="ArrowDown")n+=3;else if(k==="ArrowUp")n-=3;else if(k==="Enter"||k===" "){launch(selIdx);return}else return;if(n>=0&&n<6&&misOpen(tier,n))selIdx=n;document.getElementById("levels").innerHTML=gridHTML();bindGrid();return}
  if(mode==="done"){if(ending>90&&(k==="Enter"||k===" "))goNext();else if(!warm&&ending>90&&(k==="b"||k==="B"||k==="1"))startQuiz();return}
  if(mode!=="play"||k.length!==1||e.ctrlKey||e.metaKey)return;e.preventDefault();
  const w=words[wi];if(!w)return;const now=Date.now();if(lastK&&now-lastK<10000)stat().ms+=now-lastK;lastK=now;const sp=needSp(),ex=sp?" ":w[ci].toLowerCase();
@@ -864,6 +868,6 @@ function startWarm(){const top=Object.entries(save.stats.miss).sort((a,b)=>b[1]-
  let pick=bank.filter(w=>L.some(l=>w.includes(l))).sort(()=>Math.random()-.5);if(pick.length<9)pick=pick.concat(bank.sort(()=>Math.random()-.5)).slice(0,12);
  pick=pick.slice(0,12);const acts=["hop","block","star","stomp"],sn=[];for(let i=0;i<pick.length;i+=3)sn.push([pick.slice(i,i+3).join(" "),acts[sn.length%4]]);
  sn.forEach(x=>x[0]=nm(x[0]));startLevel(0,{name:"Warm-up: "+L.join(" ").toUpperCase(),theme:"hills",s:sn})}
-window.__mta={startWarm,showStickers,showParents,showGate,startLevel,finish,doAction,showSelect,setTier,markTier(t){save.done[t]=[1,1,1,1,1,1];for(const k in save.w)save.w[k][t][0]=1;store()},showMap,startQuiz,answerQ,buildMission,setWorld(w){world=w},get QZ(){return QZ},goNext,VLOG,pickVox,mathProb,pickPlayer,showPlayers,get PS(){return PS},get state(){return{PID,mode,tier,lvl,si,wi,ci,save,world,words,NL,rev}}};
+window.__mta={startWarm,showStickers,showParents,showGate,startLevel,finish,doAction,showSelect,setTier,markTier(t){save.done[t]=[1,1,1,1,1,1];for(const k in save.w)save.w[k][t][0]=1;store()},showMap,startQuiz,answerQ,buildMission,setWorld(w){world=w},get QZ(){return QZ},launch,canPlay,replayLocked,goNext,VLOG,pickVox,mathProb,pickPlayer,showPlayers,get PS(){return PS},get state(){return{PID,mode,tier,lvl,si,wi,ci,save,world,words,NL,rev}}};
 showStart();loop();
 </script></body></html>
